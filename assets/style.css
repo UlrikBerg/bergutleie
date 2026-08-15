@@ -548,9 +548,9 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   /* Heroen blir ett bilde med teksten liggende oppå, så den tar
      mindre av skjermen og gir et roligere førsteinntrykk. */
   .hero {
-    position: relative; display: block;
-    padding: 0; margin-top: 30px;
-    min-height: 540px; border-radius: 18px; overflow: hidden;
+    position: relative;
+    padding: 0; margin: 0 calc(50% - 50vw);
+    width: 100vw; min-height: 540px; overflow: hidden;
     display: flex; align-items: flex-end;
   }
   .hero-media { position: absolute; inset: 0; z-index: 0; }
@@ -561,16 +561,16 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .hero::after {
     content: ""; position: absolute; inset: 0; z-index: 1;
     background: linear-gradient(to top,
-      rgba(10,30,32,.95) 0%, rgba(10,30,32,.90) 42%,
-      rgba(10,30,32,.72) 68%, rgba(10,30,32,.34) 88%, rgba(10,30,32,.18) 100%);
+      rgba(10,30,32,.80) 0%, rgba(10,30,32,.70) 44%,
+      rgba(10,30,32,.46) 70%, rgba(10,30,32,.16) 90%, rgba(10,30,32,0) 100%);
   }
-  .hero-tekst { position: relative; z-index: 2; padding: 30px 24px 28px; width: 100%; }
-  .hero h1 { color: #fff; font-size: 34px; margin-bottom: 14px; }
-  .hero .lead { color: rgba(255,255,255,.93); font-size: 15.5px; line-height: 1.55; margin-bottom: 22px; }
+  .hero-tekst { position: relative; z-index: 2; padding: 30px 20px 30px; width: 100%; }
+  .hero h1 { color: #fff; font-size: 34px; margin-bottom: 14px; text-shadow: 0 2px 14px rgba(8,24,26,.55); }
+  .hero .lead { color: #fff; font-size: 15.5px; line-height: 1.55; margin-bottom: 22px; text-shadow: 0 1px 10px rgba(8,24,26,.6); }
   .hero-actions { margin-bottom: 20px; }
   .hero .btn-ghost { border-color: rgba(255,255,255,.5); color: #fff; background: rgba(255,255,255,.08); }
   .hero .btn-ghost:hover { background: rgba(255,255,255,.18); border-color: #fff; color: #fff; }
-  .usp { color: rgba(255,255,255,.88); font-size: 13.5px; }
+  .usp { color: #fff; font-size: 13.5px; text-shadow: 0 1px 8px rgba(8,24,26,.6); }
   .site-header .wrap { gap: 14px; }
 
   /* Menyen legger seg under topplinjen når den åpnes */
