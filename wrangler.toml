@@ -13,3 +13,6 @@ directory = "./dist"
 binding = "ASSETS"
 # Serverer dist/404.html når adressen ikke finnes
 not_found_handling = "404-page"
+# Worker-koden må kjøre før filene, ellers ville www.bergutleie.no fått
+# servert index.html direkte og aldri blitt omdirigert til apex-domenet.
+run_worker_first = true

@@ -1,8 +1,10 @@
-# Cloudflare Pages – omdirigeringer (ekte 301, det GitHub Pages ikke kunne gi oss)
+# Omdirigeringer – ekte 301-er
+#
 # Format:  /gammel-sti  /ny-sti  301
 #
-# Regelen under samler www på apex-domenet, så Google ser én kanonisk versjon.
-https://www.bergutleie.no/* https://bergutleie.no/:splat 301
-
-# Legg nye linjer her når en side bytter URL. Aldri slett en gammel regel –
-# den er det som bevarer rankingen og innkommende lenker.
+# MERK: Bare relative stier er tillatt her. Omdirigering mellom
+# domener (www → bergutleie.no) ligger i src/index.js, fordi
+# Cloudflare avviser absolutte URL-er i denne fila.
+#
+# Legg nye linjer her når en side bytter URL. Aldri slett en gammel
+# regel – den er det som bevarer rankingen og innkommende lenker.
