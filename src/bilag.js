@@ -27,9 +27,16 @@ export function lagBilag(d) {
 
   /* --- topp: logo og dokumenttype --- */
   p.logo(V, y - 34, 104);
-  p.tekst(H, y + 6, 'TILBUD', { fet: true, str: 9, f: DEMPET2, hoyre: true });
-  p.tekst(H, y - 16, '#' + d.tilbudsnr, { fet: true, str: 22, f: AKSENT, hoyre: true });
-  p.tekst(H, y - 32, d.utstedt, { str: 9, f: DEMPET2, hoyre: true });
+
+  // Logoen er allerede en kraftig oransje flate. Tilbudsnummeret settes
+  // derfor i mørk skrift, med en kort strek som eneste aksent - to sterke
+  // oransje elementer på samme linje drar i hver sin retning.
+  p.rekt(H - 26, y + 23, 26, 2, AKSENT);
+  p.tekst(H, y + 6, 'TILBUD', { fet: true, str: 7.5, f: DEMPET2, hoyre: true, sperre: 2.4 });
+  const nr = String(d.tilbudsnr);
+  p.tekst(H - bredde(nr, 20, true) - 4.5, y - 16, '#', { fet: true, str: 12, f: DEMPET2 });
+  p.tekst(H, y - 16, nr, { fet: true, str: 20, f: INK, hoyre: true });
+  p.tekst(H, y - 34, d.utstedt, { str: 8.5, f: DEMPET2, hoyre: true });
 
   y -= 62;
   p.rekt(V, y, H - V, 1.2, INK);
@@ -148,13 +155,16 @@ export function lagBilag(d) {
   p.tekst(V, 54, `Org.nr. ${d.orgnr}   ·   Konto ${d.kontonr}`, { str: 9, f: DEMPET });
   p.tekst(V, 42, `${d.epostFirma}   ·   bergutleie.no`, { str: 9, f: DEMPET });
 
-  p.tekst(H, 66, 'Sørliveien 78, 1788 Halden', { str: 9, f: DEMPET, hoyre: true });
-  p.tekst(H, 54, 'Man-fre 09-18  ·  Søndag 12-15', { str: 9, f: DEMPET, hoyre: true });
-  p.tekst(H, 42, 'Alle priser inkl. mva  ·  montering inngår ikke', { str: 9, f: DEMPET2, hoyre: true });
+  p.tekst(H, 54, 'Sørliveien 78, 1788 Halden', { str: 9, f: DEMPET, hoyre: true });
+  p.tekst(H, 42, 'Man-fre 09-18  ·  Søndag 12-15', { str: 9, f: DEMPET, hoyre: true });
 
+  // Forbeholdet er ikke kontaktinfo, så det hører hjemme på den nederste
+  // linjen sammen med gyldigheten.
   p.rekt(V, 32, H - V, 0.5, LINJE);
   p.tekst(V, 20, `Tilbud #${d.tilbudsnr}  ·  gyldig i ${d.gyldigDager} dager fra ${d.utstedt}`,
     { str: 8.5, f: DEMPET2 });
+  p.tekst(H, 20, 'Alle priser inkl. mva  ·  montering inngår ikke',
+    { str: 8.5, f: DEMPET2, hoyre: true });
 
   return tilBase64(p.bygg());
 }

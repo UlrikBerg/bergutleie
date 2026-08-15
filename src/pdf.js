@@ -36,10 +36,11 @@ function pdfStreng(s) {
 }
 
 /** Bredden på en tekst i punkter – grov, men god nok til høyrestilling. */
-export function bredde(tekst, str, fet) {
+export function bredde(tekst, str, fet, sperre = 0) {
   // Gjennomsnittlig tegnbredde for Helvetica, relativt til punktstørrelsen
   const faktor = fet ? 0.58 : 0.52;
-  return String(tekst).length * str * faktor;
+  const n = String(tekst).length;
+  return n * str * faktor + Math.max(0, n - 1) * sperre;
 }
 
 export function nyPdf(logoBase64, logoB, logoH) {
@@ -49,11 +50,14 @@ export function nyPdf(logoBase64, logoB, logoH) {
   const farge = (f) => f ? `${f[0]} ${f[1]} ${f[2]} rg\n` : '';
 
   return {
-    tekst(x, y, t, { fet = false, str = 10, f = [0, 0, 0], hoyre = false } = {}) {
-      const px = hoyre ? x - bredde(t, str, fet) : x;
+    // sperre = ekstra avstand mellom tegnene, til små etiketter i kapitéler.
+    // Tc er del av grafikkstaten og lever videre etter ET, så den settes alltid.
+    tekst(x, y, t, { fet = false, str = 10, f = [0, 0, 0], hoyre = false, sperre = 0 } = {}) {
+      const px = hoyre ? x - bredde(t, str, fet, sperre) : x;
       deler.push(
         farge(f) +
-        `BT /${fet ? 'F2' : 'F1'} ${str} Tf 1 0 0 1 ${px.toFixed(1)} ${y.toFixed(1)} Tm (${pdfStreng(t)}) Tj ET\n`
+        `BT /${fet ? 'F2' : 'F1'} ${str} Tf ${sperre} Tc `
+        + `1 0 0 1 ${px.toFixed(1)} ${y.toFixed(1)} Tm (${pdfStreng(t)}) Tj ET\n`
       );
     },
     rekt(x, y, b, h, f = [0, 0, 0]) {
