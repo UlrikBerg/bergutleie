@@ -105,8 +105,15 @@ function lagScene(minX, maksX, minY, maksY, kam) {
     return `<path d="M${(t[0] - rTopp * s).toFixed(1)} ${t[1].toFixed(1)} L${(b[0] - rBunn * s).toFixed(1)} ${b[1].toFixed(1)} A${rxB} ${ryB} 0 0 0 ${(b[0] + rBunn * s).toFixed(1)} ${b[1].toFixed(1)} L${(t[0] + rTopp * s).toFixed(1)} ${t[1].toFixed(1)} Z" fill="${fill}"/>`;
   };
   const skygge = (x, y, rx, ry) => ell(x, y, 0.004, rx, ry, F.skygge);
+  /** Liten tallbrikke som viser hvor mange enheter en stabel består av */
+  const etikett = (x, y, z, tekst) => {
+    const p = pt(x, y, z);
+    const b = 7.2 * tekst.length + 16;
+    return `<g><rect x="${(p[0] - b / 2).toFixed(1)}" y="${(p[1] - 21).toFixed(1)}" width="${b.toFixed(1)}" height="19" rx="9.5" fill="rgba(17,59,63,0.82)"/>`
+      + `<text x="${p[0].toFixed(1)}" y="${(p[1] - 7.5).toFixed(1)}" text-anchor="middle" font-family="Schibsted Grotesk, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">${tekst}</text></g>`;
+  };
 
-  return { pt, dep, poly, ln, cir, ell, skjort, skygge, s, yStrekk, RAMME_B, RAMME_H };
+  return { pt, dep, poly, ln, cir, ell, skjort, skygge, etikett, s, yStrekk, RAMME_B, RAMME_H };
 }
 
 /** Hvor mange bord av en gitt type får plass i et telt. */
@@ -172,21 +179,22 @@ export function oppsettSvg(kurv, finn, kam = {}) {
   const lagerBredde = harStabel || stolerIgjen > 0 ? 3.8 : 0;
 
   const S = lagScene(-1.3, Ld + 1.3 + lagerBredde, -1.3, Wd + 1.3, kam);
-  const { pt, dep, poly, ln, cir, ell, skjort, skygge, s, yStrekk, RAMME_B, RAMME_H } = S;
+  const { pt, dep, poly, ln, cir, ell, skjort, skygge, etikett, s, yStrekk, RAMME_B, RAMME_H } = S;
   const Cd = dep(Ld / 2, Wd / 2);
 
   const bak = [], midt = [], foran = [];
   let svg = '';
 
-  /* --- gress --- */
-  const gc = pt((Ld + lagerBredde) / 2, Wd / 2, 0);
-  svg += `<ellipse cx="${gc[0].toFixed(1)}" cy="${gc[1].toFixed(1)}" rx="${((Ld + lagerBredde) * 0.68 * s).toFixed(1)}" ry="${(Wd * 0.52 * s * yStrekk).toFixed(1)}" fill="url(#gress)"/>`;
+  /* --- gressplen som dekker hele flaten --- */
+  svg += `<rect x="0" y="0" width="${RAMME_B}" height="${RAMME_H}" fill="url(#gress)"/>`;
+  svg += `<rect x="0" y="0" width="${RAMME_B}" height="${RAMME_H}" fill="url(#stra)"/>`;
 
   /* --- teltgulv og tregulv --- */
   const gulvKvm = q('gulv') * 2;
   const dekket = teltId ? Math.min(1, gulvKvm / (Ld * Wd)) : 0;
   if (teltId) {
-    svg += poly([[-0.4, -0.4, 0], [Ld + 0.4, -0.4, 0], [Ld + 0.4, Wd + 0.4, 0], [-0.4, Wd + 0.4, 0]], F.gressMork);
+    svg += poly([[-0.4, -0.4, 0], [Ld + 0.4, -0.4, 0], [Ld + 0.4, Wd + 0.4, 0], [-0.4, Wd + 0.4, 0]],
+                'rgba(150,170,140,0.22)');
     if (dekket > 0) {
       const gLd = Ld * dekket;
       svg += poly([[0, 0, 0.08], [gLd, 0, 0.08], [gLd, Wd, 0.08], [0, Wd, 0.08]], F.tre, `stroke="${F.treMork}" stroke-width="0.9"`);
@@ -370,6 +378,7 @@ export function oppsettSvg(kurv, finn, kam = {}) {
 
   /* --- det som står sammenklappet ved siden --- */
   const notater = [];
+  const merker = [];
   if (teltId && (harStabel || stolerIgjen > 0 || benkerIgjen > 0)) {
     const lagerX = Ld + 1.7, lagerY = Wd / 2;
 
@@ -387,10 +396,13 @@ export function oppsettSvg(kurv, finn, kam = {}) {
 
     if (plan.kbord.ute) {
       stabelBord(lagerX, lagerY - 1.2, plan.kbord.ute, 1.8, 0.75, F.plate, 0.06);
+      merker.push({ x: lagerX + 0.9, y: lagerY - 1.2, z: 0.06 + Math.min(plan.kbord.ute, 8) * 0.1, t: `${plan.kbord.ute} bord` });
       notater.push(`${plan.kbord.ute} avlange bord`);
     }
     if (plan.trebord.ute) {
-      stabelBord(lagerX, lagerY - 1.2, plan.trebord.ute, 1.97, 0.6, '#E8DCC2', 0.06 + Math.min(plan.kbord.ute, 8) * 0.1);
+      const z0 = 0.06 + Math.min(plan.kbord.ute, 8) * 0.1;
+      stabelBord(lagerX, lagerY - 1.2, plan.trebord.ute, 1.97, 0.6, '#E8DCC2', z0);
+      merker.push({ x: lagerX + 1, y: lagerY - 1.2, z: z0 + Math.min(plan.trebord.ute, 8) * 0.1, t: `${plan.trebord.ute} trebord` });
       notater.push(`${plan.trebord.ute} trebord`);
     }
     if (plan.rbord.ute) {
@@ -399,22 +411,39 @@ export function oppsettSvg(kurv, finn, kam = {}) {
         const x = lagerX + 0.45 + i * 0.17;
         midt.push({ d: dep(x, lagerY + 0.9) + i * 0.001, s: ell(x, lagerY + 0.9, 0.8, 0.13, 0.78, F.plate, `stroke="${F.plateKant}" stroke-width="0.8"`) });
       }
+      merker.push({ x: lagerX + 0.9, y: lagerY + 0.9, z: 1.6, t: `${plan.rbord.ute} runde bord` });
       notater.push(`${plan.rbord.ute} runde bord`);
     }
     if (plan.stabord.ute) {
       for (let i = 0; i < Math.min(plan.stabord.ute, 6); i++) staaBord(lagerX + 0.5 + i * 0.7, lagerY + 1.7, false);
+      merker.push({ x: lagerX + 1.2, y: lagerY + 1.7, z: 1.2, t: `${plan.stabord.ute} ståbord` });
       notater.push(`${plan.stabord.ute} ståbord`);
     }
     if (stolerIgjen > 0) {
-      const sx = lagerX + 2.6, sy = lagerY - 0.3;
-      midt.push({ d: dep(sx, sy) - 0.6, s: skygge(sx, sy, 0.3, 0.19) });
-      for (let i = 0; i < Math.min(stolerIgjen, 14); i++) {
-        midt.push({ d: dep(sx, sy) + i * 0.001, s: ell(sx, sy, 0.1 + i * 0.08, 0.21, 0.12, F.stol, `stroke="${F.stolKant}" stroke-width="0.8"`) });
+      // Sammenklappede stoler står lent mot hverandre i rader, ikke som en pølse
+      const perStabel = 6;
+      const stabler = Math.min(3, Math.ceil(stolerIgjen / perStabel));
+      for (let st = 0; st < stabler; st++) {
+        const sx = lagerX + 2.5, sy = lagerY - 0.9 + st * 0.85;
+        const iStabel = Math.min(perStabel, stolerIgjen - st * perStabel);
+        midt.push({ d: dep(sx + 0.3, sy) - 0.6, s: skygge(sx + 0.3, sy, 0.5, 0.22) });
+        for (let i = 0; i < iStabel; i++) {
+          const x = sx + i * 0.1;
+          const rygg = poly([[x, sy - 0.2, 0.06], [x + 0.05, sy + 0.2, 0.06],
+                             [x + 0.05, sy + 0.2, 0.92], [x, sy - 0.2, 0.92]],
+                            F.stolRygg, `stroke="${F.stolKant}" stroke-width="0.8" stroke-linejoin="round"`);
+          const sete = poly([[x - 0.16, sy - 0.19, 0.42], [x + 0.16, sy - 0.19, 0.42],
+                             [x + 0.16, sy + 0.19, 0.42], [x - 0.16, sy + 0.19, 0.42]],
+                            F.stol, `stroke="${F.stolKant}" stroke-width="0.7"`);
+          midt.push({ d: dep(x, sy) + i * 0.002, s: sete + rygg });
+        }
       }
+      merker.push({ x: lagerX + 2.8, y: lagerY - 0.9, z: 1.05, t: `${stolerIgjen} stoler` });
       notater.push(`${stolerIgjen} stoler`);
     }
     if (benkerIgjen > 0) {
       for (let i = 0; i < Math.min(benkerIgjen, 6); i++) benk(lagerX + 0.2, lagerY + 2.3 + i * 0.26, 1.97);
+      merker.push({ x: lagerX + 1.2, y: lagerY + 2.4, z: 0.7, t: `${benkerIgjen} benker` });
       notater.push(`${benkerIgjen} benker`);
     }
   }
@@ -443,10 +472,16 @@ export function oppsettSvg(kurv, finn, kam = {}) {
     svg += `<path d="${path}" fill="none" stroke="#C9A45C" stroke-width="1"/>` + lp;
   }
 
+  merker.forEach(m => { svg += etikett(m.x, m.y, m.z, m.t); });
+
   const defs = `<defs>
-    <radialGradient id="gress" cx="42%" cy="38%" r="72%">
-      <stop offset="0%" stop-color="#E9EFE0"/><stop offset="100%" stop-color="#D3DEC4"/>
-    </radialGradient>
+    <linearGradient id="gress" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0%" stop-color="#E6EDDC"/><stop offset="100%" stop-color="#CFDBBE"/>
+    </linearGradient>
+    <pattern id="stra" width="34" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(-11)">
+      <path d="M5 27 q1 -5 0.4 -8 M17 29 q-1 -4 -0.3 -7 M27 26 q1.2 -5 0.6 -8"
+            stroke="#C6D4B1" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.3"/>
+    </pattern>
     <linearGradient id="duk" x1="0" y1="0" x2="0.35" y2="1">
       <stop offset="0%" stop-color="#FDFEFA"/><stop offset="100%" stop-color="#E9EDE0"/>
     </linearGradient>

@@ -377,7 +377,7 @@ function settOppKamera() {
   /* Rullehjul zoomer */
   scene.addEventListener('wheel', (e) => {
     e.preventDefault();
-    settKamera({ zoom: kamera.zoom * (e.deltaY < 0 ? 0.9 : 1.11) });
+    settKamera({ zoom: kamera.zoom * (e.deltaY < 0 ? 1.11 : 0.9) });
   }, { passive: false });
 
   /* Klyp for å zoome på mobil */
