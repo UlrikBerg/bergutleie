@@ -576,7 +576,9 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .hero-actions { margin-bottom: 20px; }
   .hero .btn-ghost { border-color: rgba(255,255,255,.5); color: #fff; background: rgba(255,255,255,.08); }
   .hero .btn-ghost:hover { background: rgba(255,255,255,.18); border-color: #fff; color: #fff; }
-  .usp { color: #fff; font-size: 13.5px; text-shadow: 0 1px 10px rgba(8,24,26,.85), 0 1px 3px rgba(8,24,26,.5); }
+  /* Punktene gjentar det som står i underteksten – bort på mobil */
+  .usp { display: none; }
+  .hero-actions { margin-bottom: 4px; }
   .site-header .wrap { gap: 14px; }
 
   /* Menyen legger seg under topplinjen når den åpnes */
