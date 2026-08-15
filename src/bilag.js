@@ -107,7 +107,7 @@ export function lagBilag(d) {
   p.rekt(V, y - boksH, H - V, boksH, FLATE);
   p.rekt(V, y - boksH, 3, boksH, AKSENT);
 
-  p.tekst(V + 18, y - 21, 'BETALING AV FORSKUDD', { fet: true, str: 8, f: AKSENT });
+  p.tekst(V + 18, y - 21, 'RESERVASJONSBETALING', { fet: true, str: 8, f: AKSENT });
 
   // beløpet stort til venstre
   p.tekst(V + 18, y - 46, kr(d.forskudd), { fet: true, str: 19, f: INK });
@@ -124,8 +124,8 @@ export function lagBilag(d) {
 
   p.rekt(V + 18, y - 92, H - V - 36, 0.5, LINJE);
   p.tekst(V + 18, y - 106, d.henter
-    ? 'Forskuddet må være betalt før utstyret kan hentes.'
-    : 'Forskuddet må være betalt før vi kjører ut utstyret.', { str: 9.5, f: INK });
+    ? 'Reservasjonen må være betalt før utstyret kan hentes.'
+    : 'Reservasjonen må være betalt før vi kjører ut utstyret.', { str: 9.5, f: INK });
   p.tekst(V + 18, y - 119, `Resten, ${kr(d.rest)}, faktureres etter at utstyret er levert tilbake.`,
     { str: 9.5, f: DEMPET });
   y -= boksH + 24;
@@ -141,19 +141,20 @@ export function lagBilag(d) {
   }
 
   /* --- bunnlinje --- */
-  p.rekt(V, 78, H - V, 0.5, LINJE);
-  p.tekst(V, 64, 'Berg Utleie', { fet: true, str: 9.5, f: INK });
-  p.tekst(V, 52, `Org.nr. ${d.orgnr}`, { str: 9, f: DEMPET });
-  p.tekst(V, 40, `Konto ${d.kontonr}`, { str: 9, f: DEMPET });
+  p.rekt(V, 82, H - V, 0.5, LINJE);
 
-  p.tekst(V + 200, 64, 'Sørliveien 78, 1788 Halden', { str: 9, f: DEMPET });
-  p.tekst(V + 200, 52, 'Man-fre 09-18  ·  Søndag 12-15', { str: 9, f: DEMPET });
+  // Venstre: hvem vi er.  Høyre: hvor og når.  Nederst: forbehold.
+  p.tekst(V, 66, 'Berg Utleie', { fet: true, str: 9.5, f: INK });
+  p.tekst(V, 54, `Org.nr. ${d.orgnr}   ·   Konto ${d.kontonr}`, { str: 9, f: DEMPET });
+  p.tekst(V, 42, `${d.epostFirma}   ·   bergutleie.no`, { str: 9, f: DEMPET });
 
-  p.tekst(H, 64, d.epostFirma, { str: 9, f: DEMPET, hoyre: true });
-  p.tekst(H, 52, 'bergutleie.no', { str: 9, f: DEMPET, hoyre: true });
-  p.tekst(H, 40, 'Alle priser inkl. mva  ·  Montering inngår ikke', { str: 8.5, f: DEMPET2, hoyre: true });
+  p.tekst(H, 66, 'Sørliveien 78, 1788 Halden', { str: 9, f: DEMPET, hoyre: true });
+  p.tekst(H, 54, 'Man-fre 09-18  ·  Søndag 12-15', { str: 9, f: DEMPET, hoyre: true });
+  p.tekst(H, 42, 'Alle priser inkl. mva  ·  montering inngår ikke', { str: 9, f: DEMPET2, hoyre: true });
 
-  p.tekst(V, 26, `Tilbud #${d.tilbudsnr} · gyldig i 14 dager fra ${d.utstedt}`, { str: 8.5, f: DEMPET2 });
+  p.rekt(V, 32, H - V, 0.5, LINJE);
+  p.tekst(V, 20, `Tilbud #${d.tilbudsnr}  ·  gyldig i ${d.gyldigDager} dager fra ${d.utstedt}`,
+    { str: 8.5, f: DEMPET2 });
 
   return tilBase64(p.bygg());
 }

@@ -18,7 +18,8 @@ import { lagBilag } from './bilag.js';
 
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
 const MVA_SATS = 0.25;          // prisene på nettsiden er oppgitt inkl. mva
-const FORSKUDD_ANDEL = 0.5;     // 50 % forskudd må betales før utstyret utleveres
+const FORSKUDD_ANDEL = 0.5;     // 50 % reservasjon må betales før utstyret utleveres
+const GYLDIG_DAGER = 2;         // hvor lenge tilbudet står ved lag
 const KONTONR = '9803 22 90426';
 const ORGNR = '919 326 581';
 const EPOST = 'post@bergutleie.no';
@@ -91,6 +92,7 @@ export async function handterForesporsel(request, env) {
                    tilbudsnr,
                    kontonr: KONTONR, orgnr: ORGNR, epostFirma: EPOST,
                    utstedt: `${naa.getDate()}. ${MANEDER[naa.getMonth()]} ${naa.getFullYear()}`,
+                   gyldigDager: GYLDIG_DAGER,
                    forskudd: Math.round(total * FORSKUDD_ANDEL),
                    rest: total - Math.round(total * FORSKUDD_ANDEL) };
 
@@ -284,10 +286,10 @@ function svarmal(d) {
     `Konto: ${KONTONR}`,
     'Merk betalingen med tilbudsnummeret.',
     '',
-    `Det er ${Math.round(FORSKUDD_ANDEL * 100)} % forskuddsbetaling på bookingen, altså ${nok(forskudd)}.`,
+    `Reservasjonsbetalingen er ${Math.round(FORSKUDD_ANDEL * 100)} % av totalen, altså ${nok(forskudd)}.`,
     d.henter
-      ? 'Forskuddet må være betalt før utstyret kan hentes.'
-      : 'Forskuddet må være betalt før vi kjører ut utstyret.',
+      ? 'Den må være betalt før utstyret kan hentes.'
+      : 'Den må være betalt før vi kjører ut utstyret.',
     `Resten, ${nok(rest)}, faktureres etter at utstyret er levert tilbake.`,
     '',
     'Gi oss gjerne beskjed hvis noe skal endres, så ordner vi det.',
