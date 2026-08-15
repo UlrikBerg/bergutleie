@@ -54,15 +54,24 @@ Og under Settings → Variables and Secrets (for skjemaet):
 - `RESEND_API_KEY` – API-nøkkel fra resend.com
 - `VARSEL_TIL` – `kontakt@bergevent.no`
 
+## Status
+
+Lansert 15. august 2026. Alt teknisk er på plass:
+
+- [x] Domenet peker på Cloudflare, HTTPS med omdirigering fra http og www
+- [x] Skjemaet sender e-post via Resend, med bookingdetaljer som PDF
+- [x] Leievilkår og personvernerklæring publisert
+- [x] Favicon, sitemap og robots.txt
+- [x] Google Search Console: domenet verifisert, sitemap sendt inn
+
 ## Gjenstår
 
-- [ ] Rydd DNS i Cloudflare: slett A-postene mot `185.199.*` og CNAME `www` → `ulrikberg.github.io`
-- [ ] Koble `bergutleie.no` og `www.bergutleie.no` som custom domains på Pages-prosjektet
-- [ ] Sett build command og output directory som over
-- [ ] Opprett Resend-konto, verifiser bergutleie.no som avsenderdomene, legg inn nøkkelen
-- [ ] Slå på «Always Use HTTPS» når sertifikatet er utstedt
-- [ ] Google Search Console: verifiser domenet og send inn sitemap
-- [ ] Gå gjennom prisene i `data/produkter.js` mot faktiske priser
+- [ ] Google Business-profil koblet til bergutleie.no (egen oppføring, ikke Berg Event sin)
+- [ ] Gå gjennom alle priser i redigeringsverktøyet
+- [ ] Avklar om lining skal prises per modul som tregulvet
+- [ ] Organisasjonsnummer i bunnteksten?
+- [ ] Egen e-postkasse på bergutleie.no (bruker kontakt@bergevent.no nå)
+- [ ] PDF-en kan ikke følge med mailto-knappen – vurder Gmail-mal eller lenke til bilaget
 
 ## Viktig å vite
 
