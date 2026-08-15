@@ -39,9 +39,7 @@ function settAntall(id, n) {
 function tegnTeller() {
   const t = document.querySelector('[data-kurv-teller]');
   if (!t) return;
-  const n = totaltAntall();
-  t.textContent = n;
-  t.hidden = n === 0;
+  t.textContent = totaltAntall();
 }
 
 /* --- knapper som finnes på flere sider --- */

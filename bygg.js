@@ -57,16 +57,16 @@ ${jsonld.map(j => `<script type="application/ld+json">\n${JSON.stringify(j, null
   <div class="wrap">
     <a href="/" class="logo"><img src="/uploads/logo.png" alt="Berg Utleie" width="908" height="491"></a>
     <nav class="site-nav">
-      <a href="/utstyr/">Utstyr</a>
-      <a href="/selskapspakker/">Selskapspakker</a>
+      <a href="/">Forside</a>
+      <a href="/utstyr/">Alle produkter</a>
+      <a href="/selskapspakker/">Pakketilbud</a>
       <a href="/#levering">Henting og levering</a>
-      <a href="/#slik">Slik fungerer det</a>
+      <a href="/foresporsel/">Få tilbud</a>
     </nav>
     <div class="header-actions">
-      <a class="kurv-lenke" href="/foresporsel/">
-        Handlekurv<span class="kurv-teller" data-kurv-teller hidden>0</span>
+      <a class="btn kurv-knapp" href="/foresporsel/">
+        Handlekurv<span class="kurv-teller" data-kurv-teller>0</span>
       </a>
-      <a class="btn" href="/utstyr/">Se utstyret</a>
     </div>
   </div>
 </header>
@@ -419,7 +419,7 @@ function produktside(p) {
         </div>
         <div class="anbefalt-hoyre">
           <span class="anbefalt-pris">${sum}</span>
-          <button type="button" class="btn-liten legg-i-kurv" data-id="${r.id}" data-antall="${n}">Legg til</button>
+          <button type="button" class="btn-liten legg-i-kurv" data-id="${r.id}" data-antall="${n}">+ Legg til</button>
         </div>
       </div>`).join('')}
     </div>
