@@ -14,6 +14,8 @@
    Se DEPLOY.md for oppsettet.
    ======================================================================== */
 
+import { lagBilag } from './bilag.js';
+
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
 const MVA_SATS = 0.25;          // prisene på nettsiden er oppgitt inkl. mva
 const FORSKUDD_ANDEL = 0.5;     // 50 % forskudd må betales før utstyret utleveres
@@ -59,10 +61,19 @@ export async function handterForesporsel(request, env) {
   const henter = /henter selv/i.test(levering);
   const kommentar = tekst(data.kommentar, 2000);
 
+  const naa = new Date();
+  const referanse = 'BU-' + naa.getFullYear() + String(naa.getMonth() + 1).padStart(2, '0')
+    + String(naa.getDate()).padStart(2, '0') + '-'
+    + String(naa.getHours()).padStart(2, '0') + String(naa.getMinutes()).padStart(2, '0');
+
   const felles = { navn, mobil, epost, periode, dagerLabel, levering, henter,
                    varer, leie, frakt, total, utenMva, mva, kommentar,
                    hentDato: fra ? norskDato(fra) : 'avtales',
-                   returDato: til ? norskDato(til) : 'avtales' };
+                   returDato: til ? norskDato(til) : 'avtales',
+                   referanse,
+                   utstedt: `${naa.getDate()}. ${MANEDER[naa.getMonth()]} ${naa.getFullYear()}`,
+                   forskudd: Math.round(total * FORSKUDD_ANDEL),
+                   rest: total - Math.round(total * FORSKUDD_ANDEL) };
 
   if (!env.RESEND_API_KEY) {
     return svar(500, { feil: 'E-post er ikke satt opp ennå.' });
@@ -80,7 +91,11 @@ export async function handterForesporsel(request, env) {
       reply_to: epost,
       subject: `Forespørsel fra ${navn} – ${nok(total)}${fra ? ' – ' + norskDato(fra) : ''}`,
       html: htmlEpost(felles),
-      text: tekstEpost(felles)
+      text: tekstEpost(felles),
+      attachments: [{
+        filename: `Bookingdetaljer-${referanse}.pdf`,
+        content: lagBilag(felles)
+      }]
     })
   });
 
@@ -194,7 +209,7 @@ function htmlEpost(d) {
     </a>
     <p style="margin:12px 0 0;font-size:12.5px;color:${C.dempet2};">
       Åpner en ferdig bekreftelse med hentetidspunkt, forskudd og forespørselen sitert under.
-      Vanlig «Svar» går også rett til kunden.
+      Bookingdetaljene ligger vedlagt som PDF – den kan videresendes til kunden.
     </p>
   </td></tr>
 
@@ -333,12 +348,13 @@ function nok(n) {
 }
 
 /** 2026-07-04 → 4. juli 2026 */
+const MANEDER = ['januar', 'februar', 'mars', 'april', 'mai', 'juni',
+                 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
+
 function norskDato(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   if (!m) return iso;
-  const mnd = ['januar', 'februar', 'mars', 'april', 'mai', 'juni',
-               'juli', 'august', 'september', 'oktober', 'november', 'desember'];
-  return `${Number(m[3])}. ${mnd[Number(m[2]) - 1]} ${m[1]}`;
+  return `${Number(m[3])}. ${MANEDER[Number(m[2]) - 1]} ${m[1]}`;
 }
 
 function svar(status, kropp) {
