@@ -14,7 +14,7 @@
 
 /* Teltenes gulvflate i meter. Må stemme med produktene i produkter.js. */
 const TELT = {
-  t36: [6, 3], t38: [8, 3], t56: [6, 5], t58: [8, 5], t510: [10, 5]
+  t33: [3, 3], t36: [6, 3], t38: [8, 3], t56: [6, 5], t58: [8, 5], t510: [10, 5]
 };
 
 const MAL = {

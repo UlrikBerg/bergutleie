@@ -26,6 +26,19 @@
 
 export const PRODUKTER = [
   {
+    id: "t33", slug: "popup-telt-3x3m", cat: "Partytelt",
+    navn: "Pop-up-telt 3×3 m", desc: "Quick up · serverings- og mattelt",
+    dl: "Værbestandig pop-up-telt som rigges opp og ned på minutter – ingen verktøy og ingen stangkabal. Perfekt som serverings- eller mattelt ved siden av festteltet, eller som ly for grillen. Får plass i stort sett alle hager.",
+    d: 500, lp: 2, areal: 9,
+    bilder: [
+      { u: "/uploads/telt-3x3-tegning.png", fit: "contain", alt: "Tegning av pop-up-telt 3x3 meter" },
+      { u: "/uploads/telt-3x3-b.png", fit: "contain", alt: "Pop-up-telt 3x3 m" },
+      { u: "/uploads/telt-3x3-c.png", fit: "contain", alt: "Pop-up-telt rigget opp" }
+    ],
+    specs: ["Mål: 3×3 m (9 kvm) · høyde 2,9 m", "Pop-up – rigges opp på minutter uten verktøy", "Vekt: 14 kg", "Vegger og tak i værbestandig polyeten"],
+    rec: [["sikring", 1]]
+  },
+  {
     id: "t36", slug: "partytelt-3x6m", cat: "Partytelt",
     navn: "Partytelt 3×6 m", desc: "18 personer med langbord",
     dl: "Et værbestandig telt med vegger og tak av polyeten. Dette teltet beskytter deg mot både stekende sol og grusom vind og regnvær. Veggene på langsidene har sprosser som gir teltet en stilig og luksuriøs stil.",
@@ -33,7 +46,8 @@ export const PRODUKTER = [
     bilder: [
       { u: "/uploads/telt-3x6-tegning.png", fit: "contain", alt: "Tegning av partytelt 3x6 meter" },
       { u: "/uploads/telt-3x6-a.webp", alt: "Partytelt 3x6 m satt opp i hage" },
-      { u: "/uploads/telt-3x6-b.jpg", alt: "Partytelt 3x6 m med bord og stoler" },
+      { u: "/uploads/telt-3x6-c.jpg", alt: "Partytelt 3x6 m med bordoppsett" },
+      { u: "/uploads/telt-3x6-b.jpg", alt: "Partytelt 3x6 m dekket til fest" },
       { u: "/uploads/barnebursdag.webp", alt: "Partytelt dekorert til barnebursdag" }
     ],
     specs: ["Mål: 3×6 m (18 kvm)", "18 personer med langbord", "Sidehøyde 2,0 m · avtakbare vegger", "Må forankres med sikringsutstyr"],
@@ -46,9 +60,10 @@ export const PRODUKTER = [
     d: 2400, lp: 10, areal: 24, capL: 24,
     bilder: [
       { u: "/uploads/telt-3x8-tegning.png", fit: "contain", alt: "Tegning av partytelt 3x8 meter" },
+      { u: "/uploads/telt-3x8-a.jpg", alt: "Partytelt 3x8 m satt opp" },
+      { u: "/uploads/telt-oppsett-ute.webp", alt: "Partytelt rigget opp utendørs" },
       { u: "/uploads/drobak-sjoutsikt.webp", alt: "Partytelt med sjøutsikt i Drøbak" },
-      { u: "/uploads/barnebursdag.webp", alt: "Partytelt dekorert til barnebursdag" },
-      { u: "/uploads/telt-3x12.webp", alt: "Partytelt satt opp i hage" }
+      { u: "/uploads/bord-pyntet.jpg", alt: "Pyntet langbord i partytelt" }
     ],
     specs: ["Mål: 3×8 m (24 kvm) · høyde 2,8 m", "24 personer med langbord", "Vekt 75 kg · værbestandig duk med sprosser", "Åpning på begge sider · må forankres"],
     rec: [["gulv", 12], ["kbord", 4], ["duk", 4], ["stol", 24], ["lys", 1], ["sikring", 1]]
@@ -59,8 +74,11 @@ export const PRODUKTER = [
     dl: "Bredt og kompakt telt med god plass rundt bordene. Fint til konfirmasjon, jubileer og selskap i hagen.",
     d: 3400, lp: 12, areal: 30, capL: 30, capR: 20,
     bilder: [
-      { u: "/uploads/telt-5x8-tegning.png", fit: "contain", alt: "Tegning av partytelt 5x6 meter" },
-      { u: "/uploads/hageselskap.webp", alt: "Hageselskap i partytelt en sommerdag" }
+      { u: "/uploads/telt-5x6-tegning.png", fit: "contain", alt: "Tegning av partytelt 5x6 meter" },
+      { u: "/uploads/telt-5x6-36pers.png", fit: "contain", alt: "Oppsett med langbord til 36 personer" },
+      { u: "/uploads/telt-5x6-24pers.png", fit: "contain", alt: "Oppsett med runde bord til 24 personer" },
+      { u: "/uploads/telt-5x6-fest.jpg", alt: "Partytelt 5x6 m dekket til selskap" },
+      { u: "/uploads/hageselskap.webp", alt: "Hageselskap i partytelt" }
     ],
     specs: ["Mål: 5×6 m (30 kvm)", "36 personer med langbord · 24 med runde bord", "Sidehøyde 2,0 m · avtakbare vegger", "Må forankres med sikringsutstyr"],
     rec: [["gulv", 15], ["kbord", 5], ["duk", 5], ["stol", 30], ["lys", 1], ["sikring", 1]]
@@ -72,8 +90,11 @@ export const PRODUKTER = [
     d: 3900, lp: 16, areal: 40, capL: 50, capR: 30,
     bilder: [
       { u: "/uploads/telt-5x8-tegning.png", fit: "contain", alt: "Tegning av partytelt 5x8 meter" },
-      { u: "/uploads/bryllup-romantisk.webp", alt: "Romantisk bryllupsdekor i partytelt" },
-      { u: "/uploads/5x8m-pyntet.jpg", alt: "Partytelt 5×8 m" }
+      { u: "/uploads/telt-5x8-48pers.png", fit: "contain", alt: "Oppsett med langbord til 48 personer" },
+      { u: "/uploads/telt-5x8-32pers.png", fit: "contain", alt: "Oppsett med runde bord til 32 personer" },
+      { u: "/uploads/telt-pyntet-inngang.webp", alt: "Pyntet inngang til partytelt" },
+      { u: "/uploads/5x8m-pyntet.jpg", alt: "Partytelt 5x8 m pyntet til fest" },
+      { u: "/uploads/bryllup-dekorert.webp", alt: "Partytelt dekorert til bryllup" }
     ],
     specs: ["Mål: 5×8 m (40 kvm)", "48 personer med langbord · 32 med runde bord", "Sidehøyde 2,0 m · avtakbare vegger", "Må forankres med sikringsutstyr"],
     rec: [["gulv", 20], ["kbord", 8], ["duk", 8], ["stol", 50], ["lys", 1], ["sikring", 1], ["jbl", 1]]
@@ -84,10 +105,12 @@ export const PRODUKTER = [
     dl: "Vårt største telt – god plass til middag, buffet og dansegulv for store markeringer.",
     d: 4400, lp: 20, areal: 50, capL: 60, capR: 40,
     bilder: [
-      { u: "/uploads/telt-5x8-tegning.png", fit: "contain", alt: "Tegning av partytelt 5x10 meter" },
-      { u: "/uploads/bryllup-romantisk.webp", alt: "Romantisk bryllupsdekor i stort partytelt" },
+      { u: "/uploads/telt-5x10-tegning.png", fit: "contain", alt: "Tegning av partytelt 5x10 meter" },
+      { u: "/uploads/telt-5x10-60pers.png", fit: "contain", alt: "Oppsett med langbord til 60 personer" },
+      { u: "/uploads/telt-5x10-40pers.png", fit: "contain", alt: "Oppsett med runde bord til 40 personer" },
+      { u: "/uploads/telt-5x10-fest.jpg", alt: "Stort partytelt dekket til selskap" },
       { u: "/uploads/stort-arrangement.webp", alt: "Stort partytelt til arrangement" },
-      { u: "/uploads/bryllup-dekorert.webp", alt: "Partytelt dekorert til bryllup" }
+      { u: "/uploads/bryllup-romantisk.webp", alt: "Romantisk bryllupsdekor i stort partytelt" }
     ],
     specs: ["Mål: 5×10 m (50 kvm)", "60 personer med langbord · 40 med runde bord", "Sidehøyde 2,0 m · avtakbare vegger", "Må forankres med sikringsutstyr"],
     rec: [["gulv", 25], ["kbord", 10], ["duk", 10], ["stol", 60], ["lys", 2], ["sikring", 1], ["jbl", 1]]
@@ -125,8 +148,10 @@ export const PRODUKTER = [
     dl: "Klassisk klappbord i solid utførelse. Rett høyde for middag, buffet eller gavebord.",
     d: 140, lp: 1,
     bilder: [
+      { u: "/uploads/avlangt-bord.png", fit: "contain", alt: "Avlangt bord 180x75 cm til leie" },
       { u: "/uploads/bord-pyntet.jpg", alt: "Pyntet langbord i partytelt" },
-      { u: "/uploads/hageselskap.webp", alt: "Langbord dekket til hageselskap" }
+      { u: "/uploads/bord-event.jpg", alt: "Avlange bord satt opp til arrangement" },
+      { u: "/uploads/duk-avlangt-b.jpg", alt: "Avlangt bord dekket med hvit duk" }
     ],
     specs: ["Mål: 180×75 cm · høyde 74 cm", "6 personer med god plass, maks 8", "Klappes flatt – enkel transport"],
     rec: [["duk", 1], ["stol", 6]]

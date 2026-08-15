@@ -305,7 +305,7 @@ function tegnOppsett() {
   const boks = document.querySelector('[data-oppsett]');
   if (!boks) return;
 
-  const relevant = ['t36','t38','t56','t58','t510','kbord','trebord','rbord',
+  const relevant = ['t33','t36','t38','t56','t58','t510','kbord','trebord','rbord',
                     'stabord','stol','trebenk','gulv','lys','lining','duk','rundduk'];
   const noeAaVise = relevant.some(id => antall(id) > 0);
   boks.hidden = !noeAaVise;
@@ -425,7 +425,7 @@ function tegnInnsikt() {
   if (!boks) return;
   const ut = [];
   const q = antall;
-  const telt = PRODUKTER.filter(p => p.cat === 'Partytelt' && q(p.id) > 0);
+  const telt = PRODUKTER.filter(p => p.cat === 'Partytelt' && p.capL > 0 && q(p.id) > 0);
   const teltAnt = telt.reduce((a, p) => a + q(p.id), 0);
   const teltCap = telt.reduce((a, p) => a + q(p.id) * (p.capL || 0), 0);
   const teltAreal = telt.reduce((a, p) => a + q(p.id) * (p.areal || 0), 0);
