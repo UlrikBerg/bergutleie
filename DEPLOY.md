@@ -79,3 +79,25 @@ en side har byttet adresse.
 
 **Får du e-post på domenet senere**, må MX-postene inn i Cloudflare – ikke hos
 Domeneshop, som ikke lenger styrer DNS.
+
+## Redigeringsverktøy (kun under bygging)
+
+```
+npm run rediger        → http://localhost:8080
+```
+
+Her kan du endre navn, priser, beskrivelser og spesifikasjoner, og laste opp
+bilder ved å dra dem inn. Første bilde er hovedbildet; bruk ← for å flytte et
+bilde fram. «Lagre endringer» skriver rett inn i `data/produkter.js`.
+
+Deretter:
+
+```
+npm run bygg
+git add -A && git commit -m "Oppdaterte priser" && git push
+```
+
+**Verktøyet ligger aldri ute på nett.** Serveren binder seg til 127.0.0.1, og
+filene `rediger.js` og `rediger.html` kopieres ikke til `dist/` – det er bare
+`dist/` som lastes opp til Cloudflare. Ved lansering trenger du ikke gjøre
+noe for å skjule den; slett gjerne begge filene når dere er ferdige å bygge.

@@ -142,6 +142,8 @@ const produktkort = (p) => `
 
 /* --- forside --- */
 function forside() {
+  // Hentes fra datafila, så meta-teksten aldri blir stående med utdatert pris
+  const billigsteTelt = Math.min(...PRODUKTER.filter(p => p.cat === 'Partytelt').map(p => p.d));
   const jsonld = [
     {
       '@context': 'https://schema.org', '@type': 'LocalBusiness',
@@ -291,7 +293,7 @@ function forside() {
 
   return layout({
     url: '/', tittel: 'Berg Utleie – lei partytelt, bord og stoler til fast pris i Halden',
-    beskrivelse: 'Utleie av partytelt, bord, stoler, dekketøy, lyd og lys til faste priser. Hent gratis på lageret ved E6 i Halden, eller få alt levert på Østlandet. Partytelt fra 1 690 kr.',
+    beskrivelse: `Utleie av partytelt, bord, stoler, dekketøy, lyd og lys til faste priser. Hent gratis på lageret ved E6 i Halden, eller få alt levert på Østlandet. Partytelt fra ${kr(billigsteTelt)}.`,
     bilde: '/uploads/bord-pyntet.jpg', innhold, jsonld
   });
 }

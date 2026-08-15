@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rediger produkter – Berg Utleie</title>
+<style>
+  :root {
+    --bg: #F7F6F1; --ink: #113B3F; --accent: #E8562E; --accent-dark: #CF4520;
+    --muted: #5A6E6D; --muted-2: #7C8D8B; --line: #E5E7E1; --gronn: #1F7A4D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    padding-bottom: 120px;
+  }
+  header {
+    position: sticky; top: 0; z-index: 10; background: #fff;
+    border-bottom: 1px solid var(--line); padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  }
+  header h1 { margin: 0; font-size: 19px; font-weight: 800; }
+  header .hjelp { font-size: 13px; color: var(--muted); margin: 3px 0 0; }
+  .verktoy { display: flex; align-items: center; gap: 14px; }
+  button {
+    font: inherit; font-weight: 700; font-size: 14px; padding: 10px 18px;
+    border-radius: 8px; cursor: pointer; border: none;
+  }
+  .primar { background: var(--accent); color: #fff; }
+  .primar:hover { background: var(--accent-dark); }
+  .primar:disabled { opacity: .5; cursor: default; }
+  .sekundar { background: #fff; border: 1.5px solid #D9E2E0; color: var(--ink); }
+  .sekundar:hover { border-color: var(--ink); }
+  .status { font-size: 13.5px; font-weight: 600; color: var(--gronn); }
+  .status.feil { color: var(--accent); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 28px; display: flex; flex-direction: column; gap: 18px; }
+  .kat { margin: 18px 0 0; font-size: 12.5px; font-weight: 800; letter-spacing: .09em;
+         text-transform: uppercase; color: var(--accent); }
+
+  .kort {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    padding: 22px; display: grid; grid-template-columns: 1fr 320px; gap: 26px;
+  }
+  .felt { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .felt label { font-size: 12px; font-weight: 700; color: var(--muted); }
+  .felt input, .felt textarea {
+    font: inherit; font-size: 14.5px; padding: 9px 11px;
+    border: 1.5px solid #D9E2E0; border-radius: 8px; background: #fff; color: var(--ink);
+  }
+  .felt textarea { resize: vertical; min-height: 68px; line-height: 1.5; }
+  .felt input:focus, .felt textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  .rad { display: grid; grid-template-columns: 1fr 150px; gap: 14px; }
+  .pris-hint { font-size: 11.5px; color: var(--muted-2); margin-top: -2px; }
+
+  .bilder-boks { border-left: 1px solid var(--line); padding-left: 24px; }
+  .bilder-boks h3 { margin: 0 0 4px; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .bilder-boks .tips { margin: 0 0 12px; font-size: 11.5px; color: var(--muted-2); line-height: 1.4; }
+  .bilder { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .bilde {
+    position: relative; width: 88px; height: 68px; border-radius: 8px;
+    overflow: hidden; border: 1.5px solid var(--line); background: #FBFAF6;
+  }
+  .bilde.hoved { border: 2px solid var(--accent); }
+  .bilde img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bilde .merke {
+    position: absolute; left: 0; bottom: 0; background: var(--accent); color: #fff;
+    font-size: 9.5px; font-weight: 800; padding: 2px 6px; border-radius: 0 6px 0 0;
+  }
+  .bilde .fjern {
+    position: absolute; top: 2px; right: 2px; width: 20px; height: 20px;
+    border-radius: 50%; background: rgba(17,59,63,.72); color: #fff;
+    font-size: 13px; line-height: 1; padding: 0; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .bilde .venstre {
+    position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+    border-radius: 50%; background: rgba(17,59,63,.72); color: #fff;
+    font-size: 12px; line-height: 1; padding: 0; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .slippsone {
+    border: 2px dashed #C3CFCB; border-radius: 10px; padding: 16px;
+    text-align: center; font-size: 13px; color: var(--muted); cursor: pointer;
+  }
+  .slippsone:hover, .slippsone.over { border-color: var(--accent); background: #FDEBE4; color: var(--accent); }
+  .slippsone input { display: none; }
+
+  .bunn {
+    position: fixed; left: 0; right: 0; bottom: 0; background: #fff;
+    border-top: 1px solid var(--line); padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  }
+  .bunn .info { font-size: 13px; color: var(--muted); }
+  code { background: #EFF1EC; padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
+  @media (max-width: 860px) {
+    .kort { grid-template-columns: 1fr; }
+    .bilder-boks { border-left: none; border-top: 1px solid var(--line); padding-left: 0; padding-top: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Rediger produkter</h1>
+    <p class="hjelp">Lokalt verktøy – ligger aldri ute på bergutleie.no</p>
+  </div>
+  <div class="verktoy">
+    <span class="status" id="status"></span>
+    <button class="sekundar" id="lastinn">Hent på nytt</button>
+    <button class="primar" id="lagre">Lagre endringer</button>
+  </div>
+</header>
+
+<main id="liste"></main>
+
+<div class="bunn">
+  <span class="info">Etter lagring: kjør <code>npm run bygg</code> og push for å publisere.</span>
+  <span class="info" id="teller"></span>
+</div>
+
+<script type="module">
+const liste = document.getElementById('liste');
+const status = document.getElementById('status');
+let produkter = [];
+
+const vis = (tekst, feil = false) => {
+  status.textContent = tekst;
+  status.className = 'status' + (feil ? ' feil' : '');
+  if (tekst) setTimeout(() => { if (status.textContent === tekst) status.textContent = ''; }, 4000);
+};
+
+async function hent() {
+  produkter = await (await fetch('/api/produkter')).json();
+  tegn();
+}
+
+function tegn() {
+  liste.innerHTML = '';
+  let forrigeKat = null;
+
+  produkter.forEach((p, i) => {
+    if (p.cat !== forrigeKat) {
+      const h = document.createElement('p');
+      h.className = 'kat';
+      h.textContent = p.cat;
+      liste.appendChild(h);
+      forrigeKat = p.cat;
+    }
+
+    const kort = document.createElement('div');
+    kort.className = 'kort';
+    const fastpris = p.fast != null;
+
+    kort.innerHTML = `
+      <div>
+        <div class="rad">
+          <div class="felt">
+            <label>Produktnavn</label>
+            <input data-i="${i}" data-f="navn" value="${esc(p.navn)}">
+          </div>
+          <div class="felt">
+            <label>${fastpris ? 'Fastpris (kr)' : 'Pris per døgn (kr)'}</label>
+            <input data-i="${i}" data-f="${fastpris ? 'fast' : 'd'}" type="number" min="0" value="${fastpris ? p.fast : p.d}">
+            <span class="pris-hint">${fastpris ? 'Samme pris uansett periode' : '1–4 dager koster det samme'}</span>
+          </div>
+        </div>
+        <div class="felt">
+          <label>Kort beskrivelse – vises i lister</label>
+          <input data-i="${i}" data-f="desc" value="${esc(p.desc)}">
+        </div>
+        <div class="felt">
+          <label>Lang beskrivelse – vises på produktsiden</label>
+          <textarea data-i="${i}" data-f="dl">${esc(p.dl)}</textarea>
+        </div>
+        <div class="felt">
+          <label>Spesifikasjoner – én per linje</label>
+          <textarea data-i="${i}" data-f="specs">${esc((p.specs || []).join('\n'))}</textarea>
+        </div>
+      </div>
+
+      <div class="bilder-boks">
+        <h3>Bilder</h3>
+        <p class="tips">Første bilde er hovedbildet. Bruk ← for å flytte et bilde fram.</p>
+        <div class="bilder" data-bilder="${i}"></div>
+        <label class="slippsone" data-slipp="${i}">
+          Slipp bilder her, eller klikk for å velge
+          <input type="file" accept="image/*" multiple data-fil="${i}">
+        </label>
+      </div>`;
+
+    liste.appendChild(kort);
+    tegnBilder(i);
+  });
+
+  document.getElementById('teller').textContent = `${produkter.length} produkter`;
+}
+
+function tegnBilder(i) {
+  const boks = liste.querySelector(`[data-bilder="${i}"]`);
+  const bilder = produkter[i].bilder || [];
+  boks.innerHTML = bilder.map((b, k) => `
+    <div class="bilde${k === 0 ? ' hoved' : ''}">
+      <img src="${b.u}" alt="">
+      ${k === 0 ? '<span class="merke">HOVED</span>' : `<button class="venstre" data-flytt="${i}:${k}" title="Flytt fram">←</button>`}
+      <button class="fjern" data-slett="${i}:${k}" title="Fjern">×</button>
+    </div>`).join('');
+}
+
+const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+/* --- redigering av felt --- */
+liste.addEventListener('input', (e) => {
+  const el = e.target;
+  const i = el.dataset.i, f = el.dataset.f;
+  if (i == null || !f) return;
+  const p = produkter[i];
+  if (f === 'specs') p.specs = el.value.split('\n').map(s => s.trim()).filter(Boolean);
+  else if (f === 'd' || f === 'fast') p[f] = Number(el.value) || 0;
+  else p[f] = el.value;
+});
+
+/* --- bildeknapper --- */
+liste.addEventListener('click', (e) => {
+  const slett = e.target.closest('[data-slett]');
+  if (slett) {
+    const [i, k] = slett.dataset.slett.split(':').map(Number);
+    produkter[i].bilder.splice(k, 1);
+    tegnBilder(i);
+    return;
+  }
+  const flytt = e.target.closest('[data-flytt]');
+  if (flytt) {
+    const [i, k] = flytt.dataset.flytt.split(':').map(Number);
+    const b = produkter[i].bilder;
+    [b[k - 1], b[k]] = [b[k], b[k - 1]];
+    tegnBilder(i);
+  }
+});
+
+/* --- opplasting --- */
+async function lastOpp(i, filer) {
+  for (const fil of filer) {
+    if (!fil.type.startsWith('image/')) continue;
+    vis(`Laster opp ${fil.name} …`);
+    const data = await new Promise(r => {
+      const l = new FileReader();
+      l.onload = () => r(l.result);
+      l.readAsDataURL(fil);
+    });
+    const svar = await fetch('/api/bilde', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ filnavn: fil.name, data })
+    });
+    if (!svar.ok) { vis('Opplasting feilet', true); continue; }
+    const { sti } = await svar.json();
+    produkter[i].bilder = produkter[i].bilder || [];
+    produkter[i].bilder.push({ u: sti, alt: produkter[i].navn });
+    tegnBilder(i);
+  }
+  vis('Bilder lagt til – husk å lagre');
+}
+
+liste.addEventListener('change', (e) => {
+  const fil = e.target.closest('[data-fil]');
+  if (fil && fil.files.length) lastOpp(Number(fil.dataset.fil), [...fil.files]);
+});
+
+liste.addEventListener('dragover', (e) => {
+  const sone = e.target.closest('[data-slipp]');
+  if (sone) { e.preventDefault(); sone.classList.add('over'); }
+});
+liste.addEventListener('dragleave', (e) => {
+  e.target.closest('[data-slipp]')?.classList.remove('over');
+});
+liste.addEventListener('drop', (e) => {
+  const sone = e.target.closest('[data-slipp]');
+  if (!sone) return;
+  e.preventDefault();
+  sone.classList.remove('over');
+  lastOpp(Number(sone.dataset.slipp), [...e.dataTransfer.files]);
+});
+
+/* --- lagring --- */
+document.getElementById('lagre').addEventListener('click', async (e) => {
+  e.target.disabled = true;
+  vis('Lagrer …');
+  try {
+    const svar = await fetch('/api/lagre', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(produkter)
+    });
+    if (!svar.ok) throw new Error((await svar.json()).feil || 'ukjent feil');
+    vis('Lagret i data/produkter.js');
+  } catch (feil) {
+    vis('Kunne ikke lagre: ' + feil.message, true);
+  }
+  e.target.disabled = false;
+});
+
+document.getElementById('lastinn').addEventListener('click', () => {
+  hent().then(() => vis('Hentet på nytt fra disk'));
+});
+
+hent();
+</script>
+</body>
+</html>
