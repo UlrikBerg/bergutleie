@@ -18,6 +18,15 @@
      areal   teltets gulvflate i kvm (kun telt)
      capL    kapasitet med langbord (kun telt)
      capR    kapasitet med runde bord (kun telt)
+
+   MERK om kapasitetstallene: de er lavere enn tallene Berg Event oppgir,
+   og det er med vilje.
+     5x6 m  – vi sier 30 fordi pakken bruker hestesko-oppsett. Dropper man
+              hesteskoen får seks avlange bord plass som to langbord, og da
+              er kapasiteten 36.
+     5x8 m  – 48 er tallet uten de to ekstra stolene på den ene kortsiden.
+              Pakken oppgir 50 for at selskapspakkene skal gå opp i 10-gangen.
+   Ikke «rett» disse mot bergevent.no uten å sjekke med Ulrik først.
      bilder  galleri; første bilde er hovedbildet
      fit     'contain' når bildet er en tegning som ikke skal beskjæres
      specs   punktliste med spesifikasjoner
@@ -314,7 +323,11 @@ export const PRODUKTER = [
 ];
 
 /* Ferdige selskapspakker. `lang` = avlange bord, `rund` = runde bord.
-   deler: [produkt-id, antall] */
+   deler: [produkt-id, antall]
+
+   Gjestetallet (n) er satt for å gå opp i 10-gangen, og forutsetter
+   hestesko-oppsett der pakken bruker det. Se merknaden om kapasitet
+   lenger opp – tallene her og capL/capR på teltene måler ikke det samme. */
 export const PAKKER = [
   { n: 20,
     lang: { telt: 't38', deler: [['t38', 1], ['sikring', 1], ['kbord', 4], ['duk', 4], ['stol', 24], ['lys', 1], ['jbl', 1]] },
