@@ -138,7 +138,7 @@ export const PRODUKTER = [
     d: 180, lp: 1.5,
     bilder: [],
     specs: ["Diameter: 150 cm · høyde 74 cm", "8 personer per bord", "Klappbart understell"],
-    rec: [["duk", 1], ["stol", 8], ["kuvert", 8]]
+    rec: [["rundduk", 1], ["stol", 8], ["kuvert", 8]]
   },
   {
     id: "stol", slug: "klappstol", cat: "Bord og stoler",
@@ -267,13 +267,13 @@ export const PRODUKTER = [
 export const PAKKER = [
   { n: 20,
     lang: { telt: 't38', deler: [['t38', 1], ['sikring', 1], ['kbord', 4], ['duk', 4], ['stol', 24], ['lys', 1], ['jbl', 1]] },
-    rund: { telt: 't56', deler: [['t56', 1], ['sikring', 1], ['rbord', 3], ['duk', 3], ['stol', 24], ['lys', 1], ['jbl', 1]] } },
+    rund: { telt: 't56', deler: [['t56', 1], ['sikring', 1], ['rbord', 3], ['rundduk', 3], ['stol', 24], ['lys', 1], ['jbl', 1]] } },
   { n: 30,
     lang: { telt: 't56', deler: [['t56', 1], ['sikring', 1], ['kbord', 6], ['duk', 6], ['stol', 30], ['lys', 1], ['jbl', 1]] },
-    rund: { telt: 't58', deler: [['t58', 1], ['sikring', 1], ['rbord', 4], ['duk', 4], ['stol', 32], ['lys', 1], ['jbl', 1]] } },
+    rund: { telt: 't58', deler: [['t58', 1], ['sikring', 1], ['rbord', 4], ['rundduk', 4], ['stol', 32], ['lys', 1], ['jbl', 1]] } },
   { n: 40,
     lang: { telt: 't58', deler: [['t58', 1], ['sikring', 1], ['kbord', 8], ['duk', 8], ['stol', 40], ['lys', 1], ['jbl', 1]] },
-    rund: { telt: 't510', deler: [['t510', 1], ['sikring', 1], ['rbord', 5], ['duk', 5], ['stol', 40], ['lys', 2], ['jbl', 1]] } },
+    rund: { telt: 't510', deler: [['t510', 1], ['sikring', 1], ['rbord', 5], ['rundduk', 5], ['stol', 40], ['lys', 2], ['jbl', 1]] } },
   { n: 50,
     lang: { telt: 't58', deler: [['t58', 1], ['sikring', 1], ['kbord', 8], ['duk', 8], ['stol', 50], ['lys', 1], ['jbl', 1]] } },
   { n: 60,
