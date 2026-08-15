@@ -12,6 +12,7 @@ import { oppsettSvg } from '/data/oppsett-svg.js';
 
 const NOKKEL = 'bergutleie-kurv';
 const ADRESSE_NOKKEL = 'bergutleie-adresse';
+const BESTILLING_NOKKEL = 'bergutleie-bestilling';
 
 /* Adressen skrives inn på forsiden og følger med til handlekurven. */
 const lesAdresse = () => {
@@ -19,6 +20,17 @@ const lesAdresse = () => {
 };
 const lagreAdresse = (v) => {
   try { localStorage.setItem(ADRESSE_NOKKEL, v); } catch { /* privat modus */ }
+};
+
+/* Datoer og leveringsvalg må også følge med fra handlekurven til tilbudssiden. */
+const lesBestilling = () => {
+  try { return JSON.parse(localStorage.getItem(BESTILLING_NOKKEL)) || {}; } catch { return {}; }
+};
+const lagreBestilling = (b) => {
+  try {
+    localStorage.setItem(BESTILLING_NOKKEL,
+      JSON.stringify({ fra: b.fra, til: b.til, modus: b.modus }));
+  } catch { /* privat modus */ }
 };
 
 /** Finner stedet i ruteplanen som en fritekstadresse peker på. */
@@ -207,11 +219,13 @@ function settOppPakker() {
 }
 
 /* --- delt tilstand for handlekurv og tilbudsskjema --- */
+const lagret = lesBestilling();
 const bestilling = {
-  fra: '', til: '',
+  fra: lagret.fra || '',
+  til: lagret.til || '',
   adresse: lesAdresse(),
   // Har kunden oppgitt adresse på forsiden, står levering forhåndsvalgt
-  modus: lesAdresse() ? 'lev' : 'hent'
+  modus: lagret.modus || (lesAdresse() ? 'lev' : 'hent')
 };
 
 function dager() {
@@ -476,8 +490,8 @@ function tegnInnsikt() {
 function koblBestillingsfelt(etterEndring) {
   const fra = document.querySelector('[data-fra]');
   const til = document.querySelector('[data-til]');
-  if (fra) { fra.value = bestilling.fra; fra.addEventListener('change', e => { bestilling.fra = e.target.value; etterEndring(); }); }
-  if (til) { til.value = bestilling.til; til.addEventListener('change', e => { bestilling.til = e.target.value; etterEndring(); }); }
+  if (fra) { fra.value = bestilling.fra; fra.addEventListener('change', e => { bestilling.fra = e.target.value; lagreBestilling(bestilling); etterEndring(); }); }
+  if (til) { til.value = bestilling.til; til.addEventListener('change', e => { bestilling.til = e.target.value; lagreBestilling(bestilling); etterEndring(); }); }
 
   const adr = document.querySelector('[data-adresse]');
   if (adr) {
@@ -494,6 +508,7 @@ function koblBestillingsfelt(etterEndring) {
     b.setAttribute('aria-pressed', String(b.dataset.val === bestilling.modus));
     b.addEventListener('click', () => {
       bestilling.modus = b.dataset.val;
+      lagreBestilling(bestilling);
       knapper.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
       etterEndring();
     });
@@ -518,20 +533,36 @@ function settOppTilbud() {
   const skjema = document.querySelector('[data-skjema]');
   if (!skjema) return;
 
-  const sammendrag = skjema.querySelector('[data-kurv-sammendrag]');
+  const sammendrag = document.querySelector('[data-kurv-sammendrag]');
   const tegnSammendrag = () => {
     const varer = PRODUKTER.filter(p => antall(p.id) > 0);
     if (!varer.length) { sammendrag.hidden = true; return; }
     const s = summer();
     sammendrag.hidden = false;
+    const dagerTekst = s.d.har ? (s.d.n === 1 ? '1 døgn' : s.d.n + ' dager') : 'ikke valgt';
+    const norsk = (iso) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+      if (!m) return iso;
+      const mnd = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+      return `${Number(m[3])}. ${mnd[Number(m[2]) - 1]}`;
+    };
+    const periode = bestilling.fra && bestilling.til
+      ? `${norsk(bestilling.fra)} – ${norsk(bestilling.til)} (${dagerTekst})` : 'Datoer ikke valgt';
+    const levering = bestilling.modus === 'lev'
+      ? (bestilling.adresse ? 'Leveres til ' + bestilling.adresse : 'Leveres – adresse mangler')
+      : 'Hentes i Sørliveien 78, 1788 Halden';
+
     sammendrag.innerHTML = `
-      <p class="sammendrag-tittel">Fra handlekurven din</p>
+      <p class="sammendrag-tittel">Din bestilling</p>
       <ul>${varer.map(p => `<li>${antall(p.id)} × ${p.navn}</li>`).join('')}</ul>
+      <dl class="sammendrag-fakta">
+        <dt>Leieperiode</dt><dd>${periode}</dd>
+        <dt>${bestilling.modus === 'lev' ? 'Levering' : 'Henting'}</dt><dd>${levering}</dd>
+      </dl>
       <p class="sammendrag-sum">Beregnet total: <strong>${s.tilbudspris ? kr(s.total) + ' + levering' : kr(s.total)}</strong></p>
-      <p class="sammendrag-note">Listen sendes med forespørselen. <a href="/handlekurv/">Endre i handlekurven →</a></p>`;
+      <p class="sammendrag-note"><a href="/handlekurv/">← Endre i handlekurven</a></p>`;
   };
 
-  koblBestillingsfelt(tegnSammendrag);
   tegnSammendrag();
 
   skjema.addEventListener('submit', async (e) => {
@@ -544,6 +575,8 @@ function settOppTilbud() {
     const s = summer();
     const kropp = {
       ...data,
+      navn: [data.fornavn, data.etternavn].filter(Boolean).join(' ').trim(),
+      fra: bestilling.fra, til: bestilling.til,
       dager: s.d.har ? s.d.n : null,
       levering: bestilling.modus === 'lev' ? (bestilling.adresse || '(ikke oppgitt)') : 'Henter selv',
       fraktpris: s.levering,

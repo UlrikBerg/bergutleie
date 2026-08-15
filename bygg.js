@@ -634,7 +634,7 @@ function handlekurv() {
         <span class="value" data-total>0 kr</span>
       </div>
       <p class="mva">Alle priser er inkl. mva. Montering inngår ikke.</p>
-      <a class="btn btn-lg bred" href="/tilbud/">Send bestillingsforespørsel</a>
+      <a class="btn btn-lg bred" href="/tilbud/">Gå videre</a>
       <p class="uforpliktende">Uforpliktende – vi svarer innen 6 timer</p>
     </aside>
   </div>
@@ -655,32 +655,24 @@ function tilbud() {
 <main class="wrap tilbud-side">
   <div class="tilbud-intro">
     <h1>Få et uforpliktende tilbud</h1>
-    <p>Fortell oss om festen, så sjekker vi tilgjengelighet og svarer med et konkret tilbud innen 6 timer.</p>
+    <p>Siste steg. Vi sjekker tilgjengelighet og sender tilbudet på e-post innen 6 timer.</p>
   </div>
 
-  <form class="tilbud-skjema" data-skjema>
-    <div class="felt-rad">
-      <label><span>Navn</span><input type="text" name="navn" placeholder="Fornavn Etternavn" required autocomplete="name"></label>
-      <label><span>Mobilnummer</span><input type="tel" name="mobil" placeholder="900 00 000" required autocomplete="tel"></label>
-    </div>
-    <div class="felt-rad">
-      <label><span>E-post</span><input type="email" name="epost" placeholder="navn@epost.no" required autocomplete="email"></label>
-      <label><span>Adresse for festen</span><input type="text" name="adresse" data-adresse list="stederliste" placeholder="Gateadresse og sted"></label>
-    </div>
-    <div>
-      <span class="field-label">Henting eller levering</span>
-      <div class="seg" data-seg-modus>
-        <button type="button" data-val="hent" aria-pressed="true">Hent selv · 0 kr</button>
-        <button type="button" data-val="lev" aria-pressed="false">Få det levert</button>
-      </div>
-    </div>
-    <div class="felt-rad">
-      <label><span>Utstyret klart</span><input type="date" name="fra" data-fra></label>
-      <label><span>Leveres tilbake</span><input type="date" name="til" data-til></label>
-    </div>
-    <label><span>Kommentar</span><textarea name="kommentar" placeholder="Hva slags utstyr trenger du? Antall gjester, type arrangement og annet vi bør vite."></textarea></label>
+  <div class="kurv-sammendrag" data-kurv-sammendrag hidden></div>
 
-    <div class="kurv-sammendrag" data-kurv-sammendrag hidden></div>
+  <form class="tilbud-skjema" data-skjema>
+    <p class="skjema-intro">Hvem skal motta tilbudet?</p>
+
+    <div class="felt-rad">
+      <label><span>Fornavn</span><input type="text" name="fornavn" required autocomplete="given-name"></label>
+      <label><span>Etternavn</span><input type="text" name="etternavn" required autocomplete="family-name"></label>
+    </div>
+
+    <label><span>E-post</span><input type="email" name="epost" placeholder="navn@epost.no" required autocomplete="email"></label>
+
+    <label><span>Mobilnummer <em>valgfritt</em></span><input type="tel" name="mobil" placeholder="900 00 000" autocomplete="tel"></label>
+
+    <label><span>Kommentar <em>valgfritt</em></span><textarea name="kommentar" placeholder="Noe vi bør vite? Tidspunkt for henting, adkomst, eller spørsmål."></textarea></label>
 
     <input type="text" name="firma" tabindex="-1" autocomplete="off" class="honningkrukke" aria-hidden="true">
     <div>

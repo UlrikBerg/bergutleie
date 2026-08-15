@@ -57,11 +57,12 @@ export async function handterForesporsel(request, env) {
   // Vi svarer 200 så boten ikke skjønner at den ble avvist.
   if (data.firma) return svar(200, { ok: true });
 
-  const navn = tekst(data.navn, 100);
-  const mobil = tekst(data.mobil, 40);
+  const navn = tekst(data.navn, 100)
+    || [tekst(data.fornavn, 60), tekst(data.etternavn, 60)].filter(Boolean).join(' ');
+  const mobil = tekst(data.mobil, 40) || 'Ikke oppgitt';
   const epost = tekst(data.epost, 120);
-  if (!navn || !mobil || !epost || !epost.includes('@')) {
-    return svar(400, { feil: 'Fyll ut navn, mobil og e-post.' });
+  if (!navn || !epost || !epost.includes('@')) {
+    return svar(400, { feil: 'Fyll ut navn og e-post.' });
   }
 
   const varer = Array.isArray(data.varer) ? data.varer.slice(0, 60) : [];

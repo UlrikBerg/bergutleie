@@ -480,6 +480,19 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
 .skjema-status { margin: 0; font-size: 14px; color: var(--muted-2); text-align: center; }
 .skjema-status.feil { color: var(--accent); font-weight: 600; }
 .kurv-sammendrag { background: var(--kort); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+.skjema-intro {
+  margin: 0 0 4px; font-size: 15.5px; font-weight: 700; color: var(--ink);
+}
+.tilbud-skjema label > span em {
+  font-style: normal; font-weight: 500; color: var(--muted-3); font-size: 12px;
+}
+.sammendrag-fakta {
+  margin: 0 0 12px; display: grid; grid-template-columns: auto 1fr;
+  gap: 4px 14px; font-size: 14px;
+}
+.sammendrag-fakta dt { color: var(--muted-2); }
+.sammendrag-fakta dd { margin: 0; color: var(--ink); font-weight: 600; }
+.kurv-sammendrag { margin-bottom: 20px; }
 .sammendrag-tittel { margin: 0 0 8px; font-size: 13px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted-2); }
 .kurv-sammendrag ul { margin: 0 0 10px; padding-left: 18px; font-size: 14.5px; color: #344845; line-height: 1.6; }
 .sammendrag-sum { margin: 0 0 4px; font-size: 14.5px; }
