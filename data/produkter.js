@@ -257,7 +257,10 @@ export const PRODUKTER = [
     navn: "JBL PartyBox 310", desc: "Kraftig partyhøyttaler med lysshow",
     dl: "Partyhøyttaler med kraftig lyd, innebygd lysshow og batteri til hele kvelden. Koble til mobilen via Bluetooth – klar for tale og dansegulv.",
     d: 590, lp: 2,
-    bilder: [],
+    bilder: [
+      { u: "/uploads/jbl-partybox-310.jpg", fit: "contain", alt: "JBL PartyBox 310 partyhøyttaler med lysshow" },
+      { u: "/uploads/jbl-partybox-310-miljo.jpg", alt: "JBL PartyBox 310 i bruk på utefest" }
+    ],
     specs: ["Kraftig lyd med innebygd lysshow", "Batteri i inntil 18 timer", "Bluetooth og mikrofoninngang", "Hjul og håndtak – enkel å flytte"],
     rec: []
   },
