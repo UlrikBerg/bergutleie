@@ -192,7 +192,7 @@ function forside() {
   const innhold = `
 <main>
   <section class="wrap hero">
-    <div>
+    <div class="hero-tekst">
       <h1>Lei festutstyr til fast pris</h1>
       <p class="lead">Utleie av alt du trenger til selskap i egen hage – telt, bord, stoler, dekketøy, lyd og lys. Hent selv gratis på lageret vårt ved E6 i Halden, eller få alt levert dit festen skal stå.</p>
       <div class="hero-actions">

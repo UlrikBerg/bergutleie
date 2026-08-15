@@ -544,6 +544,33 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
 /* ---------- responsivt ---------- */
 @media (max-width: 1050px) {
   .meny-knapp { display: flex; }
+
+  /* Heroen blir ett bilde med teksten liggende oppå, så den tar
+     mindre av skjermen og gir et roligere førsteinntrykk. */
+  .hero {
+    position: relative; display: block;
+    padding: 0; margin-top: 30px;
+    min-height: 540px; border-radius: 18px; overflow: hidden;
+    display: flex; align-items: flex-end;
+  }
+  .hero-media { position: absolute; inset: 0; z-index: 0; }
+  .hero-media img {
+    width: 100%; height: 100%; object-fit: cover;
+    aspect-ratio: auto; border-radius: 0;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to top,
+      rgba(10,30,32,.95) 0%, rgba(10,30,32,.90) 42%,
+      rgba(10,30,32,.72) 68%, rgba(10,30,32,.34) 88%, rgba(10,30,32,.18) 100%);
+  }
+  .hero-tekst { position: relative; z-index: 2; padding: 30px 24px 28px; width: 100%; }
+  .hero h1 { color: #fff; font-size: 34px; margin-bottom: 14px; }
+  .hero .lead { color: rgba(255,255,255,.93); font-size: 15.5px; line-height: 1.55; margin-bottom: 22px; }
+  .hero-actions { margin-bottom: 20px; }
+  .hero .btn-ghost { border-color: rgba(255,255,255,.5); color: #fff; background: rgba(255,255,255,.08); }
+  .hero .btn-ghost:hover { background: rgba(255,255,255,.18); border-color: #fff; color: #fff; }
+  .usp { color: rgba(255,255,255,.88); font-size: 13.5px; }
   .site-header .wrap { gap: 14px; }
 
   /* Menyen legger seg under topplinjen når den åpnes */
@@ -613,6 +640,12 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .prod-bilde.contain { padding: 10px; }
 
   /* Større trykkflater i bunnlinjen */
+  .section { padding-top: 74px; }
+  .band .wrap { padding-top: 46px; padding-bottom: 50px; }
+  .faq { padding-top: 78px; }
+  .cta-outer { padding: 78px 20px 84px; }
+  .section-head { margin-bottom: 26px; }
+  .section-head-center { margin-bottom: 28px; }
   .footer-links { gap: 0; }
   .footer-links a { padding: 11px 0; }
   .footer-col span { padding: 5px 0; }
