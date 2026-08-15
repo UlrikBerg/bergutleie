@@ -2,7 +2,7 @@
    POST /api/foresporsel
 
    Tar imot forespørselen fra handlekurven og sender den som e-post til
-   post@bergutleie.no. Kalles fra src/index.js – ingen egen server å drifte.
+   kontakt@bergevent.no. Kalles fra src/index.js – ingen egen server å drifte.
 
    Krever to miljøvariabler i Cloudflare (Settings → Variables and Secrets):
      RESEND_API_KEY   API-nøkkel fra resend.com
@@ -76,7 +76,7 @@ export async function handterForesporsel(request, env) {
     },
     body: JSON.stringify({
       from: AVSENDER,
-      to: [env.VARSEL_TIL || 'post@bergutleie.no'],
+      to: [env.VARSEL_TIL || 'kontakt@bergevent.no'],
       reply_to: epost,
       subject: `Forespørsel fra ${navn} – ${nok(sum + frakt)}`,
       text: kropp

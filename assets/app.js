@@ -543,7 +543,7 @@ function settOppTilbud() {
     } catch (feil) {
       knapp.disabled = false;
       status.className = 'skjema-status feil';
-      status.textContent = 'Noe gikk galt. Prøv igjen, eller send e-post til post@bergutleie.no.';
+      status.textContent = 'Noe gikk galt. Prøv igjen, eller send e-post til kontakt@bergevent.no.';
     }
   });
 }

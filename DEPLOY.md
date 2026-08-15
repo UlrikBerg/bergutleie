@@ -52,7 +52,7 @@ Prosjektet må ha disse (Settings → Build):
 Og under Settings → Variables and Secrets (for skjemaet):
 
 - `RESEND_API_KEY` – API-nøkkel fra resend.com
-- `VARSEL_TIL` – `post@bergutleie.no`
+- `VARSEL_TIL` – `kontakt@bergevent.no`
 
 ## Gjenstår
 
