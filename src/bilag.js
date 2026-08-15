@@ -53,7 +53,7 @@ export function lagBilag(d) {
 
   p.tekst(V, y, d.henter ? 'HENTING' : 'LEVERINGSADRESSE', { fet: true, str: 8, f: AKSENT });
   y -= 17;
-  p.tekst(V, y, d.henter ? 'Hentes på lageret ved E6 i Halden' : d.levering, { str: 10.5, f: INK });
+  p.tekst(V, y, d.henter ? 'Sørliveien 78, 1788 Halden (ved E6)' : d.levering, { str: 10.5, f: INK });
   y -= 14;
   p.tekst(V, y, d.henter ? 'Åpent man-fre 09-18 og søndag 12-15' : 'Utkjøring og henting er inkludert', { str: 9.5, f: DEMPET });
 
@@ -146,7 +146,7 @@ export function lagBilag(d) {
   p.tekst(V, 52, `Org.nr. ${d.orgnr}`, { str: 9, f: DEMPET });
   p.tekst(V, 40, `Konto ${d.kontonr}`, { str: 9, f: DEMPET });
 
-  p.tekst(V + 200, 64, 'Lageret ved E6 i Halden', { str: 9, f: DEMPET });
+  p.tekst(V + 200, 64, 'Sørliveien 78, 1788 Halden', { str: 9, f: DEMPET });
   p.tekst(V + 200, 52, 'Man-fre 09-18  ·  Søndag 12-15', { str: 9, f: DEMPET });
 
   p.tekst(H, 64, d.epostFirma, { str: 9, f: DEMPET, hoyre: true });

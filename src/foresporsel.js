@@ -263,7 +263,7 @@ function svarmal(d) {
       ? [
           `  Hentes:            ${d.hentDato}`,
           `  Leveres tilbake:   ${d.returDato}`,
-          '  Sted: Lageret vårt ved E6 i Halden.',
+          '  Sted: Sørliveien 78, 1788 Halden (rett ved E6).',
           '  Åpent man–fre 09–18 og søndag 12–15.'
         ]
       : [

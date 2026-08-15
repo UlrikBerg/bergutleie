@@ -102,8 +102,8 @@ ${innhold}
       <p class="eyebrow">Kontakt</p>
       <div class="footer-links">
         <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>
-        <span>Lageret vårt ligger rett ved E6 i Halden</span>
-        <span>Man–fre 09–18 · Søn 12–15</span>
+        <span>Sørliveien 78, 1788 Halden</span>
+        <span>Rett ved E6 · Man–fre 09–18 · Søn 12–15</span>
       </div>
     </div>
   </div>
@@ -154,7 +154,14 @@ function forside() {
       image: NETTSTED + '/uploads/hageselskap.webp',
       description: 'Utleie av partytelt, bord, stoler, dekketøy, lyd og lys til faste priser. Henting i Halden eller levering på Østlandet.',
       priceRange: 'kr',
-      address: { '@type': 'PostalAddress', addressLocality: 'Halden', addressCountry: 'NO' },
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Sørliveien 78',
+        postalCode: '1788',
+        addressLocality: 'Halden',
+        addressRegion: 'Østfold',
+        addressCountry: 'NO'
+      },
       areaServed: ['Halden', 'Sarpsborg', 'Fredrikstad', 'Moss', 'Oslo'].map(n => ({ '@type': 'City', name: n })),
       openingHoursSpecification: [
         { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '18:00' },
@@ -245,7 +252,7 @@ function forside() {
         <h3>Hent og tilbakelever på vårt lager</h3>
         <p class="big-price">0 kr</p>
         <ul class="ticks">
-          <li><span class="tick">✓</span>Lager rett ved E6 i Halden – enkel av- og påkjøring</li>
+          <li><span class="tick">✓</span>Sørliveien 78 i Halden, rett ved E6 – enkel av- og påkjøring</li>
           <li><span class="tick">✓</span>Vi hjelper deg med lasting</li>
           <li><span class="tick">✓</span>Det meste får plass i varebil eller på tilhenger</li>
           <li><span class="tick">✓</span>Samme pris for leie opptil 4 dager – f.eks. tor–man</li>
@@ -696,7 +703,7 @@ function leievilkar() {
       'Forskuddet er bindende. Se punktet om avbestilling.']],
 
     ['Henting og levering',
-     ['Henter du selv, er det gratis. Lageret ligger rett ved E6 i Halden, og vi hjelper deg med lastingen.',
+     ['Henter du selv, er det gratis. Lageret ligger i Sørliveien 78 i Halden, rett ved E6, og vi hjelper deg med lastingen.',
       'Ved levering gjelder faste sonepriser etter kjøreavstand. Prisen dekker både utkjøring og henting.',
       'Utstyret skal være klart til henting på avtalt sted og tidspunkt. Må vi kjøre forgjeves, kommer et tillegg for bomtur.',
       'Montering inngår ikke. Trenger du hjelp til opprigg og nedrigg, si fra når du bestiller.']],
