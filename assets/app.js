@@ -11,6 +11,7 @@ import { soneForKommune } from '/data/kommuner.js';
 import { teltSvg } from '/data/telt-svg.js';
 import { lagAdressesok } from '/assets/adressesok.js';
 import { oppsettSvg } from '/data/oppsett-svg.js';
+import { startMaling, hentGclid, sporForesporsel } from '/assets/maling.js';
 
 const NOKKEL = 'bergutleie-kurv';
 const ADRESSE_NOKKEL = 'bergutleie-adresse';
@@ -605,8 +606,11 @@ function settOppTilbud() {
     if (data.firma) return;                      // honningkrukke – bot fylte den ut
 
     const s = summer();
+    const klikk = hentGclid();
     const kropp = {
       ...data,
+      gclid: klikk ? klikk.id : null,
+      gclidType: klikk ? klikk.type : null,
       navn: [data.fornavn, data.etternavn].filter(Boolean).join(' ').trim(),
       fra: bestilling.fra, til: bestilling.til,
       dager: s.d.har ? s.d.n : null,
@@ -635,6 +639,7 @@ function settOppTilbud() {
         body: JSON.stringify(kropp)
       });
       if (!svar.ok) throw new Error('Serveren svarte ' + svar.status);
+      sporForesporsel(s.total);
       skjema.outerHTML = `<div class="kvittering">
         <span class="kvittering-hake">✓</span>
         <h2>Takk for forespørselen!</h2>
@@ -659,6 +664,7 @@ function tegnAlt() {
   tegnKurvside();
 }
 
+startMaling();
 settOppMeny();
 settOppGalleri();
 settOppPakker();

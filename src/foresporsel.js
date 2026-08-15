@@ -81,12 +81,17 @@ export async function handterForesporsel(request, env) {
   const levering = tekst(data.levering, 200) || 'Ikke oppgitt';
   const henter = /henter selv/i.test(levering);
   const kommentar = tekst(data.kommentar, 2000);
+  // Kom kunden fra en annonse, følger klikk-ID-en med. Den trengs for å
+  // rapportere den faktiske ordreverdien tilbake til Google senere.
+  const gclid = tekst(data.gclid, 200);
+  const gclidType = tekst(data.gclidType, 20) || 'gclid';
 
   const naa = new Date();
   const tilbudsnr = await nesteTilbudsnr(env);
 
   const felles = { navn, mobil, epost, periode, dagerLabel, levering, henter,
                    varer, leie, frakt, total, utenMva, mva, kommentar,
+                   gclid, gclidType,
                    hentDato: fra ? norskDato(fra) : 'avtales',
                    returDato: til ? norskDato(til) : 'avtales',
                    tilbudsnr,
@@ -223,6 +228,13 @@ function htmlEpost(d) {
     </div>
   </td></tr>` : ''}
 
+  ${d.gclid ? `
+  <tr><td style="padding:0 30px 22px;">
+    <p style="margin:0;font-size:12px;color:${C.dempet2 || C.dempet};">
+      Fra Google-annonse · ${esc(d.gclidType)}: <span style="font-family:ui-monospace,Menlo,monospace;">${esc(d.gclid)}</span>
+    </p>
+  </td></tr>` : ''}
+
   <tr><td style="padding:0 30px 30px;">
     <a href="${svarmal(d)}"
        style="display:inline-block;background:${C.aksent};color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:13px 26px;border-radius:8px;">
@@ -350,6 +362,7 @@ function tekstEpost(d) {
     linje('  TOTALT INKL. MVA', nok(d.total)),
     '',
     ...(d.kommentar ? ['KOMMENTAR FRA KUNDEN', d.kommentar, ''] : []),
+    ...(d.gclid ? [`Fra Google-annonse (${d.gclidType}): ${d.gclid}`, ''] : []),
     'Svar på denne e-posten går rett til kunden.'
   ].join('\n');
 }
