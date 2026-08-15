@@ -16,3 +16,9 @@ not_found_handling = "404-page"
 # Worker-koden må kjøre før filene, ellers ville www.bergutleie.no fått
 # servert index.html direkte og aldri blitt omdirigert til apex-domenet.
 run_worker_first = true
+
+# Teller for tilbudsnummer. Uten den faller nummeret tilbake på klokka,
+# og da hopper det - kunden ser at det ikke er fortløpende.
+[[kv_namespaces]]
+binding = "TELLER"
+id = "7a176560b5e7488db87a9fac4b4668d5"
