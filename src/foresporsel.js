@@ -185,11 +185,14 @@ function htmlEpost(d) {
   </td></tr>` : ''}
 
   <tr><td style="padding:0 30px 30px;">
-    <a href="mailto:${esc(d.epost)}?subject=${encodeURIComponent('Tilbud fra Berg Utleie')}"
+    <a href="${svarmal(d)}"
        style="display:inline-block;background:${C.aksent};color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:13px 26px;border-radius:8px;">
       Svar ${esc(d.navn.split(' ')[0])} med tilbud
     </a>
-    <p style="margin:12px 0 0;font-size:12.5px;color:${C.dempet2};">Svar på denne e-posten går rett til kunden.</p>
+    <p style="margin:12px 0 0;font-size:12.5px;color:${C.dempet2};">
+      Åpner et ferdig utfylt svar med tilbudet og forespørselen sitert under.
+      Vanlig «Svar» går også rett til kunden.
+    </p>
   </td></tr>
 
   <tr><td style="background:${C.bg};padding:16px 30px;border-top:1px solid ${C.linje};">
@@ -202,6 +205,60 @@ function htmlEpost(d) {
 </table>
 </td></tr></table>
 </body></html>`;
+}
+
+
+/** Ferdig utfylt svar til kunden, som åpnes av knappen i e-posten. */
+function svarmal(d) {
+  const fornavn = d.navn.split(' ')[0];
+  const bredde = 42;
+  const linje = (a, b) => '  ' + a.padEnd(bredde - String(b).length, '.') + ' ' + b;
+
+  const kropp = [
+    `Hei ${fornavn},`,
+    '',
+    'Takk for forespørselen! Vi har utstyret tilgjengelig i perioden du ønsker,',
+    'og her er tilbudet vårt:',
+    '',
+    ...d.varer.map(v => linje(`${v.antall} × ${v.navn}`, nok(v.sum))),
+    linje(d.henter ? 'Henting på lager' : 'Levering og henting', d.frakt ? nok(d.frakt) : '0 kr'),
+    '  ' + '-'.repeat(bredde),
+    linje('Totalt inkl. mva', nok(d.total)),
+    '',
+    `Leieperiode: ${d.periode}`,
+    d.henter
+      ? 'Utstyret hentes på lageret vårt ved E6 i Halden. Åpent man–fre 09–18 og søn 12–15.'
+      : `Utstyret leveres til ${d.levering}, og vi henter det igjen når festen er over.`,
+    '',
+    'Betaling skjer mot faktura etter at utstyret er levert tilbake.',
+    'Montering inngår ikke – ønsker du det, hjelper Berg Event deg gjerne.',
+    '',
+    'Gi beskjed hvis du vil bekrefte, så setter vi av utstyret til deg.',
+    'Har du spørsmål eller vil justere noe, er det bare å svare på denne e-posten.',
+    '',
+    'Med vennlig hilsen',
+    'Berg Utleie',
+    'kontakt@bergevent.no · bergutleie.no',
+    '',
+    '',
+    '--------------------------------------------------',
+    'Din forespørsel fra bergutleie.no:',
+    '',
+    `  Navn:      ${d.navn}`,
+    `  Mobil:     ${d.mobil}`,
+    `  E-post:    ${d.epost}`,
+    `  Periode:   ${d.periode} (${d.dagerLabel})`,
+    `  ${d.henter ? 'Henting:  ' : 'Levering: '} ${d.levering}`,
+    '',
+    ...d.varer.map(v => `  ${v.antall} × ${v.navn} — ${nok(v.sum)}`),
+    '',
+    `  Totalt inkl. mva: ${nok(d.total)}`,
+    ...(d.kommentar ? ['', '  Kommentar:', ...d.kommentar.split('\n').map(l => '  ' + l)] : [])
+  ].join('\n');
+
+  return 'mailto:' + encodeURIComponent(d.epost)
+    + '?subject=' + encodeURIComponent(`Tilbud fra Berg Utleie – ${d.periode}`)
+    + '&body=' + encodeURIComponent(kropp);
 }
 
 /* ----------------------------------------------------------- ren tekst --- */
