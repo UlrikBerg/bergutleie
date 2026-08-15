@@ -556,7 +556,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .hero {
     position: relative;
     padding: 0; margin: 0 calc(50% - 50vw);
-    width: 100vw; min-height: 430px; overflow: hidden;
+    width: 100vw; min-height: 408px; overflow: hidden;
     display: flex; align-items: flex-end;
   }
   .hero-media { position: absolute; inset: 0; z-index: 0; }
