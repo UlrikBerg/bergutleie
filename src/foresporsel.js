@@ -16,6 +16,7 @@
 
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
 const MVA_SATS = 0.25;          // prisene på nettsiden er oppgitt inkl. mva
+const FORSKUDD_ANDEL = 0.5;     // 50 % forskudd må betales før utstyret utleveres
 
 /* Fargene fra nettstedet, så e-posten kjennes igjen */
 const C = {
@@ -59,7 +60,9 @@ export async function handterForesporsel(request, env) {
   const kommentar = tekst(data.kommentar, 2000);
 
   const felles = { navn, mobil, epost, periode, dagerLabel, levering, henter,
-                   varer, leie, frakt, total, utenMva, mva, kommentar };
+                   varer, leie, frakt, total, utenMva, mva, kommentar,
+                   hentDato: fra ? norskDato(fra) : 'avtales',
+                   returDato: til ? norskDato(til) : 'avtales' };
 
   if (!env.RESEND_API_KEY) {
     return svar(500, { feil: 'E-post er ikke satt opp ennå.' });
@@ -187,10 +190,10 @@ function htmlEpost(d) {
   <tr><td style="padding:0 30px 30px;">
     <a href="${svarmal(d)}"
        style="display:inline-block;background:${C.aksent};color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:13px 26px;border-radius:8px;">
-      Svar ${esc(d.navn.split(' ')[0])} med tilbud
+      Bekreft bookingen til ${esc(d.navn.split(' ')[0])}
     </a>
     <p style="margin:12px 0 0;font-size:12.5px;color:${C.dempet2};">
-      Åpner et ferdig utfylt svar med tilbudet og forespørselen sitert under.
+      Åpner en ferdig bekreftelse med hentetidspunkt, forskudd og forespørselen sitert under.
       Vanlig «Svar» går også rett til kunden.
     </p>
   </td></tr>
@@ -208,33 +211,51 @@ function htmlEpost(d) {
 }
 
 
-/** Ferdig utfylt svar til kunden, som åpnes av knappen i e-posten. */
+/** Ferdig utfylt bekreftelse til kunden, som åpnes av knappen i e-posten. */
 function svarmal(d) {
   const fornavn = d.navn.split(' ')[0];
   const bredde = 42;
   const linje = (a, b) => '  ' + a.padEnd(bredde - String(b).length, '.') + ' ' + b;
+  const forskudd = Math.round(d.total * FORSKUDD_ANDEL);
+  const rest = d.total - forskudd;
 
   const kropp = [
     `Hei ${fornavn},`,
     '',
-    'Takk for forespørselen! Vi har utstyret tilgjengelig i perioden du ønsker,',
-    'og her er tilbudet vårt:',
+    `Vi kontakter deg vedrørende henvendelsen om booking av selskapsutstyr`,
+    `${d.periode === 'Ikke valgt' ? '' : 'til ' + d.periode + '. '}Utstyret er satt av til deg, og avtalen er med dette bekreftet.`,
     '',
+    'HENTING OG TILBAKELEVERING',
+    ...(d.henter
+      ? [
+          `  Hentes:            ${d.hentDato}`,
+          `  Leveres tilbake:   ${d.returDato}`,
+          '  Sted: Lageret vårt ved E6 i Halden.',
+          '  Åpent man–fre 09–18 og søndag 12–15.'
+        ]
+      : [
+          `  Leveres ut:        ${d.hentDato}`,
+          `  Hentes igjen:      ${d.returDato}`,
+          `  Adresse: ${d.levering}`
+        ]),
+    '',
+    'UTSTYRET',
     ...d.varer.map(v => linje(`${v.antall} × ${v.navn}`, nok(v.sum))),
-    linje(d.henter ? 'Henting på lager' : 'Levering og henting', d.frakt ? nok(d.frakt) : '0 kr'),
+    ...(d.frakt ? [linje('Levering og henting', nok(d.frakt))] : []),
     '  ' + '-'.repeat(bredde),
     linje('Totalt inkl. mva', nok(d.total)),
     '',
-    `Leieperiode: ${d.periode}`,
+    'BETALING',
+    'Faktura ligger vedlagt.',
+    '',
+    `Det er ${Math.round(FORSKUDD_ANDEL * 100)} % forskuddsbetaling på bookingen, altså ${nok(forskudd)}.`,
     d.henter
-      ? 'Utstyret hentes på lageret vårt ved E6 i Halden. Åpent man–fre 09–18 og søn 12–15.'
-      : `Utstyret leveres til ${d.levering}, og vi henter det igjen når festen er over.`,
+      ? 'Forskuddet må være betalt før utstyret kan hentes.'
+      : 'Forskuddet må være betalt før vi kjører ut utstyret.',
+    `Resten, ${nok(rest)}, faktureres etter at utstyret er levert tilbake.`,
     '',
-    'Betaling skjer mot faktura etter at utstyret er levert tilbake.',
-    'Montering inngår ikke – ønsker du det, hjelper Berg Event deg gjerne.',
-    '',
-    'Gi beskjed hvis du vil bekrefte, så setter vi av utstyret til deg.',
-    'Har du spørsmål eller vil justere noe, er det bare å svare på denne e-posten.',
+    'Gi oss gjerne beskjed hvis noe skal endres, så ordner vi det.',
+    'Du kan svare direkte på denne e-posten.',
     '',
     'Med vennlig hilsen',
     'Berg Utleie',
@@ -257,7 +278,7 @@ function svarmal(d) {
   ].join('\n');
 
   return 'mailto:' + encodeURIComponent(d.epost)
-    + '?subject=' + encodeURIComponent(`Tilbud fra Berg Utleie – ${d.periode}`)
+    + '?subject=' + encodeURIComponent(`Bekreftelse på booking – Berg Utleie${d.periode === 'Ikke valgt' ? '' : ' – ' + d.periode}`)
     + '&body=' + encodeURIComponent(kropp);
 }
 

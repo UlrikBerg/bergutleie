@@ -689,7 +689,8 @@ function leievilkar() {
     ['Bestilling og bekreftelse',
      ['Forespørsel gjennom nettsiden er uforpliktende. Vi sjekker tilgjengelighet og svarer med et konkret tilbud innen seks timer.',
       'Avtalen er bindende først når du har bekreftet tilbudet vårt skriftlig.',
-      'Betaling skjer mot faktura etter at utstyret er levert tilbake.']],
+      'Det er 50 % forskuddsbetaling på bookingen. Forskuddet må være betalt før utstyret hentes eller kjøres ut.',
+      'Resten faktureres etter at utstyret er levert tilbake.']],
 
     ['Henting og levering',
      ['Henter du selv, er det gratis. Lageret ligger rett ved E6 i Halden, og vi hjelper deg med lastingen.',
