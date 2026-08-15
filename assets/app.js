@@ -518,8 +518,16 @@ function settOppTilbud() {
       dager: s.d.har ? s.d.n : null,
       levering: bestilling.modus === 'lev' ? (bestilling.adresse || '(ikke oppgitt)') : 'Henter selv',
       fraktpris: s.levering,
+      dagerLabel: s.d.har ? (s.d.n === 1 ? '1 døgn' : s.d.n + ' dager') : '1–4 dager',
+      leie: s.leie,
       varer: PRODUKTER.filter(p => antall(p.id) > 0)
-        .map(p => ({ navn: p.navn, antall: antall(p.id), sum: antall(p.id) * enhetspris(p, s.d.n) }))
+        .map(p => ({
+          navn: p.navn,
+          antall: antall(p.id),
+          enhet: enhetspris(p, s.d.n),
+          fast: !!p.fast,
+          sum: antall(p.id) * enhetspris(p, s.d.n)
+        }))
     };
 
     knapp.disabled = true;
