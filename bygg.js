@@ -91,7 +91,7 @@ ${innhold}
   <div class="wrap footer-grid">
     <div>
       <img src="/uploads/logo.png" alt="Berg Utleie" width="908" height="491">
-      <p class="blurb">Utleie av partytelt, møbler, dekketøy og eventutstyr til faste priser. Hent selv i Halden, eller få levert på hele Østlandet.</p>
+      <p class="blurb">Utleie av partytelt, møbler, duker og eventutstyr til faste priser. Hent selv i Halden, eller få levert på hele Østlandet.</p>
     </div>
     <div class="footer-col">
       <p class="eyebrow">Utstyr</p>
@@ -162,8 +162,13 @@ function forside() {
       '@context': 'https://schema.org', '@type': 'LocalBusiness',
       name: 'Berg Utleie', url: NETTSTED + '/', email: 'post@bergutleie.no',
       image: NETTSTED + '/uploads/hageselskap.webp',
-      description: 'Utleie av partytelt, bord, stoler, dekketøy, lyd og lys til faste priser. Henting i Halden eller levering på Østlandet.',
+      description: 'Utleie av partytelt, bord, stoler, duker, lyd og lys til faste priser. Henting i Halden eller levering på Østlandet.',
       priceRange: 'kr',
+      // Knytter nettstedet til kartoppføringen. cid-formen er den stabile -
+      // delelenker fra Maps har med seg sesjonsparametre som endrer seg.
+      sameAs: ['https://www.google.com/maps?cid=5090795604763509705'],
+      hasMap: 'https://www.google.com/maps?cid=5090795604763509705',
+      geo: { '@type': 'GeoCoordinates', latitude: 59.1226913, longitude: 11.3083016 },
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Sørliveien 78',
@@ -194,7 +199,7 @@ function forside() {
   <section class="wrap hero">
     <div class="hero-tekst">
       <h1>Lei festutstyr til fast pris</h1>
-      <p class="lead">Utleie av alt du trenger til selskap i egen hage – telt, bord, stoler, dekketøy, lyd og lys. Hent selv gratis på lageret vårt ved E6 i Halden, eller få alt levert dit festen skal stå.</p>
+      <p class="lead">Utleie av alt du trenger til selskap i egen hage – telt, bord, stoler, duker, lyd og lys. Hent selv gratis på lageret vårt ved E6 i Halden, eller få alt levert dit festen skal stå.</p>
       <div class="hero-actions">
         <a class="btn btn-lg" href="/selskapspakker/">Se pakketilbud</a>
         <a class="btn-ghost" href="#utstyr">Se utstyret</a>
@@ -231,7 +236,7 @@ function forside() {
     <div class="section-head">
       <div>
         <h2>Alt du trenger til festen</h2>
-        <p>Telt, møbler, dekketøy og teknikk – til fast pris.</p>
+        <p>Telt, møbler, duker og teknikk – til fast pris.</p>
       </div>
       <a class="btn-link" href="/utstyr/">Se alle produktene →</a>
     </div>
@@ -305,7 +310,7 @@ function forside() {
 
   return layout({
     url: '/', tittel: 'Berg Utleie – lei partytelt, bord og stoler til fast pris i Halden',
-    beskrivelse: `Utleie av partytelt, bord, stoler, dekketøy, lyd og lys til faste priser. Hent gratis på lageret ved E6 i Halden, eller få alt levert på Østlandet. Partytelt fra ${kr(billigsteTelt)}.`,
+    beskrivelse: `Utleie av partytelt, bord, stoler, duker, lyd og lys til faste priser. Hent gratis på lageret ved E6 i Halden, eller få alt levert på Østlandet. Partytelt fra ${kr(billigsteTelt)}.`,
     bilde: '/uploads/bord-pyntet.jpg', innhold, jsonld
   });
 }
