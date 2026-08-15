@@ -323,7 +323,7 @@ function katalog() {
 
   return layout({
     url: '/utstyr/', tittel: 'Alt utstyr til leie – priser og mål | Berg Utleie',
-    beskrivelse: 'Komplett oversikt over utleieutstyr: partytelt, bord, stoler, tregulv, dekketøy, lyd, lys og varme. Faste priser, samme pris for 1–4 dagers leie.',
+    beskrivelse: 'Komplett oversikt over utleieutstyr: partytelt, bord, stoler, ståbord, tregulv, duker, lyd og lys. Faste priser, samme pris for 1–4 dagers leie.',
     innhold,
     jsonld: [{
       '@context': 'https://schema.org', '@type': 'BreadcrumbList',
@@ -482,7 +482,6 @@ function hvorfor(rid, n, sel) {
   if (rid === 'sikring') return n === 1
     ? 'Fastpris · inkluderer alltid 4 jekkestropper, 4 hanketau og 4 jordanker'
     : `Fastpris · ${n} pakker à 4 jekkestropper, 4 hanketau og 4 jordanker`;
-  if (rid === 'kuvert') return `Komplett kuvert til ${n} gjester`;
   if (rid === 'jbl') return 'Kraftig lyd og lysshow – batteri til hele kvelden';
   return '';
 }
@@ -538,7 +537,7 @@ function pakkeside() {
     ${PAKKER.map(p => kort(p, 'rund')).join('')}
   </div>
 
-  <p class="pakke-fot">Trenger du gulv, dekketøy eller varme i tillegg? Alt kan legges til i <a href="/utstyr/">produktkatalogen</a> etterpå – handlekurven foreslår det som mangler.</p>
+  <p class="pakke-fot">Trenger du gulv, ståbord eller lys i tillegg? Alt kan legges til i <a href="/utstyr/">produktkatalogen</a> etterpå – handlekurven foreslår det som mangler.</p>
 </main>`;
 
   return layout({

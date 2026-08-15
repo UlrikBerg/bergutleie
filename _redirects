@@ -11,3 +11,7 @@
 
 # Handlekurv og tilbud var én side i første utkast
 /foresporsel/  /handlekurv/  301
+
+# Dekketøypakke og terrassevarmer er tatt ut av sortimentet
+/utstyr/dekketoy/        /utstyr/  301
+/utstyr/terrassevarmer/  /utstyr/  301

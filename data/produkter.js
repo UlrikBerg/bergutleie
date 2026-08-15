@@ -129,7 +129,7 @@ export const PRODUKTER = [
       { u: "/uploads/hageselskap.webp", alt: "Langbord dekket til hageselskap" }
     ],
     specs: ["Mål: 180×75 cm · høyde 74 cm", "6 personer med god plass, maks 8", "Klappes flatt – enkel transport"],
-    rec: [["duk", 1], ["stol", 6], ["kuvert", 6]]
+    rec: [["duk", 1], ["stol", 6]]
   },
   {
     id: "rbord", slug: "rundt-bord", cat: "Bord og stoler",
@@ -138,7 +138,7 @@ export const PRODUKTER = [
     d: 180, lp: 1.5,
     bilder: [],
     specs: ["Diameter: 150 cm · høyde 74 cm", "8 personer per bord", "Klappbart understell"],
-    rec: [["rundduk", 1], ["stol", 8], ["kuvert", 8]]
+    rec: [["rundduk", 1], ["stol", 8]]
   },
   {
     id: "stol", slug: "klappstol", cat: "Bord og stoler",
@@ -163,7 +163,7 @@ export const PRODUKTER = [
     rec: [["staduk-hvit", 1]]
   },
   {
-    id: "duk", slug: "duk", cat: "Dekketøy og duker",
+    id: "duk", slug: "duk", cat: "Duker",
     navn: "Duk til avlangt bord", desc: "Passer langbord og rundbord",
     dl: "Hvit bomullsduk, nyvasket og strøket. Løfter bordet fra piknik til selskap.",
     d: 120, lp: 0.05,
@@ -174,19 +174,7 @@ export const PRODUKTER = [
     rec: []
   },
   {
-    id: "kuvert", slug: "dekketoy", cat: "Dekketøy og duker",
-    navn: "Dekketøypakke, per kuvert", desc: "Tallerkener, glass og bestikk",
-    dl: "Komplett kuvert per gjest: middags- og dessertallerken, vin- og vannglass, og bestikk. Leveres rent – lever tilbake uskylt om du vil.",
-    d: 39, lp: 0.05,
-    bilder: [
-      { u: "/uploads/barnebursdag.webp", alt: "Dekket bord med servise og glass" },
-      { u: "/uploads/tregulv-detaljer.webp", alt: "Elegante bordddetaljer" }
-    ],
-    specs: ["2 tallerkener, 2 glass og bestikk per kuvert", "Klassisk hvitt servise", "Retur uskylt mot lite tillegg"],
-    rec: [["duk", 1]]
-  },
-  {
-    id: "rundduk", slug: "duk-til-rundt-bord", cat: "Dekketøy og duker",
+    id: "rundduk", slug: "duk-til-rundt-bord", cat: "Duker",
     navn: "Duk til rundt bord", desc: "Diameter 200 cm · vevet mønster",
     dl: "Elegant festduk med vevet mønster som gir et sofistikert uttrykk til bordet. Tidløs design som passer alle typer anledninger – fra bryllup til firmafest.",
     d: 200, lp: 0.05,
@@ -199,7 +187,7 @@ export const PRODUKTER = [
     rec: []
   },
   {
-    id: "staduk-hvit", slug: "hvit-duk-til-stabord", cat: "Dekketøy og duker",
+    id: "staduk-hvit", slug: "hvit-duk-til-stabord", cat: "Duker",
     navn: "Hvit duk til ståbord", desc: "Stretchtrekk til ståbord",
     dl: "Fleksibelt stretch-bordtrekk som er lett å trekke over ståbordet og gir det et elegant preg. Ideelt til mingling – og fungerer like godt ute som inne.",
     d: 120, lp: 0.05,
@@ -211,7 +199,7 @@ export const PRODUKTER = [
     rec: [["stabord", 1]]
   },
   {
-    id: "staduk-sort", slug: "sort-duk-til-stabord", cat: "Dekketøy og duker",
+    id: "staduk-sort", slug: "sort-duk-til-stabord", cat: "Duker",
     navn: "Sort duk til ståbord", desc: "Stretchtrekk til ståbord",
     dl: "Fleksibelt stretch-bordtrekk i sort som er lett å trekke over ståbordet og gir det et elegant preg. Ideelt til mingling – og fungerer like godt ute som inne.",
     d: 120, lp: 0.05,
@@ -223,7 +211,7 @@ export const PRODUKTER = [
     rec: [["stabord", 1]]
   },
   {
-    id: "jbl", slug: "jbl-partybox-310", cat: "Lyd, lys og varme",
+    id: "jbl", slug: "jbl-partybox-310", cat: "Lyd og lys",
     navn: "JBL PartyBox 310", desc: "Kraftig partyhøyttaler med lysshow",
     dl: "Partyhøyttaler med kraftig lyd, innebygd lysshow og batteri til hele kvelden. Koble til mobilen via Bluetooth – klar for tale og dansegulv.",
     d: 590, lp: 2,
@@ -232,7 +220,7 @@ export const PRODUKTER = [
     rec: []
   },
   {
-    id: "lys", slug: "lysslynge", cat: "Lyd, lys og varme",
+    id: "lys", slug: "lysslynge", cat: "Lyd og lys",
     navn: "Lysslynge 4,5 m", desc: "Henger i midten av telttaket",
     dl: "Varmhvite pærer på slynge som henger langs mønet i telttaket. Slyngene kan skjøtes sammen for lengre telt – skjøteledning og transformator følger med, og du trenger bare én uansett hvor mange slynger du skjøter.",
     d: 129, lp: 0.2,
@@ -240,15 +228,6 @@ export const PRODUKTER = [
       { u: "/uploads/lysslynge.jpg", fit: "contain", alt: "Lysslynge med varmhvite pærer" }
     ],
     specs: ["Lengde: 4,5 m · kan skjøtes sammen", "Henger i midten av telttaket", "1 slynge til telt på 6–8 m · 2 slynger fra 10 m", "Skjøteledning og transformator følger med – én holder"],
-    rec: []
-  },
-  {
-    id: "varme", slug: "terrassevarmer", cat: "Lyd, lys og varme",
-    navn: "Terrassevarmer, gass", desc: "Inkl. full propanflaske",
-    dl: "Holder gjestene varme når kvelden blir sval. Full propanflaske inkludert i prisen.",
-    d: 290, lp: 2,
-    bilder: [],
-    specs: ["Full propanflaske inkludert", "Dekker ca. 15 kvm", "Enkel tenning og regulering"],
     rec: []
   },
   {
@@ -303,8 +282,8 @@ export const KATEGORIER = [
   { navn: 'Partytelt', bilde: '/uploads/hageselskap.webp', alt: 'Partytelt til leie' },
   { navn: 'Bord og stoler', bilde: '/uploads/bord-pyntet.jpg', alt: 'Bord og stoler til leie' },
   { navn: 'Gulv og lining', bilde: '/uploads/tregulv-montering.webp', alt: 'Tregulv og lining til partytelt' },
-  { navn: 'Dekketøy og duker', bilde: '/uploads/tregulv-detaljer.webp', alt: 'Dekketøy og duker til leie' },
-  { navn: 'Lyd, lys og varme', bilde: '/uploads/bryllup-gulv-lining.webp', alt: 'Lyd, lys og varme til fest' },
+  { navn: 'Duker', bilde: '/uploads/duk-rundt-bord.png', alt: 'Duker til leie' },
+  { navn: 'Lyd og lys', bilde: '/uploads/bryllup-gulv-lining.webp', alt: 'Lyd og lys til fest' },
   { navn: 'Sikringsutstyr', bilde: '/uploads/barnebursdag.webp', alt: 'Sikringsutstyr til telt' }
 ];
 
