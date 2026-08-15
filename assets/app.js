@@ -8,6 +8,7 @@
 
 import { PRODUKTER, STEDER, finn, sone, enhetspris, kr } from '/data/produkter.js';
 import { teltSvg } from '/data/telt-svg.js';
+import { lagAdressesok } from '/assets/adressesok.js';
 import { oppsettSvg } from '/data/oppsett-svg.js';
 
 const NOKKEL = 'bergutleie-kurv';
@@ -22,6 +23,18 @@ const lagreAdresse = (v) => {
   try { localStorage.setItem(ADRESSE_NOKKEL, v); } catch { /* privat modus */ }
 };
 
+/* Adressen kunden har valgt fra Kartverket, med poststed og koordinater. */
+const VALGT_NOKKEL = 'bergutleie-valgt-adresse';
+const lesValgtAdresse = () => {
+  try { return JSON.parse(localStorage.getItem(VALGT_NOKKEL)) || null; } catch { return null; }
+};
+const lagreValgtAdresse = (a) => {
+  try {
+    if (a) localStorage.setItem(VALGT_NOKKEL, JSON.stringify(a));
+    else localStorage.removeItem(VALGT_NOKKEL);
+  } catch { /* privat modus */ }
+};
+
 /* Datoer og leveringsvalg må også følge med fra handlekurven til tilbudssiden. */
 const lesBestilling = () => {
   try { return JSON.parse(localStorage.getItem(BESTILLING_NOKKEL)) || {}; } catch { return {}; }
@@ -33,8 +46,14 @@ const lagreBestilling = (b) => {
   } catch { /* privat modus */ }
 };
 
-/** Finner stedet i ruteplanen som en fritekstadresse peker på. */
-function finnSted(adresse) {
+/** Finner stedet i ruteplanen. Har kunden valgt en adresse fra Kartverket,
+    matcher vi på poststed og kommune; ellers faller vi tilbake til fritekst. */
+function finnSted(adresse, valgt) {
+  if (valgt) {
+    const kandidater = [valgt.poststed, valgt.kommune].filter(Boolean).map(x => x.toLowerCase());
+    const treff = STEDER.find(s => kandidater.some(k => k.includes(s.navn.toLowerCase())));
+    if (treff) return treff;
+  }
   const a = (adresse || '').trim().toLowerCase();
   if (a.length < 2) return null;
   return STEDER.find(s => a.includes(s.navn.toLowerCase())) || null;
@@ -224,6 +243,7 @@ const bestilling = {
   fra: lagret.fra || '',
   til: lagret.til || '',
   adresse: lesAdresse(),
+  valgt: lesValgtAdresse(),
   // Har kunden oppgitt adresse på forsiden, står levering forhåndsvalgt
   modus: lagret.modus || (lesAdresse() ? 'lev' : 'hent')
 };
@@ -234,7 +254,7 @@ function dager() {
   return { har: true, n: Math.max(1, Math.round((t2 - t1) / 86400000)) };
 }
 
-const stedTreff = () => finnSted(bestilling.adresse);
+const stedTreff = () => finnSted(bestilling.adresse, bestilling.valgt);
 
 /** Regner ut leie, frakt og total ut fra kurv, datoer og adresse. */
 function summer() {
@@ -496,9 +516,11 @@ function koblBestillingsfelt(etterEndring) {
   const adr = document.querySelector('[data-adresse]');
   if (adr) {
     adr.value = bestilling.adresse;
-    adr.addEventListener('input', e => {
-      bestilling.adresse = e.target.value;
-      lagreAdresse(e.target.value);
+    lagAdressesok(adr, (valgt) => {
+      bestilling.valgt = valgt;
+      bestilling.adresse = adr.value;
+      lagreAdresse(adr.value);
+      lagreValgtAdresse(valgt);
       etterEndring();
     });
   }
@@ -579,6 +601,7 @@ function settOppTilbud() {
       fra: bestilling.fra, til: bestilling.til,
       dager: s.d.har ? s.d.n : null,
       levering: bestilling.modus === 'lev' ? (bestilling.adresse || '(ikke oppgitt)') : 'Henter selv',
+      koordinater: bestilling.valgt ? { lat: bestilling.valgt.lat, lon: bestilling.valgt.lon } : null,
       fraktpris: s.levering,
       dagerLabel: s.d.har ? (s.d.n === 1 ? '1 døgn' : s.d.n + ' dager') : '1–4 dager',
       leie: s.leie,

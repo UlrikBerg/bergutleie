@@ -7,6 +7,7 @@
    ======================================================================== */
 
 import { handterForesporsel } from './foresporsel.js';
+import { handterAdressesok } from './adresse.js';
 
 export default {
   async fetch(request, env) {
@@ -17,6 +18,10 @@ export default {
     if (url.hostname === 'www.bergutleie.no') {
       url.hostname = 'bergutleie.no';
       return Response.redirect(url.toString(), 301);
+    }
+
+    if (url.pathname === '/api/adresse') {
+      return handterAdressesok(request);
     }
 
     if (url.pathname === '/api/foresporsel') {

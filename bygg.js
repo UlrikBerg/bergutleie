@@ -618,8 +618,8 @@ function handlekurv() {
           <p class="hente-note">Rett ved E6 · Man–fre 09–18 · Søndag 12–15</p>
         </div>
         <div data-adresse-felt hidden style="margin-top: 12px;">
-          <input type="text" data-adresse list="stederliste"
-                 placeholder="Gateadresse og sted, f.eks. Storgata 1, Fredrikstad">
+          <input type="text" data-adresse
+                 placeholder="Begynn å skrive adressen …">
           <p class="rute-treff" data-rute-treff hidden></p>
           <p class="sone-note" data-adresse-note hidden></p>
         </div>

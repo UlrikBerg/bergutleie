@@ -449,6 +449,22 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
 }
 .hente-adresse { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--ink); }
 .hente-note { margin: 3px 0 0; font-size: 12.5px; color: var(--muted-2); line-height: 1.45; }
+/* Adressesøk med forslagsliste */
+.adr-boks { position: relative; }
+.adr-liste {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 40;
+  margin: 0; padding: 5px; list-style: none;
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 10px 26px rgba(17,59,63,.13);
+  max-height: 268px; overflow-y: auto;
+}
+.adr-liste li {
+  padding: 10px 12px; border-radius: 7px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.adr-liste li:hover, .adr-liste li.aktiv { background: var(--line-soft); }
+.adr-gate { font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.adr-sted { font-size: 12.5px; color: var(--muted-2); }
 .rute-treff { margin: 10px 0 0; font-size: 13.5px; color: var(--gronn); font-weight: 600; line-height: 1.5; }
 .sone-note { margin: 10px 0 0; font-size: 13px; color: var(--muted-2); line-height: 1.5; }
 .sum-lines { border-top: 1px solid var(--line-soft); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
