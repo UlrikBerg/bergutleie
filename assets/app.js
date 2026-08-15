@@ -298,13 +298,15 @@ function tegnKurvside() {
 }
 
 /* --- «Slik kan det se ut» – 3D-tegning av hele kurven --- */
-let oppsettVinkel = 0;
+const KAM_START = { az: 0, elev: 0.5, zoom: 1, panX: 0, panY: 0 };
+let kamera = { ...KAM_START };
 
 function tegnOppsett() {
   const boks = document.querySelector('[data-oppsett]');
   if (!boks) return;
 
-  const relevant = ['t36','t38','t56','t58','t510','kbord','trebord','rbord','stabord','stol','trebenk','gulv','lys','lining'];
+  const relevant = ['t36','t38','t56','t58','t510','kbord','trebord','rbord',
+                    'stabord','stol','trebenk','gulv','lys','lining','duk','rundduk'];
   const noeAaVise = relevant.some(id => antall(id) > 0);
   boks.hidden = !noeAaVise;
   if (!noeAaVise) return;
@@ -312,7 +314,7 @@ function tegnOppsett() {
   const kurvTall = {};
   PRODUKTER.forEach(p => { if (antall(p.id) > 0) kurvTall[p.id] = antall(p.id); });
 
-  const res = oppsettSvg(kurvTall, finn, oppsettVinkel);
+  const res = oppsettSvg(kurvTall, finn, kamera);
   document.querySelector('[data-oppsett-scene]').innerHTML = res.svg;
 
   const note = document.querySelector('[data-oppsett-note]');
@@ -328,6 +330,101 @@ function tegnOppsett() {
     deler.push(`Tregulvet dekker ${Math.round(res.gulvdekning * 100)} % av flaten.`);
   }
   note.textContent = deler.join(' ');
+
+  const zoomVis = document.querySelector('[data-zoom-verdi]');
+  if (zoomVis) zoomVis.textContent = Math.round(kamera.zoom * 100) + ' %';
+}
+
+function settKamera(endring) {
+  Object.assign(kamera, endring);
+  kamera.elev = Math.max(0.18, Math.min(0.92, kamera.elev));
+  kamera.zoom = Math.max(0.5, Math.min(4, kamera.zoom));
+  tegnOppsett();
+}
+
+function settOppKamera() {
+  const scene = document.querySelector('[data-oppsett-scene]');
+  if (!scene) return;
+
+  /* Dra: horisontalt roterer, vertikalt vipper. Shift eller to fingre panorerer. */
+  scene.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    // Enkelte nettlesere kaster her hvis pekeren ikke er «aktiv». Draget
+    // skal fungere uansett, så feilen må ikke stoppe resten.
+    try { scene.setPointerCapture(e.pointerId); } catch { /* ikke kritisk */ }
+    scene.classList.add('drar');
+    const x0 = e.clientX, y0 = e.clientY;
+    const start = { ...kamera };
+    const panorer = e.shiftKey || e.button === 1;
+
+    const flytt = (ev) => {
+      const dx = ev.clientX - x0, dy = ev.clientY - y0;
+      if (panorer) {
+        settKamera({ panX: start.panX + dx, panY: start.panY + dy });
+      } else {
+        settKamera({ az: start.az + dx * 0.009, elev: start.elev - dy * 0.0035 });
+      }
+    };
+    const slipp = () => {
+      scene.classList.remove('drar');
+      scene.removeEventListener('pointermove', flytt);
+      scene.removeEventListener('pointerup', slipp);
+      scene.removeEventListener('pointercancel', slipp);
+    };
+    scene.addEventListener('pointermove', flytt);
+    scene.addEventListener('pointerup', slipp);
+    scene.addEventListener('pointercancel', slipp);
+  });
+
+  /* Rullehjul zoomer */
+  scene.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    settKamera({ zoom: kamera.zoom * (e.deltaY < 0 ? 1.12 : 0.89) });
+  }, { passive: false });
+
+  /* Klyp for å zoome på mobil */
+  let pekere = new Map(), startAvstand = 0, startZoom = 1;
+  scene.addEventListener('pointerdown', (e) => {
+    pekere.set(e.pointerId, e);
+    if (pekere.size === 2) {
+      const [a, b] = [...pekere.values()];
+      startAvstand = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      startZoom = kamera.zoom;
+    }
+  });
+  scene.addEventListener('pointermove', (e) => {
+    if (!pekere.has(e.pointerId)) return;
+    pekere.set(e.pointerId, e);
+    if (pekere.size === 2 && startAvstand > 0) {
+      const [a, b] = [...pekere.values()];
+      const na = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      settKamera({ zoom: startZoom * (na / startAvstand) });
+    }
+  });
+  ['pointerup', 'pointercancel'].forEach(t =>
+    scene.addEventListener(t, (e) => { pekere.delete(e.pointerId); startAvstand = 0; }));
+
+  /* Tastatur når tegningen har fokus */
+  scene.setAttribute('tabindex', '0');
+  scene.addEventListener('keydown', (e) => {
+    const steg = e.shiftKey ? 0.35 : 0.12;
+    if (e.key === 'ArrowLeft') { settKamera({ az: kamera.az - steg }); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { settKamera({ az: kamera.az + steg }); e.preventDefault(); }
+    if (e.key === 'ArrowUp') { settKamera({ elev: kamera.elev + 0.06 }); e.preventDefault(); }
+    if (e.key === 'ArrowDown') { settKamera({ elev: kamera.elev - 0.06 }); e.preventDefault(); }
+    if (e.key === '+' || e.key === '=') settKamera({ zoom: kamera.zoom * 1.15 });
+    if (e.key === '-') settKamera({ zoom: kamera.zoom * 0.87 });
+    if (e.key === '0') settKamera({ ...KAM_START });
+  });
+
+  /* Knapper */
+  document.querySelector('[data-kam-venstre]')?.addEventListener('click', () => settKamera({ az: kamera.az - 0.4 }));
+  document.querySelector('[data-kam-hoyre]')?.addEventListener('click', () => settKamera({ az: kamera.az + 0.4 }));
+  document.querySelector('[data-kam-inn]')?.addEventListener('click', () => settKamera({ zoom: kamera.zoom * 1.25 }));
+  document.querySelector('[data-kam-ut]')?.addEventListener('click', () => settKamera({ zoom: kamera.zoom * 0.8 }));
+  document.querySelector('[data-kam-null]')?.addEventListener('click', () => settKamera({ ...KAM_START }));
+  document.querySelector('[data-kam-ovenfra]')?.addEventListener('click', () =>
+    settKamera({ elev: kamera.elev > 0.75 ? 0.5 : 0.88 }));
 }
 
 /* Forslag basert på hva som ligger i kurven */
@@ -408,26 +505,8 @@ function settOppKurvside() {
   if (!liste) return;
   koblBestillingsfelt(tegnKurvside);
 
-  document.querySelector('[data-oppsett-snu]')?.addEventListener('click', () => {
-    oppsettVinkel += Math.PI / 8;
-    tegnOppsett();
-  });
-
-  const scene = document.querySelector('[data-oppsett-scene]');
-  scene?.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    scene.setPointerCapture(e.pointerId);
-    scene.classList.add('drar');
-    const x0 = e.clientX, v0 = oppsettVinkel;
-    const flytt = (ev) => { oppsettVinkel = v0 + (ev.clientX - x0) * 0.011; tegnOppsett(); };
-    const slipp = () => {
-      scene.classList.remove('drar');
-      scene.removeEventListener('pointermove', flytt);
-      scene.removeEventListener('pointerup', slipp);
-    };
-    scene.addEventListener('pointermove', flytt);
-    scene.addEventListener('pointerup', slipp);
-  });
+  settOppKamera();
+;
   liste.addEventListener('click', (e) => {
     const f = e.target.closest('[data-fjern]');
     if (f) settAntall(f.dataset.fjern, 0);

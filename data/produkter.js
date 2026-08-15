@@ -280,7 +280,9 @@ export const PRODUKTER = [
     navn: "Sikringspakke telt", desc: "4 jekkestropper, 4 hanketau og 4 jordanker",
     dl: "Alt du trenger for å forankre teltet trygt: 4 jekkestropper, 4 hanketau og 4 jordanker. Fastpris uansett leieperiode – én pakke per telt.",
     fast: 400, lp: 1,
-    bilder: [],
+    bilder: [
+      { u: "/uploads/sikringspakke.jpg", alt: "Sikringspakke med 4 hanketau, 4 jekkestropper og 4 jordanker" }
+    ],
     specs: ["Inkluderer alltid: 4 jekkestropper · 4 hanketau · 4 jordanker", "Fastpris – uavhengig av antall dager", "Én pakke sikrer ett telt", "Påkrevd for trygg oppføring"],
     rec: []
   }

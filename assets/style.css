@@ -361,15 +361,38 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 
 /* ---------- «Slik kan det se ut» ---------- */
 .oppsett { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px 16px; }
-.oppsett-topp { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.oppsett-topp {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 12px; flex-wrap: wrap;
+}
 .oppsett-topp h2 { margin: 0; font-size: 16px; font-weight: 800; }
+.kam-knapper { display: flex; align-items: center; gap: 4px; }
+.kam-knapper button {
+  border: 1.5px solid #D9E2E0; background: #fff; color: var(--muted-2);
+  font: inherit; font-size: 14px; font-weight: 700; line-height: 1;
+  min-width: 30px; height: 30px; padding: 0 8px;
+  border-radius: 7px; cursor: pointer; transition: all .12s;
+}
+.kam-knapper button:hover { border-color: var(--ink); color: var(--ink); }
+.kam-knapper button[data-kam-null] { font-size: 12.5px; font-weight: 600; }
+.zoom-verdi {
+  font-size: 12px; font-weight: 700; color: var(--muted-3);
+  min-width: 46px; text-align: center; font-variant-numeric: tabular-nums;
+}
 .oppsett-scene {
-  background: #F6F8F2; border: 1px solid var(--line-soft); border-radius: 10px;
+  background: linear-gradient(#F8FAF4, #F1F5EA);
+  border: 1px solid var(--line-soft); border-radius: 10px;
   overflow: hidden; cursor: grab; touch-action: none; user-select: none;
 }
+.oppsett-scene:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .oppsett-scene.drar { cursor: grabbing; }
 .oppsett-scene svg { display: block; width: 100%; height: auto; }
-.oppsett-note { margin: 10px 0 0; font-size: 13px; color: var(--muted-2); line-height: 1.5; }
+.oppsett-hjelp { margin: 8px 0 0; font-size: 11.5px; color: var(--muted-3); }
+.oppsett-hjelp kbd {
+  background: var(--line-soft); border-radius: 3px;
+  padding: 1px 5px; font-size: 11px; font-family: inherit;
+}
+.oppsett-note { margin: 8px 0 0; font-size: 13px; color: var(--muted-2); line-height: 1.5; }
 
 /* ---------- handlekurv ---------- */
 .kurv-tittel { margin: 0 0 36px; font-size: 42px; font-weight: 800; letter-spacing: -0.025em; }
