@@ -27,9 +27,9 @@ export function lagBilag(d) {
 
   /* --- topp: logo og dokumenttype --- */
   p.logo(V, y - 34, 104);
-  p.tekst(H, y + 6, 'BOOKINGDETALJER', { fet: true, str: 9, f: DEMPET2, hoyre: true });
-  p.tekst(H, y - 12, d.referanse, { fet: true, str: 16, f: INK, hoyre: true });
-  p.tekst(H, y - 28, d.utstedt, { str: 9, f: DEMPET2, hoyre: true });
+  p.tekst(H, y + 6, 'TILBUD', { fet: true, str: 9, f: DEMPET2, hoyre: true });
+  p.tekst(H, y - 16, '#' + d.tilbudsnr, { fet: true, str: 22, f: AKSENT, hoyre: true });
+  p.tekst(H, y - 32, d.utstedt, { str: 9, f: DEMPET2, hoyre: true });
 
   y -= 62;
   p.rekt(V, y, H - V, 1.2, INK);
@@ -102,18 +102,33 @@ export function lagBilag(d) {
   sumLinje('Totalt inkl. mva', kr(d.total), { fet: true });
 
   /* --- betaling --- */
-  y -= 16;
-  const boksH = 76;
+  y -= 18;
+  const boksH = 128;
   p.rekt(V, y - boksH, H - V, boksH, FLATE);
-  p.rekt(V, y - boksH, 2.5, boksH, AKSENT);
-  p.tekst(V + 16, y - 20, 'BETALING', { fet: true, str: 8, f: AKSENT });
-  p.tekst(V + 16, y - 38, `Forskudd 50 %: ${kr(d.forskudd)}`, { fet: true, str: 11.5, f: INK });
-  p.tekst(V + 16, y - 53, d.henter
-    ? 'Må være betalt før utstyret hentes.'
-    : 'Må være betalt før vi kjører ut utstyret.', { str: 9.5, f: DEMPET });
-  p.tekst(V + 16, y - 66, `Resten, ${kr(d.rest)}, faktureres etter at utstyret er levert tilbake.`,
+  p.rekt(V, y - boksH, 3, boksH, AKSENT);
+
+  p.tekst(V + 18, y - 21, 'BETALING AV FORSKUDD', { fet: true, str: 8, f: AKSENT });
+
+  // beløpet stort til venstre
+  p.tekst(V + 18, y - 46, kr(d.forskudd), { fet: true, str: 19, f: INK });
+  p.tekst(V + 18, y - 61, '50 % av totalen', { str: 9, f: DEMPET2 });
+
+  // konto og merking til høyre, satt opp som en giro
+  const kx = V + 205;
+  p.tekst(kx, y - 40, 'Kontonummer', { str: 8.5, f: DEMPET2 });
+  p.tekst(kx + 100, y - 40, d.kontonr, { fet: true, str: 12, f: INK });
+  p.tekst(kx, y - 60, 'Merkes med', { str: 8.5, f: DEMPET2 });
+  p.tekst(kx + 100, y - 60, 'Tilbud ' + d.tilbudsnr, { fet: true, str: 12, f: AKSENT });
+  p.tekst(kx, y - 78, 'Beløp', { str: 8.5, f: DEMPET2 });
+  p.tekst(kx + 100, y - 78, kr(d.forskudd), { fet: true, str: 12, f: INK });
+
+  p.rekt(V + 18, y - 92, H - V - 36, 0.5, LINJE);
+  p.tekst(V + 18, y - 106, d.henter
+    ? 'Forskuddet må være betalt før utstyret kan hentes.'
+    : 'Forskuddet må være betalt før vi kjører ut utstyret.', { str: 9.5, f: INK });
+  p.tekst(V + 18, y - 119, `Resten, ${kr(d.rest)}, faktureres etter at utstyret er levert tilbake.`,
     { str: 9.5, f: DEMPET });
-  y -= boksH + 22;
+  y -= boksH + 24;
 
   /* --- kommentar --- */
   if (d.kommentar) {
@@ -126,11 +141,19 @@ export function lagBilag(d) {
   }
 
   /* --- bunnlinje --- */
-  p.rekt(V, 66, H - V, 0.5, LINJE);
-  p.tekst(V, 52, 'Berg Utleie', { fet: true, str: 9, f: INK });
-  p.tekst(V, 40, 'bergutleie.no  ·  post@bergutleie.no', { str: 9, f: DEMPET });
-  p.tekst(H, 52, 'Lageret ved E6 i Halden', { str: 9, f: DEMPET, hoyre: true });
-  p.tekst(H, 40, 'Alle priser er inkl. mva. Montering inngår ikke.', { str: 9, f: DEMPET2, hoyre: true });
+  p.rekt(V, 78, H - V, 0.5, LINJE);
+  p.tekst(V, 64, 'Berg Utleie', { fet: true, str: 9.5, f: INK });
+  p.tekst(V, 52, `Org.nr. ${d.orgnr}`, { str: 9, f: DEMPET });
+  p.tekst(V, 40, `Konto ${d.kontonr}`, { str: 9, f: DEMPET });
+
+  p.tekst(V + 200, 64, 'Lageret ved E6 i Halden', { str: 9, f: DEMPET });
+  p.tekst(V + 200, 52, 'Man-fre 09-18  ·  Søndag 12-15', { str: 9, f: DEMPET });
+
+  p.tekst(H, 64, d.epostFirma, { str: 9, f: DEMPET, hoyre: true });
+  p.tekst(H, 52, 'bergutleie.no', { str: 9, f: DEMPET, hoyre: true });
+  p.tekst(H, 40, 'Alle priser inkl. mva  ·  Montering inngår ikke', { str: 8.5, f: DEMPET2, hoyre: true });
+
+  p.tekst(V, 26, `Tilbud #${d.tilbudsnr} · gyldig i 14 dager fra ${d.utstedt}`, { str: 8.5, f: DEMPET2 });
 
   return tilBase64(p.bygg());
 }

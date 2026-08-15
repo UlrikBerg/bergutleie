@@ -19,12 +19,31 @@ import { lagBilag } from './bilag.js';
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
 const MVA_SATS = 0.25;          // prisene på nettsiden er oppgitt inkl. mva
 const FORSKUDD_ANDEL = 0.5;     // 50 % forskudd må betales før utstyret utleveres
+const KONTONR = '9803 22 90426';
+const ORGNR = '919 326 581';
+const EPOST = 'post@bergutleie.no';
+const TILBUDSNR_START = 17512;
 
 /* Fargene fra nettstedet, så e-posten kjennes igjen */
 const C = {
   ink: '#113B3F', aksent: '#E8562E', bg: '#F7F6F1',
   linje: '#E5E7E1', dempet: '#5A6E6D', dempet2: '#7C8D8B'
 };
+
+/** Neste tilbudsnummer. Teller opp i KV; uten KV brukes et tidsbasert
+    nummer som også er unikt og stigende, bare med hull i rekka. */
+async function nesteTilbudsnr(env) {
+  if (env.TELLER) {
+    try {
+      const forrige = parseInt(await env.TELLER.get('tilbudsnr'), 10);
+      const neste = (isNaN(forrige) ? TILBUDSNR_START : forrige) + 1;
+      await env.TELLER.put('tilbudsnr', String(neste));
+      return neste;
+    } catch { /* faller gjennom til reserven */ }
+  }
+  const minutterSidenStart = Math.floor((Date.now() - Date.UTC(2026, 7, 15)) / 60000);
+  return TILBUDSNR_START + minutterSidenStart;
+}
 
 export async function handterForesporsel(request, env) {
   let data;
@@ -62,15 +81,14 @@ export async function handterForesporsel(request, env) {
   const kommentar = tekst(data.kommentar, 2000);
 
   const naa = new Date();
-  const referanse = 'BU-' + naa.getFullYear() + String(naa.getMonth() + 1).padStart(2, '0')
-    + String(naa.getDate()).padStart(2, '0') + '-'
-    + String(naa.getHours()).padStart(2, '0') + String(naa.getMinutes()).padStart(2, '0');
+  const tilbudsnr = await nesteTilbudsnr(env);
 
   const felles = { navn, mobil, epost, periode, dagerLabel, levering, henter,
                    varer, leie, frakt, total, utenMva, mva, kommentar,
                    hentDato: fra ? norskDato(fra) : 'avtales',
                    returDato: til ? norskDato(til) : 'avtales',
-                   referanse,
+                   tilbudsnr,
+                   kontonr: KONTONR, orgnr: ORGNR, epostFirma: EPOST,
                    utstedt: `${naa.getDate()}. ${MANEDER[naa.getMonth()]} ${naa.getFullYear()}`,
                    forskudd: Math.round(total * FORSKUDD_ANDEL),
                    rest: total - Math.round(total * FORSKUDD_ANDEL) };
@@ -89,11 +107,11 @@ export async function handterForesporsel(request, env) {
       from: AVSENDER,
       to: [env.VARSEL_TIL || 'kontakt@bergevent.no'],
       reply_to: epost,
-      subject: `Forespørsel fra ${navn} – ${nok(total)}${fra ? ' – ' + norskDato(fra) : ''}`,
+      subject: `Forespørsel #${tilbudsnr} fra ${navn} – ${nok(total)}${fra ? ' – ' + norskDato(fra) : ''}`,
       html: htmlEpost(felles),
       text: tekstEpost(felles),
       attachments: [{
-        filename: `Bookingdetaljer-${referanse}.pdf`,
+        filename: `Tilbud-${tilbudsnr}-Berg-Utleie.pdf`,
         content: lagBilag(felles)
       }]
     })
@@ -151,7 +169,7 @@ function htmlEpost(d) {
   <tr><td style="background:${C.ink};padding:26px 30px;">
     <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#7FA09E;">Berg Utleie</p>
     <h1 style="margin:0;font-size:23px;font-weight:800;color:#ffffff;">Ny forespørsel</h1>
-    <p style="margin:6px 0 0;font-size:14px;color:#BCD0CE;">${esc(d.navn)} · ${nok(d.total)}</p>
+    <p style="margin:6px 0 0;font-size:14px;color:#BCD0CE;">${esc(d.navn)} · ${nok(d.total)} · Tilbud #${d.tilbudsnr}</p>
   </td></tr>
 
   <tr><td style="padding:26px 30px 6px;">
@@ -261,7 +279,9 @@ function svarmal(d) {
     linje('Totalt inkl. mva', nok(d.total)),
     '',
     'BETALING',
-    'Faktura ligger vedlagt.',
+    `Tilbudsnummer: ${d.tilbudsnr}`,
+    `Konto: ${KONTONR}`,
+    'Merk betalingen med tilbudsnummeret.',
     '',
     `Det er ${Math.round(FORSKUDD_ANDEL * 100)} % forskuddsbetaling på bookingen, altså ${nok(forskudd)}.`,
     d.henter
