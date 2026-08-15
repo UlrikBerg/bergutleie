@@ -242,7 +242,8 @@ export function oppsettSvg(kurv, finn, kam = {}) {
       });
     }
 
-    const takFyll = q('lining') > 0 ? 'url(#lining)' : 'url(#duk)';
+    const harLining = q('lining56') + q('lining58') + q('lining510') > 0;
+    const takFyll = harLining ? 'url(#lining)' : 'url(#duk)';
     [
       { p: [[0, 0, h], [Ld, 0, h], [Ld, Wd / 2, H], [0, Wd / 2, H]], c: [Ld / 2, Wd * 0.25], f: takFyll },
       { p: [[0, Wd, h], [Ld, Wd, h], [Ld, Wd / 2, H], [0, Wd / 2, H]], c: [Ld / 2, Wd * 0.75], f: takFyll },

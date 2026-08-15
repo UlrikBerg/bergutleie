@@ -109,7 +109,7 @@ ${innhold}
   </div>
   <div class="footer-bottom">
     <div class="wrap">
-      <span>© 2026 Berg Utleie. Alle rettigheter reservert.</span>
+      <span>© 2026 Berg Utleie · Org.nr. 919 326 581</span>
       <span class="legal"><a href="/personvern/">Personvern</a><a href="/leievilkar/">Leievilkår</a></span>
     </div>
   </div>

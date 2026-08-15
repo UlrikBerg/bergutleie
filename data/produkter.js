@@ -90,7 +90,7 @@ export const PRODUKTER = [
       { u: "/uploads/hageselskap.webp", alt: "Hageselskap i partytelt" }
     ],
     specs: ["Mål: 5×6 m (30 kvm)", "36 personer med langbord · 24 med runde bord", "Sidehøyde 2,0 m · avtakbare vegger", "Må forankres med sikringsutstyr"],
-    rec: [["gulv", 15], ["kbord", 5], ["duk", 5], ["stol", 30], ["lys", 1], ["sikring", 1]]
+    rec: [["lining56", 1], ["gulv", 15], ["kbord", 5], ["duk", 5], ["stol", 30], ["lys", 1], ["sikring", 1]]
   },
   {
     id: "t58", slug: "partytelt-5x8m", cat: "Partytelt",
@@ -106,7 +106,7 @@ export const PRODUKTER = [
       { u: "/uploads/bryllup-dekorert.webp", alt: "Partytelt dekorert til bryllup" }
     ],
     specs: ["Mål: 5×8 m (40 kvm)", "48 personer med langbord · 32 med runde bord", "Sidehøyde 2,0 m · avtakbare vegger", "Må forankres med sikringsutstyr"],
-    rec: [["gulv", 20], ["kbord", 8], ["duk", 8], ["stol", 50], ["lys", 1], ["sikring", 1], ["jbl", 1]]
+    rec: [["lining58", 1], ["gulv", 20], ["kbord", 8], ["duk", 8], ["stol", 50], ["lys", 1], ["sikring", 1], ["jbl", 1]]
   },
   {
     id: "t510", slug: "partytelt-5x10m", cat: "Partytelt",
@@ -122,7 +122,7 @@ export const PRODUKTER = [
       { u: "/uploads/bryllup-romantisk.webp", alt: "Romantisk bryllupsdekor i stort partytelt" }
     ],
     specs: ["Mål: 5×10 m (50 kvm)", "60 personer med langbord · 40 med runde bord", "Sidehøyde 2,0 m · avtakbare vegger", "Må forankres med sikringsutstyr"],
-    rec: [["gulv", 25], ["kbord", 10], ["duk", 10], ["stol", 60], ["lys", 2], ["sikring", 1], ["jbl", 1]]
+    rec: [["lining510", 1], ["gulv", 25], ["kbord", 10], ["duk", 10], ["stol", 60], ["lys", 2], ["sikring", 1], ["jbl", 1]]
   },
   {
     id: "gulv", slug: "gulvmodul", cat: "Gulv og lining",
@@ -140,17 +140,42 @@ export const PRODUKTER = [
     rec: []
   },
   {
-    id: "lining", slug: "lining-i-tak", cat: "Gulv og lining",
-    navn: "Lining i tak (pris per kvm)", desc: "Hvit drapering, per teltmodul",
-    dl: "Hvit himling som skjuler teltets rammer og gir rommet et mykt, festkledd uttrykk.",
-    d: 100, lp: 1,
+    id: "lining56", slug: "lining-5x6m", cat: "Gulv og lining",
+    navn: "Lining i tak – 5×6 m", desc: "Hvit himling til partytelt 5×6 m",
+    dl: "Hvit himling som skjuler teltets rammer og gir rommet et mykt, festkledd uttrykk. Skreddersydd til partytelt 5×6 m, og monteres enkelt med strikk.",
+    d: 3000, lp: 1,
     bilder: [
       { u: "/uploads/bryllup-gulv-lining.webp", alt: "Hvit lining i taket på partytelt" },
       { u: "/uploads/bryllup-dekorert.webp", alt: "Partytelt med lining dekorert til bryllup" }
     ],
-    specs: ["Hvit drapering i hele taket", "Prises per kvm", "Monteres enkelt med strikk"],
-    rec: [["lys", 1]]
+    specs: ["Passer partytelt 5×6 m", "Hvit drapering i hele taket", "Monteres enkelt med strikk", "Løfter uttrykket betraktelig til bryllup og jubileum"],
+    rec: [["t56", 1]]
   },
+  {
+    id: "lining58", slug: "lining-5x8m", cat: "Gulv og lining",
+    navn: "Lining i tak – 5×8 m", desc: "Hvit himling til partytelt 5×8 m",
+    dl: "Hvit himling som skjuler teltets rammer og gir rommet et mykt, festkledd uttrykk. Skreddersydd til partytelt 5×8 m, og monteres enkelt med strikk.",
+    d: 4000, lp: 1.4,
+    bilder: [
+      { u: "/uploads/bryllup-gulv-lining.webp", alt: "Hvit lining i taket på partytelt" },
+      { u: "/uploads/bryllup-dekorert.webp", alt: "Partytelt med lining dekorert til bryllup" }
+    ],
+    specs: ["Passer partytelt 5×8 m", "Hvit drapering i hele taket", "Monteres enkelt med strikk", "Løfter uttrykket betraktelig til bryllup og jubileum"],
+    rec: [["t58", 1]]
+  },
+  {
+    id: "lining510", slug: "lining-5x10m", cat: "Gulv og lining",
+    navn: "Lining i tak – 5×10 m", desc: "Hvit himling til partytelt 5×10 m",
+    dl: "Hvit himling som skjuler teltets rammer og gir rommet et mykt, festkledd uttrykk. Skreddersydd til partytelt 5×10 m, og monteres enkelt med strikk.",
+    d: 5000, lp: 1.8,
+    bilder: [
+      { u: "/uploads/bryllup-romantisk.webp", alt: "Stort partytelt med hvit lining" },
+      { u: "/uploads/bryllup-gulv-lining.webp", alt: "Hvit lining i taket på partytelt" }
+    ],
+    specs: ["Passer partytelt 5×10 m", "Hvit drapering i hele taket", "Monteres enkelt med strikk", "Løfter uttrykket betraktelig til bryllup og jubileum"],
+    rec: [["t510", 1]]
+  },
+
   {
     id: "kbord", slug: "langbord", cat: "Bord og stoler",
     navn: "Avlangt bord 180×75 cm", desc: "6–8 personer per bord",

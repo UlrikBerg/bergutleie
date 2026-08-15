@@ -285,7 +285,8 @@ function tegnOppsett() {
   if (!boks) return;
 
   const relevant = ['t33','t36','t38','t56','t58','t510','kbord','trebord','rbord',
-                    'stabord','stol','trebenk','gulv','lys','lining','duk','rundduk'];
+                    'stabord','stol','trebenk','gulv','lys','duk','rundduk',
+                    'lining56','lining58','lining510'];
   const noeAaVise = relevant.some(id => antall(id) > 0);
   boks.hidden = !noeAaVise;
   if (!noeAaVise) return;
