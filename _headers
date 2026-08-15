@@ -1,0 +1,19 @@
+# Cloudflare Pages – HTTP-headers
+# Denne fila leses av Cloudflare, ikke av GitHub Pages.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+
+# Bilder og statiske filer: cache lenge (endres via nytt filnavn)
+/uploads/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML: alltid revalider, så endringer blir synlige umiddelbart etter push
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
