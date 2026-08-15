@@ -567,6 +567,15 @@ function handlekurv() {
 
   <div class="kurv-layout" data-kurv-layout hidden>
     <div class="kurv-venstre">
+      <section class="oppsett" data-oppsett hidden>
+        <div class="oppsett-topp">
+          <h2>Slik kan det se ut</h2>
+          <button type="button" class="btn-liten" data-oppsett-snu>↻ Snu</button>
+        </div>
+        <div class="oppsett-scene" data-oppsett-scene></div>
+        <p class="oppsett-note" data-oppsett-note></p>
+      </section>
+
       <div class="kurv-liste" data-kurv-liste></div>
 
       <section class="innsikt" data-innsikt hidden>

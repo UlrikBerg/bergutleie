@@ -8,6 +8,7 @@
 
 import { PRODUKTER, STEDER, finn, sone, enhetspris, kr } from '/data/produkter.js';
 import { teltSvg } from '/data/telt-svg.js';
+import { oppsettSvg } from '/data/oppsett-svg.js';
 
 const NOKKEL = 'bergutleie-kurv';
 const ADRESSE_NOKKEL = 'bergutleie-adresse';
@@ -292,7 +293,41 @@ function tegnKurvside() {
   const aFelt = document.querySelector('[data-adresse-felt]');
   if (aFelt) aFelt.hidden = bestilling.modus !== 'lev';
 
+  tegnOppsett();
   tegnInnsikt();
+}
+
+/* --- «Slik kan det se ut» – 3D-tegning av hele kurven --- */
+let oppsettVinkel = 0;
+
+function tegnOppsett() {
+  const boks = document.querySelector('[data-oppsett]');
+  if (!boks) return;
+
+  const relevant = ['t36','t38','t56','t58','t510','kbord','trebord','rbord','stabord','stol','trebenk','gulv','lys','lining'];
+  const noeAaVise = relevant.some(id => antall(id) > 0);
+  boks.hidden = !noeAaVise;
+  if (!noeAaVise) return;
+
+  const kurvTall = {};
+  PRODUKTER.forEach(p => { if (antall(p.id) > 0) kurvTall[p.id] = antall(p.id); });
+
+  const res = oppsettSvg(kurvTall, finn, oppsettVinkel);
+  document.querySelector('[data-oppsett-scene]').innerHTML = res.svg;
+
+  const note = document.querySelector('[data-oppsett-note]');
+  const deler = [];
+  if (!res.teltId) {
+    deler.push('Legg et telt i kurven for å se oppsettet under duk.');
+  } else if (res.notater.length) {
+    deler.push('Får ikke plass i teltet og står sammenklappet ved siden av: ' + res.notater.join(', ') + '.');
+  } else {
+    deler.push('Alt utstyret får plass i teltet.');
+  }
+  if (res.teltId && res.gulvdekning > 0 && res.gulvdekning < 1) {
+    deler.push(`Tregulvet dekker ${Math.round(res.gulvdekning * 100)} % av flaten.`);
+  }
+  note.textContent = deler.join(' ');
 }
 
 /* Forslag basert på hva som ligger i kurven */
@@ -372,6 +407,27 @@ function settOppKurvside() {
   const liste = document.querySelector('[data-kurv-liste]');
   if (!liste) return;
   koblBestillingsfelt(tegnKurvside);
+
+  document.querySelector('[data-oppsett-snu]')?.addEventListener('click', () => {
+    oppsettVinkel += Math.PI / 8;
+    tegnOppsett();
+  });
+
+  const scene = document.querySelector('[data-oppsett-scene]');
+  scene?.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    scene.setPointerCapture(e.pointerId);
+    scene.classList.add('drar');
+    const x0 = e.clientX, v0 = oppsettVinkel;
+    const flytt = (ev) => { oppsettVinkel = v0 + (ev.clientX - x0) * 0.011; tegnOppsett(); };
+    const slipp = () => {
+      scene.classList.remove('drar');
+      scene.removeEventListener('pointermove', flytt);
+      scene.removeEventListener('pointerup', slipp);
+    };
+    scene.addEventListener('pointermove', flytt);
+    scene.addEventListener('pointerup', slipp);
+  });
   liste.addEventListener('click', (e) => {
     const f = e.target.closest('[data-fjern]');
     if (f) settAntall(f.dataset.fjern, 0);
