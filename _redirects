@@ -8,3 +8,6 @@
 #
 # Legg nye linjer her når en side bytter URL. Aldri slett en gammel
 # regel – den er det som bevarer rankingen og innkommende lenker.
+
+# Handlekurv og tilbud var én side i første utkast
+/foresporsel/  /handlekurv/  301

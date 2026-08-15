@@ -10,6 +10,22 @@ import { PRODUKTER, STEDER, finn, sone, enhetspris, kr } from '/data/produkter.j
 import { teltSvg } from '/data/telt-svg.js';
 
 const NOKKEL = 'bergutleie-kurv';
+const ADRESSE_NOKKEL = 'bergutleie-adresse';
+
+/* Adressen skrives inn på forsiden og følger med til handlekurven. */
+const lesAdresse = () => {
+  try { return localStorage.getItem(ADRESSE_NOKKEL) || ''; } catch { return ''; }
+};
+const lagreAdresse = (v) => {
+  try { localStorage.setItem(ADRESSE_NOKKEL, v); } catch { /* privat modus */ }
+};
+
+/** Finner stedet i ruteplanen som en fritekstadresse peker på. */
+function finnSted(adresse) {
+  const a = (adresse || '').trim().toLowerCase();
+  if (a.length < 2) return null;
+  return STEDER.find(s => a.includes(s.navn.toLowerCase())) || null;
+}
 
 /* --- kurvtilstand --- */
 const les = () => {
@@ -70,7 +86,7 @@ document.addEventListener('click', (e) => {
     kurv = Object.fromEntries(JSON.parse(velg.dataset.deler));
     lagre();
     velg.textContent = 'Lagt i handlekurven ✓';
-    setTimeout(() => { window.location.href = '/foresporsel/'; }, 600);
+    setTimeout(() => { window.location.href = '/handlekurv/'; }, 600);
   }
 });
 
@@ -91,7 +107,7 @@ function tegnProduktside() {
     if (note) {
       note.hidden = n === 0;
       note.innerHTML = n === 0 ? '' :
-        `✓ I handlekurven: ${n} stk · <a href="/foresporsel/">Til handlekurven →</a>`;
+        `✓ I handlekurven: ${n} stk · <a href="/handlekurv/">Til handlekurven →</a>`;
     }
   });
 }
@@ -118,6 +134,27 @@ function settOppGalleri() {
     if (e.key === 'ArrowLeft') vis(i - 1);
     if (e.key === 'ArrowRight') vis(i + 1);
   });
+}
+
+/* --- forside: adressefelt i leveringskortet --- */
+function settOppForsideAdresse() {
+  const felt = document.querySelector('[data-forside-adresse]');
+  if (!felt) return;
+  const bekreft = document.querySelector('[data-forside-bekreft]');
+
+  const tegn = () => {
+    const sted = finnSted(felt.value);
+    if (!sted) { bekreft.hidden = true; return; }
+    const z = sone(sted.km);
+    bekreft.hidden = false;
+    bekreft.textContent = z
+      ? `✓ Levering til ${sted.navn} er klar – adressen er med deg videre`
+      : `✓ ${sted.navn} er utenfor de faste sonene – vi gir fast pris på forespørsel`;
+  };
+
+  felt.value = lesAdresse();
+  tegn();
+  felt.addEventListener('input', () => { lagreAdresse(felt.value); tegn(); });
 }
 
 /* --- pakkeside: bordtype og rotasjon --- */
@@ -163,42 +200,68 @@ function settOppPakker() {
   });
 }
 
-/* --- handlekurv og forespørsel --- */
-const kurvSide = {
-  fra: '', til: '', modus: 'hent', adresse: ''
+/* --- delt tilstand for handlekurv og tilbudsskjema --- */
+const bestilling = {
+  fra: '', til: '',
+  adresse: lesAdresse(),
+  // Har kunden oppgitt adresse på forsiden, står levering forhåndsvalgt
+  modus: lesAdresse() ? 'lev' : 'hent'
 };
 
 function dager() {
-  const t1 = Date.parse(kurvSide.fra), t2 = Date.parse(kurvSide.til);
+  const t1 = Date.parse(bestilling.fra), t2 = Date.parse(bestilling.til);
   if (isNaN(t1) || isNaN(t2) || t2 < t1) return { har: false, n: 1 };
   return { har: true, n: Math.max(1, Math.round((t2 - t1) / 86400000)) };
 }
 
-function stedTreff() {
-  const a = kurvSide.adresse.trim().toLowerCase();
-  if (a.length < 2) return null;
-  return STEDER.find(s => a.includes(s.navn.toLowerCase())) || null;
+const stedTreff = () => finnSted(bestilling.adresse);
+
+/** Regner ut leie, frakt og total ut fra kurv, datoer og adresse. */
+function summer() {
+  const d = dager();
+  let leie = 0;
+  PRODUKTER.forEach(p => { leie += antall(p.id) * enhetspris(p, d.n); });
+
+  let levering = 0, levLabel = '0 kr', ruteMeta = '', adresseNote = '', tilbudspris = false;
+  if (bestilling.modus === 'lev') {
+    const sted = stedTreff();
+    if (!sted) {
+      levLabel = 'Legg inn adresse';
+      adresseNote = bestilling.adresse.trim().length > 1
+        ? 'Fant ikke stedet i ruteplanen – skriv nærmeste by (f.eks. Fredrikstad), eller send forespørsel så beregner vi.'
+        : 'Skriv adressen, så finner vi fast fraktpris automatisk.';
+    } else {
+      const z = sone(sted.km);
+      if (!z) {
+        tilbudspris = true;
+        levLabel = 'Etter avtale';
+        adresseNote = sted.navn + ' ligger utenfor de faste sonene våre – vi gir deg fast pris på forespørsel.';
+      } else {
+        levering = z.pris;
+        levLabel = kr(levering);
+        ruteMeta = 'Fast fraktpris til ' + sted.navn + ' – levering og henting av Berg Event-ansatte er inkludert.';
+      }
+    }
+  }
+  return { d, leie, levering, levLabel, ruteMeta, adresseNote, tilbudspris, total: leie + levering };
 }
 
+/* --- handlekurvsiden --- */
 function tegnKurvside() {
   const liste = document.querySelector('[data-kurv-liste]');
   if (!liste) return;
 
   const varer = PRODUKTER.filter(p => antall(p.id) > 0);
-  const tom = document.querySelector('[data-kurv-tom]');
-  const skjema = document.querySelector('[data-skjema-seksjon]');
-  tom.hidden = varer.length > 0;
-  liste.hidden = varer.length === 0;
-  if (skjema) skjema.hidden = varer.length === 0;
+  document.querySelector('[data-kurv-tom]').hidden = varer.length > 0;
+  document.querySelector('[data-kurv-layout]').hidden = varer.length === 0;
 
-  const d = dager();
-  const dagerLabel = d.har ? (d.n === 1 ? '1 døgn' : d.n + ' dager') : '1–4 dager';
+  const s = summer();
+  const dagerLabel = s.d.har ? (s.d.n === 1 ? '1 døgn' : s.d.n + ' dager') : '1–4 dager';
 
   liste.innerHTML = varer.map(p => {
-    const e = enhetspris(p, d.n);
+    const e = enhetspris(p, s.d.n);
     return `
     <div class="kurv-rad">
-      <span class="kurv-media">${p.bilder.length ? `<img src="${p.bilder[0].u}" alt="" loading="lazy">` : ''}</span>
       <div class="kurv-navn">
         <p class="navn"><a href="/utstyr/${p.slug}/">${p.navn}</a></p>
         <p class="enhet">${p.fast ? kr(p.fast) + ' fastpris /stk' : kr(e) + ' /stk for ' + dagerLabel}</p>
@@ -208,55 +271,28 @@ function tegnKurvside() {
         <span class="val">${antall(p.id)}</span>
         <button type="button" class="inc" data-id="${p.id}" aria-label="Legg til én">+</button>
       </div>
-      <span class="kurv-sum">${kr(antall(p.id) * e)}</span>
+      <p class="kurv-sum">${kr(antall(p.id) * e)}</p>
       <button type="button" class="fjern" data-fjern="${p.id}" aria-label="Fjern ${p.navn}">×</button>
     </div>`;
   }).join('');
 
-  /* priser */
-  let leie = 0, lastplass = 0;
-  PRODUKTER.forEach(p => {
-    leie += antall(p.id) * enhetspris(p, d.n);
-    lastplass += antall(p.id) * p.lp;
-  });
-
-  let levering = 0, levLabel = '0 kr', adresseNote = '', tilbud = false;
-  if (kurvSide.modus === 'lev') {
-    const sted = stedTreff();
-    if (!sted) {
-      levLabel = 'Legg inn adresse';
-      adresseNote = kurvSide.adresse.trim().length > 1
-        ? 'Fant ikke stedet i ruteplanen – skriv nærmeste by (f.eks. Fredrikstad), eller send forespørsel så beregner vi.'
-        : 'Skriv adressen, så finner vi fast fraktpris automatisk.';
-    } else {
-      const z = sone(sted.km);
-      if (!z) {
-        tilbud = true;
-        levLabel = 'Etter avtale';
-        adresseNote = sted.navn + ' ligger utenfor de faste sonene våre – vi gir deg fast pris på forespørsel.';
-      } else {
-        levering = z.pris;
-        levLabel = kr(levering);
-        adresseNote = 'Fast fraktpris til ' + sted.navn + ' – levering og henting av Berg Event-ansatte er inkludert.';
-      }
-    }
-  }
-
-  const settTekst = (sel, t) => { const e = document.querySelector(sel); if (e) e.textContent = t; };
-  settTekst('[data-periode-tag]', '(' + dagerLabel + ')');
-  settTekst('[data-leie]', kr(leie));
-  settTekst('[data-levering]', levLabel);
-  settTekst('[data-total]', tilbud ? kr(leie + levering) + ' + levering' : kr(leie + levering));
-  settTekst('[data-dager-note]', !d.har
+  const sett = (sel, t) => { const e = document.querySelector(sel); if (e) e.textContent = t; };
+  sett('[data-periode-tag]', '(' + dagerLabel + ')');
+  sett('[data-leie]', kr(s.leie));
+  sett('[data-levering]', s.levLabel);
+  sett('[data-total]', s.tilbudspris ? kr(s.total) + ' + levering' : kr(s.total));
+  sett('[data-dager-note]', !s.d.har
     ? 'Velg datoer – 1–4 dagers leie koster det samme.'
-    : (d.n <= 4 ? dagerLabel + ' – samme pris som én dag.' : d.n + ' dager – +15 % per døgn utover 4.'));
+    : (s.d.n <= 4 ? dagerLabel + ' – samme pris som én dag.' : s.d.n + ' dager – +15 % per døgn utover 4.'));
 
+  const rute = document.querySelector('[data-rute-treff]');
+  if (rute) { rute.textContent = s.ruteMeta ? '✓ ' + s.ruteMeta : ''; rute.hidden = !s.ruteMeta; }
   const aNote = document.querySelector('[data-adresse-note]');
-  if (aNote) { aNote.textContent = adresseNote; aNote.hidden = !adresseNote; }
+  if (aNote) { aNote.textContent = s.adresseNote; aNote.hidden = !s.adresseNote; }
   const aFelt = document.querySelector('[data-adresse-felt]');
-  if (aFelt) aFelt.hidden = kurvSide.modus !== 'lev';
+  if (aFelt) aFelt.hidden = bestilling.modus !== 'lev';
 
-  tegnInnsikt(lastplass);
+  tegnInnsikt();
 }
 
 /* Forslag basert på hva som ligger i kurven */
@@ -304,49 +340,80 @@ function tegnInnsikt() {
     </div>`).join('');
 }
 
+/* Felles oppkobling av dato-, adresse- og modusfelt (finnes på begge sider) */
+function koblBestillingsfelt(etterEndring) {
+  const fra = document.querySelector('[data-fra]');
+  const til = document.querySelector('[data-til]');
+  if (fra) { fra.value = bestilling.fra; fra.addEventListener('change', e => { bestilling.fra = e.target.value; etterEndring(); }); }
+  if (til) { til.value = bestilling.til; til.addEventListener('change', e => { bestilling.til = e.target.value; etterEndring(); }); }
+
+  const adr = document.querySelector('[data-adresse]');
+  if (adr) {
+    adr.value = bestilling.adresse;
+    adr.addEventListener('input', e => {
+      bestilling.adresse = e.target.value;
+      lagreAdresse(e.target.value);
+      etterEndring();
+    });
+  }
+
+  const knapper = [...document.querySelectorAll('[data-seg-modus] button')];
+  knapper.forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.val === bestilling.modus));
+    b.addEventListener('click', () => {
+      bestilling.modus = b.dataset.val;
+      knapper.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      etterEndring();
+    });
+  });
+}
+
 function settOppKurvside() {
   const liste = document.querySelector('[data-kurv-liste]');
   if (!liste) return;
-
-  const dl = document.getElementById('stederliste');
-  if (dl) dl.innerHTML = STEDER.map(s => `<option value="${s.navn}">`).join('');
-
-  document.querySelector('[data-fra]')?.addEventListener('change', (e) => { kurvSide.fra = e.target.value; tegnKurvside(); });
-  document.querySelector('[data-til]')?.addEventListener('change', (e) => { kurvSide.til = e.target.value; tegnKurvside(); });
-  document.querySelector('[data-adresse]')?.addEventListener('input', (e) => { kurvSide.adresse = e.target.value; tegnKurvside(); });
-
-  document.querySelectorAll('[data-seg-modus] button').forEach(b => {
-    b.addEventListener('click', () => {
-      kurvSide.modus = b.dataset.val;
-      document.querySelectorAll('[data-seg-modus] button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-      tegnKurvside();
-    });
-  });
-
+  koblBestillingsfelt(tegnKurvside);
   liste.addEventListener('click', (e) => {
     const f = e.target.closest('[data-fjern]');
     if (f) settAntall(f.dataset.fjern, 0);
   });
+}
 
+/* --- tilbudssiden --- */
+function settOppTilbud() {
   const skjema = document.querySelector('[data-skjema]');
-  skjema?.addEventListener('submit', async (e) => {
+  if (!skjema) return;
+
+  const sammendrag = skjema.querySelector('[data-kurv-sammendrag]');
+  const tegnSammendrag = () => {
+    const varer = PRODUKTER.filter(p => antall(p.id) > 0);
+    if (!varer.length) { sammendrag.hidden = true; return; }
+    const s = summer();
+    sammendrag.hidden = false;
+    sammendrag.innerHTML = `
+      <p class="sammendrag-tittel">Fra handlekurven din</p>
+      <ul>${varer.map(p => `<li>${antall(p.id)} × ${p.navn}</li>`).join('')}</ul>
+      <p class="sammendrag-sum">Beregnet total: <strong>${s.tilbudspris ? kr(s.total) + ' + levering' : kr(s.total)}</strong></p>
+      <p class="sammendrag-note">Listen sendes med forespørselen. <a href="/handlekurv/">Endre i handlekurven →</a></p>`;
+  };
+
+  koblBestillingsfelt(tegnSammendrag);
+  tegnSammendrag();
+
+  skjema.addEventListener('submit', async (e) => {
     e.preventDefault();
     const status = skjema.querySelector('[data-skjema-status]');
     const knapp = skjema.querySelector('button[type="submit"]');
     const data = Object.fromEntries(new FormData(skjema));
     if (data.firma) return;                      // honningkrukke – bot fylte den ut
 
-    const d = dager();
-    const sted = stedTreff();
-    const z = sted ? sone(sted.km) : null;
+    const s = summer();
     const kropp = {
       ...data,
-      fra: kurvSide.fra, til: kurvSide.til,
-      dager: d.har ? d.n : null,
-      levering: kurvSide.modus === 'lev' ? (kurvSide.adresse || '(ikke oppgitt)') : 'Henter selv',
-      fraktpris: kurvSide.modus === 'lev' && z ? z.pris : 0,
+      dager: s.d.har ? s.d.n : null,
+      levering: bestilling.modus === 'lev' ? (bestilling.adresse || '(ikke oppgitt)') : 'Henter selv',
+      fraktpris: s.levering,
       varer: PRODUKTER.filter(p => antall(p.id) > 0)
-        .map(p => ({ navn: p.navn, antall: antall(p.id), sum: antall(p.id) * enhetspris(p, d.n) }))
+        .map(p => ({ navn: p.navn, antall: antall(p.id), sum: antall(p.id) * enhetspris(p, s.d.n) }))
     };
 
     knapp.disabled = true;
@@ -359,10 +426,12 @@ function settOppKurvside() {
         body: JSON.stringify(kropp)
       });
       if (!svar.ok) throw new Error('Serveren svarte ' + svar.status);
-      skjema.innerHTML = `<div class="kvittering">
-        <p class="kvittering-tittel">✓ Takk – forespørselen er sendt!</p>
-        <p>Vi bekrefter tilgjengelighet på e-post innen 6 timer. Du hører fra oss på ${data.epost}.</p>
-        <a class="btn" href="/">Tilbake til forsiden</a></div>`;
+      skjema.outerHTML = `<div class="kvittering">
+        <span class="kvittering-hake">✓</span>
+        <h2>Takk for forespørselen!</h2>
+        <p>Vi sjekker tilgjengelighet og sender deg et uforpliktende tilbud innen 6 timer.</p>
+        <a class="btn btn-mork" href="/">Til forsiden</a>
+      </div>`;
       kurv = {};
       lagre();
     } catch (feil) {
@@ -373,6 +442,7 @@ function settOppKurvside() {
   });
 }
 
+
 /* --- tegn alt som avhenger av kurven --- */
 function tegnAlt() {
   tegnTeller();
@@ -380,7 +450,9 @@ function tegnAlt() {
   tegnKurvside();
 }
 
+settOppForsideAdresse();
 settOppGalleri();
 settOppPakker();
 settOppKurvside();
+settOppTilbud();
 tegnAlt();
