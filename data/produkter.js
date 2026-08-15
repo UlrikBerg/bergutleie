@@ -174,6 +174,32 @@ export const PRODUKTER = [
     rec: [["staduk-hvit", 1]]
   },
   {
+    id: "trebord", slug: "trebord", cat: "Bord og stoler",
+    navn: "Trebord", desc: "197 × 60 cm · del av benkesett",
+    dl: "Klassisk trebord fra benkesettet vårt – ideelt til hagefester, firmafester og sit-down-selskap der du vil ha plass til mange gjester. Bordplaten er i tre og bena i stål, og bordet klappes enkelt sammen når dansegulvet skal fram.",
+    d: 180, lp: 1,
+    bilder: [
+      { u: "/uploads/trebord.png", fit: "contain", alt: "Trebord til leie" },
+      { u: "/uploads/benkesett.webp", alt: "Benkesett med trebord og trebenker" },
+      { u: "/uploads/trebenk-b.webp", alt: "Trebenk til benkesett" }
+    ],
+    specs: ["Lengde: 197 cm · bredde 60 cm", "Vekt: 16 kg", "Treplate med ben i stål", "Klappes sammen for enkel transport"],
+    rec: [["trebenk", 2]]
+  },
+  {
+    id: "trebenk", slug: "trebenk", cat: "Bord og stoler",
+    navn: "Trebenk", desc: "197 cm · plass til 3 voksne + 1 barn",
+    dl: "Trebenk som hører til benkesettet. Én benk gir plass til opptil tre voksne og ett barn, så to benker dekker ett trebord. Treplate med ben i stål, og klappes sammen når den ikke er i bruk.",
+    d: 120, lp: 0.6,
+    bilder: [
+      { u: "/uploads/trebenk.png", fit: "contain", alt: "Trebenk til leie" },
+      { u: "/uploads/benkesett.webp", alt: "Benkesett med trebord og trebenker" },
+      { u: "/uploads/trebord.png", fit: "contain", alt: "Trebord som hører til benken" }
+    ],
+    specs: ["Lengde: 197 cm", "Plass til 3 voksne + 1 barn", "Vekt: 8 kg", "Treplate med ben i stål"],
+    rec: [["trebord", 1]]
+  },
+  {
     id: "duk", slug: "duk", cat: "Duker",
     navn: "Duk til avlangt bord", desc: "Passer langbord og rundbord",
     dl: "Hvit bomullsduk, nyvasket og strøket. Løfter bordet fra piknik til selskap.",
