@@ -136,7 +136,12 @@ export const PRODUKTER = [
     navn: "Rundt bord Ø150 cm", desc: "8 personer per bord",
     dl: "Runde bord skaper god samtale rundt middagen. Klassisk valg til bryllup og finere selskap.",
     d: 180, lp: 1.5,
-    bilder: [],
+    bilder: [
+      { u: "/uploads/rundt-bord.png", fit: "contain", alt: "Rundt bord Ø150 cm til leie" },
+      { u: "/uploads/rundt-bord-dekket.jpg", alt: "Rundt bord dekket til selskap" },
+      { u: "/uploads/rundt-bord-fest.jpg", alt: "Runde bord i partytelt" },
+      { u: "/uploads/bryllup-gulv-lining.webp", alt: "Runde bord i partytelt med lining" }
+    ],
     specs: ["Diameter: 150 cm · høyde 74 cm", "8 personer per bord", "Klappbart understell"],
     rec: [["rundduk", 1], ["stol", 8]]
   },
@@ -145,7 +150,13 @@ export const PRODUKTER = [
     navn: "Hvit klappstol", desc: "Med polstret sete",
     dl: "Hvit klappstol med polstret sete. Pen nok til bryllup, robust nok til hagefest.",
     d: 25, lp: 0.25,
-    bilder: [],
+    bilder: [
+      { u: "/uploads/klappstol.png", fit: "contain", alt: "Hvit klappstol til leie" },
+      { u: "/uploads/klappstol-produkt.jpg", alt: "Hvit klappstol med polstret sete" },
+      { u: "/uploads/klappstol-bryllup.jpg", alt: "Hvite klappstoler dekket til bryllup" },
+      { u: "/uploads/klappstol-fest.jpg", alt: "Hvite klappstoler rundt festbord" },
+      { u: "/uploads/klappstol-dekket-bord.webp", alt: "Dekket bord med hvite klappstoler" }
+    ],
     specs: ["Hvit med polstret sete", "Tåler utendørs bruk", "Stables enkelt"],
     rec: []
   },
@@ -168,7 +179,11 @@ export const PRODUKTER = [
     dl: "Hvit bomullsduk, nyvasket og strøket. Løfter bordet fra piknik til selskap.",
     d: 120, lp: 0.05,
     bilder: [
-      { u: "/uploads/duker.png", alt: "Duk til avlangt bord" }
+      { u: "/uploads/duk-avlangt.webp", fit: "contain", alt: "Hvit duk til avlangt bord" },
+      { u: "/uploads/duk-avlangt-b.jpg", alt: "Avlangt bord dekket med hvit duk" },
+      { u: "/uploads/duk-avlangt-c.jpg", alt: "Langbord med hvite duker" },
+      { u: "/uploads/bord-pyntet.jpg", alt: "Pyntet langbord i partytelt" },
+      { u: "/uploads/duk-avlangt-kveld.webp", alt: "Dekket langbord i partytelt om kvelden" }
     ],
     specs: ["Hvit bomull, strøket", "Passer avlangt bord 180x75 cm", "Leveres rene – returneres brukte"],
     rec: []
@@ -179,9 +194,10 @@ export const PRODUKTER = [
     dl: "Elegant festduk med vevet mønster som gir et sofistikert uttrykk til bordet. Tidløs design som passer alle typer anledninger – fra bryllup til firmafest.",
     d: 200, lp: 0.05,
     bilder: [
-      { u: "/uploads/duk-rundt-bord.png", alt: "Duk til rundt bord" },
-      { u: "/uploads/duk-rundt-bord-b.png", alt: "Rundt bord dekket med duk" },
-      { u: "/uploads/duk-rundt-bord-c.jpg", alt: "Dekket rundbord til fest" }
+      { u: "/uploads/duk-rundt-bord.png", fit: "contain", alt: "Duk til rundt bord" },
+      { u: "/uploads/duk-rundt-bord-b.png", alt: "Rundt bord med festduk" },
+      { u: "/uploads/duk-rundt-bord-c.jpg", alt: "Dekket rundbord med duk" },
+      { u: "/uploads/duk-rundt-bord-d.jpg", alt: "Runde bord med duker i telt" }
     ],
     specs: ["Diameter: 200 cm", "Passer runde bord opptil 170 cm i diameter", "60 % polyester, 40 % bomull", "Vekt: 0,9 kg · rens er inkludert"],
     rec: []
