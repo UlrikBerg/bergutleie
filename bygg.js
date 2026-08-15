@@ -101,7 +101,7 @@ ${innhold}
     <div class="footer-col">
       <p class="eyebrow">Kontakt</p>
       <div class="footer-links">
-        <a href="mailto:kontakt@bergevent.no">kontakt@bergevent.no</a>
+        <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>
         <span>Lageret vårt ligger rett ved E6 i Halden</span>
         <span>Man–fre 09–18 · Søn 12–15</span>
       </div>
@@ -150,7 +150,7 @@ function forside() {
   const jsonld = [
     {
       '@context': 'https://schema.org', '@type': 'LocalBusiness',
-      name: 'Berg Utleie', url: NETTSTED + '/', email: 'kontakt@bergevent.no',
+      name: 'Berg Utleie', url: NETTSTED + '/', email: 'post@bergutleie.no',
       image: NETTSTED + '/uploads/hageselskap.webp',
       description: 'Utleie av partytelt, bord, stoler, dekketøy, lyd og lys til faste priser. Henting i Halden eller levering på Østlandet.',
       priceRange: 'kr',
@@ -738,7 +738,7 @@ function leievilkar() {
 <main class="wrap side">
   <div class="side-intro">
     <h1>Leievilkår</h1>
-    <p>Dette er vilkårene som gjelder når du leier utstyr av Berg Utleie. Er det noe du lurer på, er det bare å ta kontakt på <a href="mailto:kontakt@bergevent.no">kontakt@bergevent.no</a> – vi svarer innen seks timer.</p>
+    <p>Dette er vilkårene som gjelder når du leier utstyr av Berg Utleie. Er det noe du lurer på, er det bare å ta kontakt på <a href="mailto:post@bergutleie.no">post@bergutleie.no</a> – vi svarer innen seks timer.</p>
   </div>
 
   <div class="vilkar">
@@ -767,7 +767,7 @@ function personvern() {
   const seksjoner = [
     ['Hvem er ansvarlig',
      ['Berg Utleie er behandlingsansvarlig for opplysningene du gir oss gjennom bergutleie.no.',
-      'Har du spørsmål om hvordan vi håndterer opplysningene dine, kan du når som helst kontakte oss på <a href="mailto:kontakt@bergevent.no">kontakt@bergevent.no</a>.']],
+      'Har du spørsmål om hvordan vi håndterer opplysningene dine, kan du når som helst kontakte oss på <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>.']],
 
     ['Hva vi samler inn',
      ['Når du sender en forespørsel, ber vi om <strong>navn</strong>, <strong>mobilnummer</strong> og <strong>e-postadresse</strong>, slik at vi kan svare deg med et tilbud.',
@@ -799,7 +799,7 @@ function personvern() {
      ['Du har rett til å få vite hvilke opplysninger vi har om deg, og til å få kopi av dem.',
       'Du kan be om at vi retter opplysninger som er feil, eller sletter dem når vi ikke lenger trenger dem.',
       'Du kan protestere mot behandlingen, og du kan klage til Datatilsynet dersom du mener vi håndterer opplysningene dine feil.',
-      'Send en e-post til <a href="mailto:kontakt@bergevent.no">kontakt@bergevent.no</a>, så ordner vi det. Vi svarer innen 30 dager.']],
+      'Send en e-post til <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>, så ordner vi det. Vi svarer innen 30 dager.']],
 
     ['Sikkerhet',
      ['Nettsiden bruker kryptert forbindelse, slik at det du skriver i skjemaet ikke kan leses av andre underveis.',

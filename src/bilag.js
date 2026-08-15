@@ -128,7 +128,7 @@ export function lagBilag(d) {
   /* --- bunnlinje --- */
   p.rekt(V, 66, H - V, 0.5, LINJE);
   p.tekst(V, 52, 'Berg Utleie', { fet: true, str: 9, f: INK });
-  p.tekst(V, 40, 'bergutleie.no  ·  kontakt@bergevent.no', { str: 9, f: DEMPET });
+  p.tekst(V, 40, 'bergutleie.no  ·  post@bergutleie.no', { str: 9, f: DEMPET });
   p.tekst(H, 52, 'Lageret ved E6 i Halden', { str: 9, f: DEMPET, hoyre: true });
   p.tekst(H, 40, 'Alle priser er inkl. mva. Montering inngår ikke.', { str: 9, f: DEMPET2, hoyre: true });
 
