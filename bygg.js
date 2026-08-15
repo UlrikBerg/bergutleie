@@ -44,7 +44,11 @@ function layout({ url, tittel, beskrivelse, bilde, innhold, jsonld = [], klasse 
 <meta property="og:url" content="${full}">
 <meta property="og:image" content="${NETTSTED}${bilde || '/uploads/hageselskap.webp'}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/uploads/logo.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/uploads/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/uploads/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/uploads/favicon-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#E8562E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -78,7 +82,6 @@ ${innhold}
     <div>
       <img src="/uploads/logo.png" alt="Berg Utleie" width="908" height="491">
       <p class="blurb">Utleie av partytelt, møbler, dekketøy og eventutstyr til faste priser. Hent selv i Halden, eller få levert på hele Østlandet.</p>
-      <a class="parent" href="https://bergevent.no">En del av Berg Event-familien →</a>
     </div>
     <div class="footer-col">
       <p class="eyebrow">Utstyr</p>
@@ -92,7 +95,7 @@ ${innhold}
         <a href="/selskapspakker/">Selskapspakker</a>
         <a href="/#slik">Slik fungerer det</a>
         <a href="/#levering">Henting og levering</a>
-        <a href="https://bergevent.no">Berg Event</a>
+        <a href="/leievilkar/">Leievilkår</a>
       </div>
     </div>
     <div class="footer-col">
@@ -156,16 +159,15 @@ function forside() {
       openingHoursSpecification: [
         { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '18:00' },
         { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Sunday', opens: '12:00', closes: '15:00' }
-      ],
-      parentOrganization: { '@type': 'Organization', name: 'Berg Event', url: 'https://bergevent.no' }
+      ]
     },
     {
       '@context': 'https://schema.org', '@type': 'FAQPage',
       mainEntity: [
-        ['Hva er forskjellen på Berg Utleie og Berg Event?', 'Samme utstyr og samme folk. Berg Utleie er for deg som vil ha faste priser og ordne det praktiske selv – eller betale en fast sonepris for levering og henting. Berg Event skreddersyr hele arrangementer med montering og rigging.'],
+        ['Må jeg rigge opp teltet selv?', 'Ja, montering inngår ikke i prisen. Teltene er laget for å settes opp uten spesialverktøy, og du får med sikringsutstyr og veiledning. Trenger du hjelp til opprigg, si fra når du bestiller, så finner vi en løsning.'],
         ['Hvordan beregnes leieprisen?', 'Samme pris for 1–4 dagers leie – en hel helg koster altså det samme som én dag. Fra dag 5 legges det til 15 % av grunnprisen per døgn. Sikringsutstyr har fastpris uansett periode.'],
         ['Når kan jeg hente og levere tilbake?', 'Lageret ligger rett ved E6 i Halden og har åpent man–fre 09–18 og søndag 12–15. Helgeleie hentes torsdag–fredag og leveres tilbake mandag.'],
-        ['Kan dere montere teltet for meg?', 'Levering inkluderer ikke montering. Ønsker du opprigg og nedrigg, hjelper søsterselskapet vårt Berg Event deg – be om tilbud, så ordner vi resten.']
+        ['Kan dere montere teltet for meg?', 'Levering inkluderer ikke montering. Trenger du hjelp til opprigg og nedrigg, si fra når du bestiller, så finner vi en løsning.']
       ].map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } }))
     }
   ];
@@ -255,7 +257,7 @@ function forside() {
         <p class="big-price">fra ${kr(SONER[0].pris)}</p>
         <ul class="ticks lys">
           <li><span class="tick">✓</span>Fast pris – du ser totalen før du bestiller</li>
-          <li><span class="tick">✓</span>Kjøres ut og hentes av Berg Event-ansatte</li>
+          <li><span class="tick">✓</span>Vi kjører ut og henter selv – du trenger ikke være hjemme</li>
           <li><span class="tick">✓</span>Rett til festplassen – du slipper tilhenger og tunge løft</li>
           <li><span class="tick">✓</span>Vi henter alt igjen når festen er over</li>
         </ul>
@@ -610,7 +612,7 @@ function handlekurv() {
         <span class="label">Totalt</span>
         <span class="value" data-total>0 kr</span>
       </div>
-      <p class="mva">Alle priser er inkl. mva. Montering inngår ikke – be om tilbud fra Berg Event.</p>
+      <p class="mva">Alle priser er inkl. mva. Montering inngår ikke.</p>
       <a class="btn btn-lg bred" href="/tilbud/">Send bestillingsforespørsel</a>
       <p class="uforpliktende">Uforpliktende – vi svarer innen 6 timer</p>
     </aside>
@@ -689,14 +691,15 @@ function leievilkar() {
     ['Bestilling og bekreftelse',
      ['Forespørsel gjennom nettsiden er uforpliktende. Vi sjekker tilgjengelighet og svarer med et konkret tilbud innen seks timer.',
       'Avtalen er bindende først når du har bekreftet tilbudet vårt skriftlig.',
-      'Det er 50 % forskuddsbetaling på bookingen. Forskuddet må være betalt før utstyret hentes eller kjøres ut.',
-      'Resten faktureres etter at utstyret er levert tilbake.']],
+      'Det er <strong>50 % forskuddsbetaling</strong> på bookingen. Forskuddet faktureres når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.',
+      'Resten faktureres etter at utstyret er levert tilbake.',
+      'Forskuddet er bindende. Se punktet om avbestilling.']],
 
     ['Henting og levering',
      ['Henter du selv, er det gratis. Lageret ligger rett ved E6 i Halden, og vi hjelper deg med lastingen.',
       'Ved levering gjelder faste sonepriser etter kjøreavstand. Prisen dekker både utkjøring og henting.',
       'Utstyret skal være klart til henting på avtalt sted og tidspunkt. Må vi kjøre forgjeves, kommer et tillegg for bomtur.',
-      'Montering inngår ikke. Ønsker du opprigg og nedrigg, ordner søsterselskapet vårt Berg Event det – be om tilbud.']],
+      'Montering inngår ikke. Trenger du hjelp til opprigg og nedrigg, si fra når du bestiller.']],
 
     ['Ditt ansvar under leien',
      ['Utstyret står for leietakers regning og risiko i hele leieperioden.',
@@ -721,9 +724,10 @@ function leievilkar() {
       'Meld fra så snart som mulig hvis noe blir ødelagt. Det er både enklere og billigere enn at vi oppdager det ved retur.']],
 
     ['Avbestilling',
-     ['Avbestilling mer enn 14 dager før leiestart er kostnadsfritt.',
-      'Ved avbestilling nærmere leiestart kan vi holde tilbake et reservasjonsbeløp for utstyr vi har satt av til deg.',
-      'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer, framfor å fakturere avbestilling.']],
+     ['<strong>Forskuddet refunderes ikke ved avbestilling.</strong> Når du har bekreftet avtalen, har vi satt av utstyret til deg og takket nei til andre kunder på samme dato. Forskuddet er derfor en bindende sum.',
+      'Avbestiller du før avtalen er bekreftet og forskuddet fakturert, koster det ingenting.',
+      'Resterende 50 % faktureres ikke ved avbestilling – du betaler aldri mer enn forskuddet.',
+      'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer. Da flyttes forskuddet med til den nye datoen, framfor at du taper det.']],
 
     ['Reklamasjon',
      ['Er noe galt med utstyret du har fått, si fra til oss med én gang, og senest før arrangementet starter, så vi rekker å ordne opp.',
@@ -747,7 +751,7 @@ function leievilkar() {
     </section>`).join('')}
   </div>
 
-  <p class="vilkar-fot">Sist oppdatert 15. august 2026. Se også <a href="/personvern/">personvernerklæringen</a>. Berg Utleie er en del av Berg Event-familien.</p>
+  <p class="vilkar-fot">Sist oppdatert 15. august 2026. Se også <a href="/personvern/">personvernerklæringen</a>.</p>
 </main>`;
 
   return layout({
@@ -783,7 +787,7 @@ function personvern() {
       'Vi bruker ingen informasjonskapsler til sporing, analyse eller annonser.']],
 
     ['Hvem som får se opplysningene',
-     ['Opplysningene behandles av oss i Berg Utleie, og av ansatte i Berg Event når de skal kjøre ut eller hente utstyr hos deg.',
+     ['Opplysningene behandles av oss i Berg Utleie, og av sjåføren som skal kjøre ut eller hente utstyr hos deg.',
       'Forespørselen sendes som e-post via tjenesten Resend, som leverer e-posten til oss. Nettsiden driftes av Cloudflare.',
       'Vi selger aldri opplysninger videre, og deler dem ikke med andre enn det som er nødvendig for å gjennomføre utleien.']],
 
@@ -852,7 +856,7 @@ for (const p of PRODUKTER) await skriv(join('utstyr', p.slug), produktside(p));
 for (const f of ['assets', 'uploads', 'data']) {
   await cp(join(ROT, f), join(UT, f), { recursive: true });
 }
-for (const f of ['_headers', '_redirects', 'robots.txt', '404.html']) {
+for (const f of ['_headers', '_redirects', 'robots.txt', '404.html', 'site.webmanifest']) {
   await cp(join(ROT, f), join(UT, f));
 }
 

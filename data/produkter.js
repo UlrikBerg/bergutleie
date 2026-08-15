@@ -19,14 +19,14 @@
      capL    kapasitet med langbord (kun telt)
      capR    kapasitet med runde bord (kun telt)
 
-   MERK om kapasitetstallene: de er lavere enn tallene Berg Event oppgir,
-   og det er med vilje.
+   MERK om kapasitetstallene: de er lavere enn maks kapasitet, og det er
+   med vilje.
      5x6 m  – vi sier 30 fordi pakken bruker hestesko-oppsett. Dropper man
               hesteskoen får seks avlange bord plass som to langbord, og da
               er kapasiteten 36.
      5x8 m  – 48 er tallet uten de to ekstra stolene på den ene kortsiden.
               Pakken oppgir 50 for at selskapspakkene skal gå opp i 10-gangen.
-   Ikke «rett» disse mot bergevent.no uten å sjekke med Ulrik først.
+   Ikke «rett» disse uten å sjekke med Ulrik først.
      bilder  galleri; første bilde er hovedbildet
      fit     'contain' når bildet er en tegning som ikke skal beskjæres
      specs   punktliste med spesifikasjoner

@@ -219,7 +219,7 @@ function summer() {
       } else {
         levering = z.pris;
         levLabel = kr(levering);
-        ruteMeta = 'Fast fraktpris til ' + sted.navn + ' – levering og henting av Berg Event-ansatte er inkludert.';
+        ruteMeta = 'Fast fraktpris til ' + sted.navn + ' – både utkjøring og henting er inkludert.';
       }
     }
   }
