@@ -96,7 +96,22 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .site-nav { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 500; }
 .header-actions { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
 /* Handlekurven er hovedknappen i headeren, med teller som hvit boble */
-.kurv-knapp { padding: 10px 18px; display: flex; align-items: center; gap: 9px; white-space: nowrap; }
+.kurv-knapp { padding: 10px 16px; display: flex; align-items: center; gap: 9px; white-space: nowrap; }
+.kurv-ikon { width: 18px; height: 18px; flex-shrink: 0; display: none; }
+
+/* Hamburger – vises kun når navigasjonen kollapser */
+.meny-knapp {
+  display: none; flex-direction: column; justify-content: center; gap: 5px;
+  width: 44px; height: 44px; padding: 0 11px;
+  background: none; border: 1.5px solid #D9E2E0; border-radius: 9px; cursor: pointer;
+}
+.meny-knapp span {
+  display: block; height: 2px; width: 100%; border-radius: 2px;
+  background: var(--ink); transition: transform .2s, opacity .2s;
+}
+.meny-knapp[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.meny-knapp[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.meny-knapp[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 .kurv-teller {
   display: flex; align-items: center; justify-content: center;
   min-width: 22px; height: 22px; padding: 0 6px;
@@ -234,6 +249,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .brodsmuler span { margin: 0 8px; }
 .brodsmuler .naa { color: var(--ink); font-weight: 600; margin: 0; }
 .prod-topp { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: start; }
+.prod-topp > * { min-width: 0; }
 .galleri-hoved {
   position: relative; aspect-ratio: 4 / 3; background: #fff;
   border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
@@ -251,7 +267,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .gal-nav:hover { background: #fff; }
 .gal-nav.forrige { left: 12px; }
 .gal-nav.neste { right: 12px; }
-.miniatyrer { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.miniatyrer { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; max-width: 100%; }
 .mini {
   width: 76px; height: 58px; border-radius: 8px; overflow: hidden;
   cursor: pointer; padding: 0; background: #fff;
@@ -267,7 +283,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .kjopsboks { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
 .pris-stor { margin: 0 0 2px; font-size: 28px; font-weight: 800; }
 .pris-sub { margin: 0 0 18px; font-size: 13.5px; color: var(--muted-2); }
-.kjop-rad { display: flex; gap: 12px; align-items: center; }
+.kjop-rad { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .antall-boks { display: flex; align-items: center; border: 1.5px solid #D9E2E0; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
 .antall-boks button { width: 38px; height: 46px; border: none; background: #fff; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; }
 .antall-boks .dec { color: var(--muted-2); }
@@ -322,7 +338,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .rund-note { margin: 16px 0 0; text-align: center; font-size: 13.5px; color: var(--muted-3); }
 .pakke-grid {
   margin-top: 28px; display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
   gap: 20px; align-items: start;
 }
 .pakke-kort { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
@@ -372,6 +388,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 /* ---------- handlekurv ---------- */
 .kurv-tittel { margin: 0 0 36px; font-size: 42px; font-weight: 800; letter-spacing: -0.025em; }
 .kurv-layout { display: grid; grid-template-columns: 1fr 390px; gap: 32px; align-items: start; }
+.kurv-layout > * { min-width: 0; }
 .kurv-venstre { display: flex; flex-direction: column; gap: 24px; }
 .kurv-tom { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 56px; text-align: center; }
 .kurv-tom p { margin: 0 0 18px; font-size: 17px; color: var(--muted); }
@@ -526,7 +543,25 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
 
 /* ---------- responsivt ---------- */
 @media (max-width: 1050px) {
-  .site-nav { display: none; }
+  .meny-knapp { display: flex; }
+  .site-header .wrap { gap: 14px; }
+
+  /* Menyen legger seg under topplinjen når den åpnes */
+  .site-nav {
+    display: none;
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: #fff; border-bottom: 1px solid var(--line);
+    box-shadow: 0 12px 28px rgba(17,59,63,.10);
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 6px 0; z-index: 60;
+  }
+  .site-nav.apen { display: flex; }
+  .site-nav a {
+    padding: 15px 24px; font-size: 16px; font-weight: 600;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .site-nav a:last-child { border-bottom: none; }
+  .site-header { position: relative; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding-top: 48px; padding-bottom: 56px; }
   .hero h1 { font-size: 40px; }
   .steps { grid-template-columns: repeat(2, 1fr); gap: 24px; }
@@ -542,11 +577,52 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
 
 @media (max-width: 640px) {
   .wrap { padding: 0 20px; }
+
+  /* Kategorikortene i to kolonner – ellers blir seksjonen uendelig lang */
+  .cat-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cat-card .meta { padding: 12px 13px; gap: 8px; }
+  .cat-card .navn { font-size: 14.5px; }
+  .cat-card .fra { font-size: 12.5px; }
+  .cat-card .arrow { display: none; }
+
+  /* Handlekurv-knappen blir et ikon med teller når plassen er trang */
+  .kurv-ord { display: none; }
+  .kurv-ikon { display: block; }
+  .kurv-knapp { padding: 0 13px; height: 44px; gap: 7px; border-radius: 9px; }
+  .kurv-teller { min-width: 20px; height: 20px; font-size: 11.5px; }
+
+  /* Produktkortene i to kolonner – ett kort per skjerm blir uendelig scrolling */
+  .prod-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .prod-tekst { padding: 12px 13px 14px; gap: 8px; }
+  .prod-tekst h3 { font-size: 14px; line-height: 1.3; }
+  .prod-tekst .desc { font-size: 12.5px; margin-top: 2px; }
+  .prod-bunn { flex-direction: column; align-items: flex-start; gap: 9px; }
+  .prod-bunn .pris { font-size: 15px; }
+  .prod-bunn .pris-tag { display: block; margin-left: 0; margin-top: 1px; }
+  .prod-kort .legg-i-kurv { width: 100%; height: 42px; }
+  .prod-tekst h3 a { display: block; padding: 3px 0; }
+  .kjop-rad .btn { flex: 1 1 100%; }
+  .antall-boks { width: 100%; justify-content: space-between; }
+  .filtre a { padding: 12px 18px; }
+  .mini { width: 64px; height: 50px; }
+  .gal-nav { width: 42px; height: 42px; }
+  .antall-boks button { height: 42px; width: 42px; }
+  .seg button { padding: 13px 6px; }
+  .bordknapp { padding: 13px 22px; }
+  .fjern { padding: 10px 8px; font-size: 22px; }
+  .prod-bilde.contain { padding: 10px; }
+
+  /* Større trykkflater i bunnlinjen */
+  .footer-links { gap: 0; }
+  .footer-links a { padding: 11px 0; }
+  .footer-col span { padding: 5px 0; }
+  .btn-link { padding: 12px 0; }
+  .faq summary { padding: 6px 0; }
   .hero h1 { font-size: 32px; }
   .hero .lead { font-size: 16.5px; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .usp { gap: 12px; flex-direction: column; }
-  .steps, .cat-grid, .prod-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
   .section-head h2, .section-head-center h2, .faq h2 { font-size: 26px; }
   .card-light, .card-dark, .foresporsel-skjema { padding: 24px; }
   .cta { padding: 40px 24px; }

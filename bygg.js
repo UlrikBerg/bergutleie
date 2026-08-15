@@ -60,7 +60,7 @@ ${jsonld.map(j => `<script type="application/ld+json">\n${JSON.stringify(j, null
 <header class="site-header">
   <div class="wrap">
     <a href="/" class="logo"><img src="/uploads/logo.png" alt="Berg Utleie" width="908" height="491"></a>
-    <nav class="site-nav">
+    <nav class="site-nav" id="hovedmeny">
       <a href="/">Forside</a>
       <a href="/utstyr/">Alle produkter</a>
       <a href="/selskapspakker/">Pakketilbud</a>
@@ -68,9 +68,19 @@ ${jsonld.map(j => `<script type="application/ld+json">\n${JSON.stringify(j, null
       <a href="/tilbud/">Få tilbud</a>
     </nav>
     <div class="header-actions">
-      <a class="btn kurv-knapp" href="/handlekurv/">
-        Handlekurv<span class="kurv-teller" data-kurv-teller>0</span>
+      <a class="btn kurv-knapp" href="/handlekurv/" aria-label="Handlekurv">
+        <svg class="kurv-ikon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M1.5 1.5h2.2l1.9 9.4a1.4 1.4 0 0 0 1.4 1.1h7a1.4 1.4 0 0 0 1.4-1.1L18 4.6H5.1"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="7.8" cy="16.4" r="1.5" fill="currentColor"/>
+          <circle cx="14.6" cy="16.4" r="1.5" fill="currentColor"/>
+        </svg>
+        <span class="kurv-ord">Handlekurv</span><span class="kurv-teller" data-kurv-teller>0</span>
       </a>
+      <button type="button" class="meny-knapp" data-meny
+              aria-label="Åpne menyen" aria-expanded="false" aria-controls="hovedmeny">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>

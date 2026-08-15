@@ -96,6 +96,32 @@ function blink(el) {
   setTimeout(() => el.classList.remove('blink'), 400);
 }
 
+/* --- mobilmeny --- */
+function settOppMeny() {
+  const knapp = document.querySelector('[data-meny]');
+  const meny = document.getElementById('hovedmeny');
+  if (!knapp || !meny) return;
+
+  const lukk = () => {
+    meny.classList.remove('apen');
+    knapp.setAttribute('aria-expanded', 'false');
+    knapp.setAttribute('aria-label', 'Åpne menyen');
+  };
+
+  knapp.addEventListener('click', () => {
+    const apen = meny.classList.toggle('apen');
+    knapp.setAttribute('aria-expanded', String(apen));
+    knapp.setAttribute('aria-label', apen ? 'Lukk menyen' : 'Åpne menyen');
+  });
+
+  // Lukk når man klikker utenfor, trykker Escape, eller velger en lenke
+  document.addEventListener('click', (e) => {
+    if (!meny.contains(e.target) && !knapp.contains(e.target)) lukk();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lukk(); });
+  meny.querySelectorAll('a').forEach(a => a.addEventListener('click', lukk));
+}
+
 /* --- produktside: antall og galleri --- */
 function tegnProduktside() {
   document.querySelectorAll('[data-antall-boks]').forEach(boks => {
@@ -565,6 +591,7 @@ function tegnAlt() {
   tegnKurvside();
 }
 
+settOppMeny();
 settOppGalleri();
 settOppPakker();
 settOppKurvside();
