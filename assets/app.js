@@ -6,7 +6,8 @@
    Kurven ligger i localStorage, så den følger deg mellom sidene.
    ======================================================================== */
 
-import { PRODUKTER, STEDER, finn, sone, enhetspris, kr } from '/data/produkter.js';
+import { PRODUKTER, STEDER, SONER, finn, sone, enhetspris, kr } from '/data/produkter.js';
+import { soneForKommune } from '/data/kommuner.js';
 import { teltSvg } from '/data/telt-svg.js';
 import { lagAdressesok } from '/assets/adressesok.js';
 import { oppsettSvg } from '/data/oppsett-svg.js';
@@ -46,17 +47,24 @@ const lagreBestilling = (b) => {
   } catch { /* privat modus */ }
 };
 
-/** Finner stedet i ruteplanen. Har kunden valgt en adresse fra Kartverket,
-    matcher vi på poststed og kommune; ellers faller vi tilbake til fritekst. */
+/**
+ * Finner fraktsonen for adressen. Har kunden valgt en adresse fra Kartverket,
+ * bruker vi kommunen – det er den soneinndelingen vi selv har bestemt.
+ * Ellers faller vi tilbake til å kjenne igjen et stedsnavn i fritekst.
+ * Returnerer { sone, navn } eller null når vi ikke kjører dit til fast pris.
+ */
 function finnSted(adresse, valgt) {
-  if (valgt) {
-    const kandidater = [valgt.poststed, valgt.kommune].filter(Boolean).map(x => x.toLowerCase());
-    const treff = STEDER.find(s => kandidater.some(k => k.includes(s.navn.toLowerCase())));
-    if (treff) return treff;
+  if (valgt?.kommune) {
+    const nr = soneForKommune(valgt.kommune);
+    if (nr) return { sone: nr, navn: valgt.poststed || valgt.kommune };
+    return null;                       // kjent adresse, men utenfor sonene
   }
   const a = (adresse || '').trim().toLowerCase();
   if (a.length < 2) return null;
-  return STEDER.find(s => a.includes(s.navn.toLowerCase())) || null;
+  const sted = STEDER.find(s => a.includes(s.navn.toLowerCase()));
+  if (!sted) return null;
+  const s = sone(sted.km);
+  return s ? { sone: SONER.indexOf(s) + 1, navn: sted.navn } : null;
 }
 
 /* --- kurvtilstand --- */
@@ -265,22 +273,24 @@ function summer() {
   let levering = 0, levLabel = '0 kr', ruteMeta = '', adresseNote = '', tilbudspris = false;
   if (bestilling.modus === 'lev') {
     const sted = stedTreff();
+    const harValgt = !!bestilling.valgt;
     if (!sted) {
-      levLabel = 'Legg inn adresse';
-      adresseNote = bestilling.adresse.trim().length > 1
-        ? 'Fant ikke stedet i ruteplanen – skriv nærmeste by (f.eks. Fredrikstad), eller send forespørsel så beregner vi.'
-        : 'Skriv adressen, så finner vi fast fraktpris automatisk.';
-    } else {
-      const z = sone(sted.km);
-      if (!z) {
+      if (harValgt) {
         tilbudspris = true;
         levLabel = 'Etter avtale';
-        adresseNote = sted.navn + ' ligger utenfor de faste sonene våre – vi gir deg fast pris på forespørsel.';
+        adresseNote = (bestilling.valgt.poststed || 'Stedet') +
+          ' ligger utenfor de faste sonene våre – vi gir deg fast pris på forespørsel.';
       } else {
-        levering = z.pris;
-        levLabel = kr(levering);
-        ruteMeta = 'Fast fraktpris til ' + sted.navn + ' – både utkjøring og henting er inkludert.';
+        levLabel = 'Legg inn adresse';
+        adresseNote = bestilling.adresse.trim().length > 1
+          ? 'Velg adressen fra listen, så finner vi fast fraktpris.'
+          : 'Skriv adressen, så finner vi fast fraktpris automatisk.';
       }
+    } else {
+      const z = SONER[sted.sone - 1];
+      levering = z.pris;
+      levLabel = kr(levering);
+      ruteMeta = 'Fast fraktpris til ' + sted.navn + ' – både utkjøring og henting er inkludert.';
     }
   }
   return { d, leie, levering, levLabel, ruteMeta, adresseNote, tilbudspris, total: leie + levering };
