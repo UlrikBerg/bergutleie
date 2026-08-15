@@ -67,11 +67,10 @@ function lagScene(minX, maksX, minY, maksY, kam) {
   });
   minYu -= 3.4 * kHoyde;                // plass til telttoppen
 
-  // Rammen følger innholdets form, slik at tegningen alltid fyller flaten.
-  // Zoom skalerer innenfor rammen i stedet for å endre den.
+  // Rammen er fast, slik at seksjonen på siden ikke hopper i høyde når
+  // man snur eller zoomer. Innholdet skaleres for å passe inn i den.
   const bU = maksXu - minXu, hU = maksYu - minYu;
-  const MARG = 18, RAMME_B = 880;
-  const RAMME_H = Math.round(Math.max(300, Math.min(580, RAMME_B * (hU / bU))));
+  const MARG = 20, RAMME_B = 880, RAMME_H = 470;
   const s0 = Math.min((RAMME_B - MARG * 2) / bU, (RAMME_H - MARG * 2) / hU);
   const s = s0 * zoom;
 

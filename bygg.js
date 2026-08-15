@@ -570,19 +570,10 @@ function handlekurv() {
       <section class="oppsett" data-oppsett hidden>
         <div class="oppsett-topp">
           <h2>Slik kan det se ut</h2>
-          <div class="kam-knapper">
-            <button type="button" data-kam-venstre aria-label="Drei mot venstre">↺</button>
-            <button type="button" data-kam-hoyre aria-label="Drei mot høyre">↻</button>
-            <button type="button" data-kam-ovenfra aria-label="Se ovenfra">⌖</button>
-            <button type="button" data-kam-ut aria-label="Zoom ut">−</button>
-            <span class="zoom-verdi" data-zoom-verdi>100 %</span>
-            <button type="button" data-kam-inn aria-label="Zoom inn">+</button>
-            <button type="button" data-kam-null aria-label="Nullstill visningen">Nullstill</button>
-          </div>
+          <p class="oppsett-hjelp">Dra for å snu · rull for å zoome · dobbeltklikk for å nullstille</p>
         </div>
         <div class="oppsett-scene" data-oppsett-scene role="application"
-             aria-label="3D-tegning av oppsettet. Dra for å snu, hold shift for å flytte, rull for å zoome."></div>
-        <p class="oppsett-hjelp">Dra for å snu · rull for å zoome · hold <kbd>shift</kbd> og dra for å flytte</p>
+             aria-label="3D-tegning av oppsettet. Dra for å snu, rull for å zoome, hold shift og dra for å flytte."></div>
         <p class="oppsett-note" data-oppsett-note></p>
       </section>
 

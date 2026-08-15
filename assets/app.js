@@ -331,8 +331,6 @@ function tegnOppsett() {
   }
   note.textContent = deler.join(' ');
 
-  const zoomVis = document.querySelector('[data-zoom-verdi]');
-  if (zoomVis) zoomVis.textContent = Math.round(kamera.zoom * 100) + ' %';
 }
 
 function settKamera(endring) {
@@ -362,7 +360,7 @@ function settOppKamera() {
       if (panorer) {
         settKamera({ panX: start.panX + dx, panY: start.panY + dy });
       } else {
-        settKamera({ az: start.az + dx * 0.009, elev: start.elev - dy * 0.0035 });
+        settKamera({ az: start.az - dx * 0.009, elev: start.elev + dy * 0.0035 });
       }
     };
     const slipp = () => {
@@ -379,7 +377,7 @@ function settOppKamera() {
   /* Rullehjul zoomer */
   scene.addEventListener('wheel', (e) => {
     e.preventDefault();
-    settKamera({ zoom: kamera.zoom * (e.deltaY < 0 ? 1.12 : 0.89) });
+    settKamera({ zoom: kamera.zoom * (e.deltaY < 0 ? 0.9 : 1.11) });
   }, { passive: false });
 
   /* Klyp for å zoome på mobil */
@@ -417,14 +415,8 @@ function settOppKamera() {
     if (e.key === '0') settKamera({ ...KAM_START });
   });
 
-  /* Knapper */
-  document.querySelector('[data-kam-venstre]')?.addEventListener('click', () => settKamera({ az: kamera.az - 0.4 }));
-  document.querySelector('[data-kam-hoyre]')?.addEventListener('click', () => settKamera({ az: kamera.az + 0.4 }));
-  document.querySelector('[data-kam-inn]')?.addEventListener('click', () => settKamera({ zoom: kamera.zoom * 1.25 }));
-  document.querySelector('[data-kam-ut]')?.addEventListener('click', () => settKamera({ zoom: kamera.zoom * 0.8 }));
-  document.querySelector('[data-kam-null]')?.addEventListener('click', () => settKamera({ ...KAM_START }));
-  document.querySelector('[data-kam-ovenfra]')?.addEventListener('click', () =>
-    settKamera({ elev: kamera.elev > 0.75 ? 0.5 : 0.88 }));
+  /* Dobbeltklikk nullstiller visningen */
+  scene.addEventListener('dblclick', () => settKamera({ ...KAM_START }));
 }
 
 /* Forslag basert på hva som ligger i kurven */
