@@ -191,17 +191,33 @@ export function oppsettSvg(kurv, finn, kam = {}) {
 
   /* --- teltgulv og tregulv --- */
   const gulvKvm = q('gulv') * 2;
-  const dekket = teltId ? Math.min(1, gulvKvm / (Ld * Wd)) : 0;
   if (teltId) {
     svg += poly([[-0.4, -0.4, 0], [Ld + 0.4, -0.4, 0], [Ld + 0.4, Wd + 0.4, 0], [-0.4, Wd + 0.4, 0]],
                 'rgba(150,170,140,0.22)');
-    if (dekket > 0) {
-      const gLd = Ld * dekket;
-      svg += poly([[0, 0, 0.08], [gLd, 0, 0.08], [gLd, Wd, 0.08], [0, Wd, 0.08]], F.tre, `stroke="${F.treMork}" stroke-width="0.9"`);
-      for (let x = 0.45; x < gLd - 0.05; x += 0.45) svg += ln([x, 0, 0.085], [x, Wd, 0.085], F.treStripe, 0.7);
-      svg += poly([[0, Wd, 0], [gLd, Wd, 0], [gLd, Wd, 0.08], [0, Wd, 0.08]], F.treMork);
-      svg += poly([[gLd, 0, 0], [gLd, Wd, 0], [gLd, Wd, 0.08], [gLd, 0, 0.08]], F.treMork);
+  }
+
+  // Gulv kan leies uten telt, så det tegnes uavhengig av om det står et telt.
+  // Med telt dekker det en andel av teltflaten; uten telt legges det som et
+  // felt midt på plassen, med den flaten kunden faktisk har kjøpt.
+  let dekket = 0, gLd = 0, gWd = Wd, gY0 = 0, gX0 = 0;
+  if (gulvKvm > 0) {
+    if (teltId) {
+      dekket = Math.min(1, gulvKvm / (Ld * Wd));
+      gLd = Ld * dekket;
+    } else {
+      gWd = Math.min(Wd, Math.max(2, Math.sqrt(gulvKvm * 0.6)));
+      gLd = Math.min(Ld, gulvKvm / gWd);
+      gY0 = (Wd - gWd) / 2;
+      gX0 = (Ld - gLd) / 2;          // sentrer gulvet under møblene
+      dekket = 1;
     }
+  }
+  if (gLd > 0) {
+    const gY1 = gY0 + gWd, gX1 = gX0 + gLd;
+    svg += poly([[gX0, gY0, 0.08], [gX1, gY0, 0.08], [gX1, gY1, 0.08], [gX0, gY1, 0.08]], F.tre, `stroke="${F.treMork}" stroke-width="0.9"`);
+    for (let x = gX0 + 0.45; x < gX1 - 0.05; x += 0.45) svg += ln([x, gY0, 0.085], [x, gY1, 0.085], F.treStripe, 0.7);
+    svg += poly([[gX0, gY1, 0], [gX1, gY1, 0], [gX1, gY1, 0.08], [gX0, gY1, 0.08]], F.treMork);
+    svg += poly([[gX1, gY0, 0], [gX1, gY1, 0], [gX1, gY1, 0.08], [gX1, gY0, 0.08]], F.treMork);
   }
 
   /* --- telt --- */
@@ -266,10 +282,18 @@ export function oppsettSvg(kurv, finn, kam = {}) {
       g += ln([o[0], o[1], 0], [o[0], o[1], zt], F.plateKant, 1.1);
     });
     if (medDuk) {
-      const o = 0.09, zb = 0.3;                     // duken henger ned til 30 cm
-      g += poly([[x0 - o, y1 + o, zb], [x1 + o, y1 + o, zb], [x1 + o, y1 + o, zt], [x0 - o, y1 + o, zt]], F.duk, `stroke="${F.dukKant}" stroke-width="0.7"`);
-      g += poly([[x1 + o, y0 - o, zb], [x1 + o, y1 + o, zb], [x1 + o, y1 + o, zt], [x1 + o, y0 - o, zt]], '#F1F0E7', `stroke="${F.dukKant}" stroke-width="0.7"`);
-      g += poly([[x0 - o, y0 - o, zt], [x1 + o, y0 - o, zt], [x1 + o, y1 + o, zt], [x0 - o, y1 + o, zt]], F.duk, `stroke="${F.dukKant}" stroke-width="0.8"`);
+      // Duken henger ned på alle fire sider. Sidene sorteres etter dybde slik
+      // at de riktige er synlige uansett hvilken vei tegningen er snudd.
+      const o = 0.09, zb = 0.3;
+      const a0 = x0 - o, a1 = x1 + o, b0 = y0 - o, b1 = y1 + o;
+      [
+        { p: [[a0, b1, zb], [a1, b1, zb], [a1, b1, zt], [a0, b1, zt]], d: dep((a0 + a1) / 2, b1), f: F.duk },
+        { p: [[a0, b0, zb], [a1, b0, zb], [a1, b0, zt], [a0, b0, zt]], d: dep((a0 + a1) / 2, b0), f: F.duk },
+        { p: [[a1, b0, zb], [a1, b1, zb], [a1, b1, zt], [a1, b0, zt]], d: dep(a1, cy), f: '#F1F0E7' },
+        { p: [[a0, b0, zb], [a0, b1, zb], [a0, b1, zt], [a0, b0, zt]], d: dep(a0, cy), f: '#F1F0E7' }
+      ].sort((p, r) => p.d - r.d)
+       .forEach(side => { g += poly(side.p, side.f, `stroke="${F.dukKant}" stroke-width="0.7"`); });
+      g += poly([[a0, b0, zt], [a1, b0, zt], [a1, b1, zt], [a0, b1, zt]], F.duk, `stroke="${F.dukKant}" stroke-width="0.8"`);
     } else {
       g += poly([[x0, y1, 0.6], [x1, y1, 0.6], [x1, y1, zt], [x0, y1, zt]], F.plateSide);
       g += poly([[x1, y0, 0.6], [x1, y1, 0.6], [x1, y1, zt], [x1, y0, zt]], F.plateKant);

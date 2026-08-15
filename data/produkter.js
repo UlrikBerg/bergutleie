@@ -81,7 +81,7 @@ export const PRODUKTER = [
     id: "t56", slug: "partytelt-5x6m", cat: "Partytelt",
     navn: "Partytelt 5×6 m", desc: "36 med langbord · 24 med runde bord",
     dl: "Bredt og kompakt telt med god plass rundt bordene. Fint til konfirmasjon, jubileer og selskap i hagen.",
-    d: 3400, lp: 12, areal: 30, capL: 30, capR: 20,
+    d: 3400, lp: 12, areal: 30, capL: 36, capR: 24,
     bilder: [
       { u: "/uploads/telt-5x6-tegning.png", fit: "contain", alt: "Tegning av partytelt 5x6 meter" },
       { u: "/uploads/telt-5x6-36pers.png", fit: "contain", alt: "Oppsett med langbord til 36 personer" },
@@ -96,7 +96,7 @@ export const PRODUKTER = [
     id: "t58", slug: "partytelt-5x8m", cat: "Partytelt",
     navn: "Partytelt 5×8 m", desc: "48 med langbord · 32 med runde bord",
     dl: "Romslig telt med plass til både bordoppsett og dansegulv. Passer bryllup og større familieselskap.",
-    d: 3900, lp: 16, areal: 40, capL: 50, capR: 30,
+    d: 3900, lp: 16, areal: 40, capL: 48, capR: 32,
     bilder: [
       { u: "/uploads/telt-5x8-tegning.png", fit: "contain", alt: "Tegning av partytelt 5x8 meter" },
       { u: "/uploads/telt-5x8-48pers.png", fit: "contain", alt: "Oppsett med langbord til 48 personer" },
