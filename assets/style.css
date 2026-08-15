@@ -210,17 +210,17 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .prod-kort:hover { border-color: var(--ink); }
 .prod-media {
   display: block; position: relative; aspect-ratio: 4 / 3;
-  background: var(--kort); overflow: hidden; border-bottom: 1px solid var(--line-soft);
+  background: #fff; overflow: hidden; border-bottom: 1px solid var(--line-soft);
 }
 .prod-bilde { width: 100%; height: 100%; object-fit: cover; display: block; }
-.prod-bilde.contain { object-fit: contain; padding: 12px; }
+.prod-bilde.contain { object-fit: contain; padding: 14px; }
 .tom-media { display: block; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, #EDEBE2 0 14px, #E5E3D8 14px 28px); }
 .prod-tekst { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .prod-tekst h3 { margin: 0; font-weight: 700; font-size: 16px; }
 .prod-tekst .desc { margin: 3px 0 0; font-size: 13.5px; color: var(--muted-2); line-height: 1.45; }
 .prod-bunn { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; }
 .prod-bunn .pris { font-weight: 800; font-size: 16px; }
-.prod-bunn .pris-tag { font-size: 12.5px; color: var(--muted-3); }
+.prod-bunn .pris-tag { font-size: 12.5px; color: var(--muted-3); margin-left: 7px; }
 .prod-kort .legg-i-kurv {
   background: var(--accent-soft); color: var(--accent); border: none;
   font: inherit; font-weight: 800; font-size: 18px;
@@ -235,7 +235,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .brodsmuler .naa { color: var(--ink); font-weight: 600; margin: 0; }
 .prod-topp { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: start; }
 .galleri-hoved {
-  position: relative; aspect-ratio: 4 / 3; background: var(--kort);
+  position: relative; aspect-ratio: 4 / 3; background: #fff;
   border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
 }
 .galleri-hoved img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -254,9 +254,10 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .miniatyrer { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 .mini {
   width: 76px; height: 58px; border-radius: 8px; overflow: hidden;
-  cursor: pointer; padding: 0; background: var(--kort);
+  cursor: pointer; padding: 0; background: #fff;
   border: 1.5px solid var(--line); flex-shrink: 0;
 }
+.mini img { object-fit: contain; padding: 3px; }
 .mini.aktiv { border: 2px solid var(--accent); }
 .mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .prod-topp h1 { margin: 0 0 14px; font-size: 36px; font-weight: 800; line-height: 1.1; }
@@ -299,8 +300,9 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 }
 .anbefalt-media {
   display: block; width: 74px; height: 58px; border-radius: 8px;
-  background: var(--kort); overflow: hidden; flex-shrink: 0; border: 1px solid var(--line-soft);
+  background: #fff; overflow: hidden; flex-shrink: 0; border: 1px solid var(--line-soft);
 }
+.anbefalt-media img { object-fit: contain; padding: 4px; }
 .anbefalt-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .anbefalt-rad > div:nth-child(2) { flex: 1; min-width: 0; }
 .anbefalt-navn { margin: 0; font-weight: 700; font-size: 15.5px; }
@@ -499,6 +501,8 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   width: 6px; height: 6px; border-radius: 50%; background: #C3CFCB;
 }
 .vilkar-fot { margin: 44px 0 0; font-size: 13px; color: var(--muted-3); }
+.vilkar-fot a, .vilkar-blokk li a { color: var(--accent); font-weight: 600; }
+.vilkar-blokk li strong { font-weight: 700; color: var(--ink); }
 @media (max-width: 640px) {
   .vilkar-blokk ul { padding-left: 0; }
 }

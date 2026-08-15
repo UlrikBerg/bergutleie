@@ -134,7 +134,7 @@ const produktkort = (p) => `
         <p class="desc">${esc(p.desc)}</p>
       </div>
       <div class="prod-bunn">
-        <span><span class="pris">${fraPris(p)}</span><span class="pris-tag"> ${p.fast ? 'fastpris' : '1–4 dager'}</span></span>
+        <span><span class="pris">${fraPris(p)}</span><span class="pris-tag">${p.fast ? 'fastpris' : '1–4 dager'}</span></span>
         <button type="button" class="legg-i-kurv" data-id="${p.id}" aria-label="Legg ${esc(p.navn)} i handlekurven">+</button>
       </div>
     </div>
@@ -746,12 +746,84 @@ function leievilkar() {
     </section>`).join('')}
   </div>
 
-  <p class="vilkar-fot">Sist oppdatert 15. august 2026. Berg Utleie er en del av Berg Event-familien.</p>
+  <p class="vilkar-fot">Sist oppdatert 15. august 2026. Se også <a href="/personvern/">personvernerklæringen</a>. Berg Utleie er en del av Berg Event-familien.</p>
 </main>`;
 
   return layout({
     url: '/leievilkar/', tittel: 'Leievilkår | Berg Utleie',
     beskrivelse: 'Vilkårene for utleie hos Berg Utleie: leieperiode og priser, henting og levering, ansvar, retur og rengjøring, skader og avbestilling.',
+    innhold
+  });
+}
+
+
+/* --- personvern --- */
+function personvern() {
+  const seksjoner = [
+    ['Hvem er ansvarlig',
+     ['Berg Utleie er behandlingsansvarlig for opplysningene du gir oss gjennom bergutleie.no.',
+      'Har du spørsmål om hvordan vi håndterer opplysningene dine, kan du når som helst kontakte oss på <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>.']],
+
+    ['Hva vi samler inn',
+     ['Når du sender en forespørsel, ber vi om <strong>navn</strong>, <strong>mobilnummer</strong> og <strong>e-postadresse</strong>, slik at vi kan svare deg med et tilbud.',
+      'Du kan i tillegg oppgi <strong>adressen for arrangementet</strong> og <strong>datoene</strong> du ønsker å leie, som vi trenger for å regne ut frakt og sjekke tilgjengelighet.',
+      'Kommentarfeltet er frivillig. Skriv gjerne det som er nyttig for oss å vite, men unngå sensitive opplysninger.',
+      'Listen over utstyret du har valgt sendes med forespørselen, slik at vi vet hva du spør om.']],
+
+    ['Hva vi bruker det til',
+     ['Opplysningene brukes utelukkende til å svare på forespørselen din, gi deg et tilbud, og gjennomføre utleien dersom du bestiller.',
+      'Vi bruker dem ikke til markedsføring, og sender ikke nyhetsbrev med mindre du selv ber om det.',
+      'Det rettslige grunnlaget er at behandlingen er nødvendig for å svare deg og for å oppfylle en avtale med deg.']],
+
+    ['Handlekurven i nettleseren din',
+     ['Utstyret du legger i handlekurven lagres lokalt i din egen nettleser, ikke hos oss. Det er derfor det ligger der når du kommer tilbake.',
+      'Vi kan ikke se innholdet i handlekurven din før du selv sender inn forespørselen.',
+      'Vil du tømme den, kan du fjerne varene i handlekurven eller slette nettleserdata for bergutleie.no.',
+      'Vi bruker ingen informasjonskapsler til sporing, analyse eller annonser.']],
+
+    ['Hvem som får se opplysningene',
+     ['Opplysningene behandles av oss i Berg Utleie, og av ansatte i Berg Event når de skal kjøre ut eller hente utstyr hos deg.',
+      'Forespørselen sendes som e-post via tjenesten Resend, som leverer e-posten til oss. Nettsiden driftes av Cloudflare.',
+      'Vi selger aldri opplysninger videre, og deler dem ikke med andre enn det som er nødvendig for å gjennomføre utleien.']],
+
+    ['Hvor lenge vi lagrer',
+     ['Forespørsler som ikke fører til en bestilling sletter vi innen tolv måneder.',
+      'Ved gjennomført utleie beholder vi det som må til for regnskap og dokumentasjon, i den perioden bokføringsloven krever.']],
+
+    ['Rettighetene dine',
+     ['Du har rett til å få vite hvilke opplysninger vi har om deg, og til å få kopi av dem.',
+      'Du kan be om at vi retter opplysninger som er feil, eller sletter dem når vi ikke lenger trenger dem.',
+      'Du kan protestere mot behandlingen, og du kan klage til Datatilsynet dersom du mener vi håndterer opplysningene dine feil.',
+      'Send en e-post til <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>, så ordner vi det. Vi svarer innen 30 dager.']],
+
+    ['Sikkerhet',
+     ['Nettsiden bruker kryptert forbindelse, slik at det du skriver i skjemaet ikke kan leses av andre underveis.',
+      'Vi ber aldri om personnummer, passord eller kortopplysninger. Betaling skjer mot faktura i etterkant, aldri gjennom nettsiden.']]
+  ];
+
+  const innhold = `
+<main class="wrap side">
+  <div class="side-intro">
+    <h1>Personvern</h1>
+    <p>Her står det hvilke opplysninger vi ber om når du sender en forespørsel, hva vi bruker dem til, og hvilke rettigheter du har. Vi samler ikke inn mer enn vi trenger for å gi deg et tilbud.</p>
+  </div>
+
+  <div class="vilkar">
+    ${seksjoner.map(([tittel, punkter], i) => `
+    <section class="vilkar-blokk">
+      <h2><span class="vilkar-nr">${i + 1}</span>${esc(tittel)}</h2>
+      <ul>
+        ${punkter.map(p => `<li>${p}</li>`).join('\n        ')}
+      </ul>
+    </section>`).join('')}
+  </div>
+
+  <p class="vilkar-fot">Sist oppdatert 15. august 2026. Se også <a href="/leievilkar/">leievilkårene</a>.</p>
+</main>`;
+
+  return layout({
+    url: '/personvern/', tittel: 'Personvern | Berg Utleie',
+    beskrivelse: 'Hvilke opplysninger Berg Utleie samler inn gjennom forespørselsskjemaet, hva de brukes til, hvor lenge de lagres og hvilke rettigheter du har.',
     innhold
   });
 }
@@ -772,6 +844,7 @@ await skriv('selskapspakker', pakkeside());
 await skriv('handlekurv', handlekurv());
 await skriv('tilbud', tilbud());
 await skriv('leievilkar', leievilkar());
+await skriv('personvern', personvern());
 for (const p of PRODUKTER) await skriv(join('utstyr', p.slug), produktside(p));
 
 /* statiske filer */

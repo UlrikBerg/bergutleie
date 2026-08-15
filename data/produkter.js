@@ -126,9 +126,9 @@ export const PRODUKTER = [
   },
   {
     id: "gulv", slug: "gulvmodul", cat: "Gulv og lining",
-    navn: "Gulvmodul 2×1 m (pris per kvm)", desc: "Impregnert terrassebord · 2 kvm per modul",
+    navn: "Gulvmodul 2×1 m (pris per modul)", desc: "Impregnert terrassebord · 2 kvm per modul",
     dl: "Gulvmoduler av impregnert terrassebord gir selskapet et elegant løft – en jevn og solid base som beskytter mot bløtt underlag. Passer alle teltstørrelser.",
-    d: 140, lp: 1.2,
+    d: 280, lp: 1.2,
     bilder: [
       { u: "/uploads/tregulv-montering.webp", alt: "Montering av tregulv i partytelt" },
       { u: "/uploads/nesparken-moss.webp", alt: "Partytelt med tregulv i Nesparken" },
@@ -200,9 +200,9 @@ export const PRODUKTER = [
     dl: "Fleksibelt ståbord som passer like godt til mingling i bryllup som til konferanser, messer og firmafester. Med stretchduk i hvit eller sort får bordet et sofistikert preg – dukene leies separat.",
     d: 170, lp: 0.5,
     bilder: [
-      { u: "/uploads/stabord.png", alt: "Ståbord til leie" },
-      { u: "/uploads/stabord-duk-hvit.png", alt: "Ståbord med hvit stretchduk" },
-      { u: "/uploads/stabord-duk-sort.png", alt: "Ståbord med sort stretchduk" }
+      { u: "/uploads/stabord.png", fit: "contain", alt: "Ståbord til leie" },
+      { u: "/uploads/stabord-duk-hvit.png", fit: "contain", alt: "Ståbord med hvit stretchduk" },
+      { u: "/uploads/stabord-duk-sort.png", fit: "contain", alt: "Ståbord med sort stretchduk" }
     ],
     specs: ["Diameter: 80 cm · høyde 110 cm", "Vekt: 9,3 kg", "Fungerer både innendørs og utendørs", "Stretchduk i hvit eller sort leies separat"],
     rec: [["staduk-hvit", 1]]
@@ -268,8 +268,8 @@ export const PRODUKTER = [
     dl: "Fleksibelt stretch-bordtrekk som er lett å trekke over ståbordet og gir det et elegant preg. Ideelt til mingling – og fungerer like godt ute som inne.",
     d: 120, lp: 0.05,
     bilder: [
-      { u: "/uploads/stabord-duk-hvit.png", alt: "Hvit stretchduk til ståbord" },
-      { u: "/uploads/stabord.png", alt: "Ståbord" }
+      { u: "/uploads/stabord-duk-hvit.png", fit: "contain", alt: "Hvit stretchduk til ståbord" },
+      { u: "/uploads/stabord.png", fit: "contain", alt: "Ståbord" }
     ],
     specs: ["Type: stretch", "Passer bord med diameter 80 cm", "Vekt: 0,5 kg", "Prisen inkluderer rens"],
     rec: [["stabord", 1]]
@@ -280,8 +280,8 @@ export const PRODUKTER = [
     dl: "Fleksibelt stretch-bordtrekk i sort som er lett å trekke over ståbordet og gir det et elegant preg. Ideelt til mingling – og fungerer like godt ute som inne.",
     d: 120, lp: 0.05,
     bilder: [
-      { u: "/uploads/stabord-duk-sort.png", alt: "Sort stretchduk til ståbord" },
-      { u: "/uploads/stabord.png", alt: "Ståbord" }
+      { u: "/uploads/stabord-duk-sort.png", fit: "contain", alt: "Sort stretchduk til ståbord" },
+      { u: "/uploads/stabord.png", fit: "contain", alt: "Ståbord" }
     ],
     specs: ["Type: stretch", "Passer bord med diameter 80 cm", "Vekt: 0,5 kg", "Prisen inkluderer rens"],
     rec: [["stabord", 1]]
@@ -315,7 +315,7 @@ export const PRODUKTER = [
     dl: "Alt du trenger for å forankre teltet trygt: 4 jekkestropper, 4 hanketau og 4 jordanker. Fastpris uansett leieperiode – én pakke per telt.",
     fast: 400, lp: 1,
     bilder: [
-      { u: "/uploads/sikringspakke.jpg", alt: "Sikringspakke med 4 hanketau, 4 jekkestropper og 4 jordanker" }
+      { u: "/uploads/sikringspakke.jpg", fit: "contain", alt: "Sikringspakke med 4 hanketau, 4 jekkestropper og 4 jordanker" }
     ],
     specs: ["Inkluderer alltid: 4 jekkestropper · 4 hanketau · 4 jordanker", "Fastpris – uavhengig av antall dager", "Én pakke sikrer ett telt", "Påkrevd for trygg oppføring"],
     rec: []
