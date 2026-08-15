@@ -168,18 +168,6 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .zones span:first-child { color: var(--on-dark); }
 .zones span:last-child { font-weight: 700; }
 .fine { margin: 0; font-size: 12.5px; color: var(--on-dark-2); line-height: 1.5; }
-/* Adressefelt i det mørke leveringskortet på forsiden */
-.adresse-label { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: var(--on-dark); }
-.adresse-felt {
-  width: 100%; font: inherit; font-size: 14.5px; padding: 12px 14px;
-  border: none; border-radius: 8px; background: #fff; color: var(--ink);
-  margin-bottom: 10px;
-}
-.adresse-bekreft {
-  margin: 0 0 14px; font-size: 14px; color: #8FD9B0;
-  font-weight: 700; line-height: 1.5;
-}
-
 /* ---------- FAQ ---------- */
 .faq { max-width: 900px; margin: 0 auto; padding-top: 96px; }
 .faq h2 { margin: 0 0 32px; font-size: 34px; font-weight: 800; text-align: center; }
@@ -486,6 +474,34 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
 .kvittering p { margin: 0 0 26px; font-size: 15.5px; color: #3D6B52; line-height: 1.6; }
 .btn-mork { background: var(--ink); }
 .btn-mork:hover { background: #0C2B2E; }
+
+/* ---------- leievilkår ---------- */
+.vilkar { display: flex; flex-direction: column; gap: 34px; max-width: 780px; }
+.vilkar-blokk h2 {
+  margin: 0 0 14px; font-size: 19px; font-weight: 800;
+  display: flex; align-items: center; gap: 12px;
+}
+.vilkar-nr {
+  display: flex; align-items: center; justify-content: center;
+  width: 27px; height: 27px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 800;
+}
+.vilkar-blokk ul {
+  margin: 0; padding: 0 0 0 39px; list-style: none;
+  display: flex; flex-direction: column; gap: 11px;
+}
+.vilkar-blokk li {
+  position: relative; padding-left: 18px;
+  font-size: 15.5px; color: #344845; line-height: 1.6;
+}
+.vilkar-blokk li::before {
+  content: ""; position: absolute; left: 0; top: 9px;
+  width: 6px; height: 6px; border-radius: 50%; background: #C3CFCB;
+}
+.vilkar-fot { margin: 44px 0 0; font-size: 13px; color: var(--muted-3); }
+@media (max-width: 640px) {
+  .vilkar-blokk ul { padding-left: 0; }
+}
 
 /* ---------- bunnlinje ---------- */
 .site-footer { background: var(--ink); color: #fff; }

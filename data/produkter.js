@@ -365,11 +365,11 @@ export const SONER = [
 
 export const KATEGORIER = [
   { navn: 'Partytelt', bilde: '/uploads/hageselskap.webp', alt: 'Partytelt til leie' },
-  { navn: 'Bord og stoler', bilde: '/uploads/bord-pyntet.jpg', alt: 'Bord og stoler til leie' },
+  { navn: 'Bord og stoler', bilde: '/uploads/rundt-bord-dekket.jpg', alt: 'Runde bord og stoler dekket til selskap' },
   { navn: 'Gulv og lining', bilde: '/uploads/tregulv-montering.webp', alt: 'Tregulv og lining til partytelt' },
-  { navn: 'Duker', bilde: '/uploads/duk-rundt-bord.png', alt: 'Duker til leie' },
-  { navn: 'Lyd og lys', bilde: '/uploads/bryllup-gulv-lining.webp', alt: 'Lyd og lys til fest' },
-  { navn: 'Sikringsutstyr', bilde: '/uploads/barnebursdag.webp', alt: 'Sikringsutstyr til telt' }
+  { navn: 'Duker', bilde: '/uploads/duk-avlangt-c.jpg', alt: 'Langbord dekket med hvite duker' },
+  { navn: 'Lyd og lys', bilde: '/uploads/jbl-partybox-310-miljo.jpg', alt: 'JBL PartyBox høyttalere på fest' },
+  { navn: 'Sikringsutstyr', bilde: '/uploads/sikringspakke.jpg', alt: 'Sikringspakke med hanketau, jekkestropper og jordanker' }
 ];
 
 /* --- Prislogikk – delt mellom byggeskript og nettleser --- */

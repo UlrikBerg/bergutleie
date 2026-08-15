@@ -137,27 +137,6 @@ function settOppGalleri() {
   });
 }
 
-/* --- forside: adressefelt i leveringskortet --- */
-function settOppForsideAdresse() {
-  const felt = document.querySelector('[data-forside-adresse]');
-  if (!felt) return;
-  const bekreft = document.querySelector('[data-forside-bekreft]');
-
-  const tegn = () => {
-    const sted = finnSted(felt.value);
-    if (!sted) { bekreft.hidden = true; return; }
-    const z = sone(sted.km);
-    bekreft.hidden = false;
-    bekreft.textContent = z
-      ? `✓ Levering til ${sted.navn} er klar – adressen er med deg videre`
-      : `✓ ${sted.navn} er utenfor de faste sonene – vi gir fast pris på forespørsel`;
-  };
-
-  felt.value = lesAdresse();
-  tegn();
-  felt.addEventListener('input', () => { lagreAdresse(felt.value); tegn(); });
-}
-
 /* --- pakkeside: bordtype og rotasjon --- */
 function settOppPakker() {
   const knapper = [...document.querySelectorAll('.bordknapp')];
@@ -577,7 +556,6 @@ function tegnAlt() {
   tegnKurvside();
 }
 
-settOppForsideAdresse();
 settOppGalleri();
 settOppPakker();
 settOppKurvside();

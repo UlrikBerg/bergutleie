@@ -181,7 +181,6 @@ function forside() {
         <a class="btn-ghost" href="#utstyr">Se utstyret</a>
       </div>
       <div class="usp">
-        <span><span class="dot"></span>Faste priser – ingen overraskelser</span>
         <span><span class="dot"></span>Gratis henting på lager</span>
         <span><span class="dot"></span>2000+ utleier i Berg-familien</span>
       </div>
@@ -250,7 +249,6 @@ function forside() {
           <li><span class="tick">✓</span>Samme pris for leie opptil 4 dager – f.eks. tor–man</li>
           <li><span class="tick">✓</span>Selvbetjent henting 24/7 – hent når det passer deg</li>
         </ul>
-        <a class="btn-ghost" href="#kontakt">Finn veien til lageret</a>
       </div>
       <div class="card-dark">
         <h3>Vi leverer og henter for deg</h3>
@@ -261,12 +259,7 @@ function forside() {
           <li><span class="tick">✓</span>Rett til festplassen – du slipper tilhenger og tunge løft</li>
           <li><span class="tick">✓</span>Vi henter alt igjen når festen er over</li>
         </ul>
-        <p class="adresse-label">Hvor skal festen være?</p>
-        <input type="text" class="adresse-felt" data-forside-adresse list="stederliste"
-               placeholder="Legg inn adresse her – se fraktprisen med en gang">
-        <p class="adresse-bekreft" data-forside-bekreft hidden></p>
-        <p class="fine">Adressen følger deg gjennom hele handleturen – fraktprisen ser du i handlekurven. Montering inngår ikke.</p>
-        <datalist id="stederliste">${STEDER.map(s => `<option value="${esc(s.navn)}">`).join('')}</datalist>
+
       </div>
     </div>
   </section>
@@ -684,6 +677,85 @@ function tilbud() {
   });
 }
 
+
+/* --- leievilkår --- */
+function leievilkar() {
+  const seksjoner = [
+    ['Leieperiode og priser',
+     ['Prisene er faste og oppgitt inkludert mva. Samme pris gjelder for 1–4 dagers leie, slik at en hel helg koster det samme som ett døgn. Fra dag fem legges det til 15 % av grunnprisen per døgn.',
+      'Sikringsutstyr har fastpris uansett hvor lenge du leier.',
+      'Leieperioden regnes fra utstyret hentes eller leveres, til det er tilbake hos oss.']],
+
+    ['Bestilling og bekreftelse',
+     ['Forespørsel gjennom nettsiden er uforpliktende. Vi sjekker tilgjengelighet og svarer med et konkret tilbud innen seks timer.',
+      'Avtalen er bindende først når du har bekreftet tilbudet vårt skriftlig.',
+      'Betaling skjer mot faktura etter at utstyret er levert tilbake.']],
+
+    ['Henting og levering',
+     ['Henter du selv, er det gratis. Lageret ligger rett ved E6 i Halden, og vi hjelper deg med lastingen.',
+      'Ved levering gjelder faste sonepriser etter kjøreavstand. Prisen dekker både utkjøring og henting.',
+      'Utstyret skal være klart til henting på avtalt sted og tidspunkt. Må vi kjøre forgjeves, kommer et tillegg for bomtur.',
+      'Montering inngår ikke. Ønsker du opprigg og nedrigg, ordner søsterselskapet vårt Berg Event det – be om tilbud.']],
+
+    ['Ditt ansvar under leien',
+     ['Utstyret står for leietakers regning og risiko i hele leieperioden.',
+      'Kontroller at grunnen der teltet skal stå er fri for strømkabler, vann- og avløpsrør og annet i bakken før du fester noe. Vi er ikke ansvarlige for skade på underlaget.',
+      'Teltet må forankres forsvarlig med sikringsutstyr. Én sikringspakke per telt.',
+      'Ta ned teltduken eller sikre teltet ekstra ved varslet sterk vind.']],
+
+    ['Slik skal utstyret behandles',
+     ['Det er ikke tillatt å slå spiker, stifter, kramper eller lignende i telt, bord, stoler eller gulv.',
+      'Grilling, levende lys, gassvarmere og all bruk av åpen ild er forbudt inne i teltet.',
+      'Ikke bruk teip, lim eller sprayprodukter direkte på teltduken.',
+      'Dekketøy og duker leveres rene og skal returneres i samme stand. Duker returneres tørre – rens er inkludert i prisen.']],
+
+    ['Retur og rengjøring',
+     ['Utstyret leveres tilbake tørt og rengjort til avtalt tid.',
+      'Er teltet vått eller skittent ved retur, kan vi måtte fakturere et gebyr på 1 000 kr per telt for tørking og vask.',
+      'Er utstyret ikke tilbake til avtalt tid, faktureres ytterligere døgn etter gjeldende priser.']],
+
+    ['Skader og manglende utstyr',
+     ['Småskader og normal slitasje er forventet og koster deg ingenting.',
+      'Større skader og manglende utstyr erstattes etter fast prisliste, som du får sammen med bestillingsbekreftelsen.',
+      'Meld fra så snart som mulig hvis noe blir ødelagt. Det er både enklere og billigere enn at vi oppdager det ved retur.']],
+
+    ['Avbestilling',
+     ['Avbestilling mer enn 14 dager før leiestart er kostnadsfritt.',
+      'Ved avbestilling nærmere leiestart kan vi holde tilbake et reservasjonsbeløp for utstyr vi har satt av til deg.',
+      'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer, framfor å fakturere avbestilling.']],
+
+    ['Reklamasjon',
+     ['Er noe galt med utstyret du har fått, si fra til oss med én gang, og senest før arrangementet starter, så vi rekker å ordne opp.',
+      'Innsigelser til leieavtalen må komme senest 14 dager før leieperioden starter.']]
+  ];
+
+  const innhold = `
+<main class="wrap side">
+  <div class="side-intro">
+    <h1>Leievilkår</h1>
+    <p>Dette er vilkårene som gjelder når du leier utstyr av Berg Utleie. Er det noe du lurer på, er det bare å ta kontakt på <a href="mailto:post@bergutleie.no">post@bergutleie.no</a> – vi svarer innen seks timer.</p>
+  </div>
+
+  <div class="vilkar">
+    ${seksjoner.map(([tittel, punkter], i) => `
+    <section class="vilkar-blokk">
+      <h2><span class="vilkar-nr">${i + 1}</span>${esc(tittel)}</h2>
+      <ul>
+        ${punkter.map(p => `<li>${p.replace(/<a /g, '<a ')}</li>`).join('\n        ')}
+      </ul>
+    </section>`).join('')}
+  </div>
+
+  <p class="vilkar-fot">Sist oppdatert 15. august 2026. Berg Utleie er en del av Berg Event-familien.</p>
+</main>`;
+
+  return layout({
+    url: '/leievilkar/', tittel: 'Leievilkår | Berg Utleie',
+    beskrivelse: 'Vilkårene for utleie hos Berg Utleie: leieperiode og priser, henting og levering, ansvar, retur og rengjøring, skader og avbestilling.',
+    innhold
+  });
+}
+
 /* --- bygg --- */
 async function skriv(rel, html) {
   const fil = join(UT, rel, 'index.html');
@@ -699,6 +771,7 @@ await skriv('utstyr', katalog());
 await skriv('selskapspakker', pakkeside());
 await skriv('handlekurv', handlekurv());
 await skriv('tilbud', tilbud());
+await skriv('leievilkar', leievilkar());
 for (const p of PRODUKTER) await skriv(join('utstyr', p.slug), produktside(p));
 
 /* statiske filer */
