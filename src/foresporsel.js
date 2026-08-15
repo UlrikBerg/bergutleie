@@ -286,10 +286,10 @@ function svarmal(d) {
     `Konto: ${KONTONR}`,
     'Merk betalingen med tilbudsnummeret.',
     '',
-    `Reservasjonsbetalingen er ${Math.round(FORSKUDD_ANDEL * 100)} % av totalen, altså ${nok(forskudd)}.`,
+    `Forskuddsbetaling for reservasjon: ${Math.round(FORSKUDD_ANDEL * 100)} % av totalen, altså ${nok(forskudd)}.`,
     d.henter
-      ? 'Den må være betalt før utstyret kan hentes.'
-      : 'Den må være betalt før vi kjører ut utstyret.',
+      ? 'Forskuddet reserverer utstyret og må være betalt før henting.'
+      : 'Forskuddet reserverer utstyret og må være betalt før utkjøring.',
     `Resten, ${nok(rest)}, faktureres etter at utstyret er levert tilbake.`,
     '',
     'Gi oss gjerne beskjed hvis noe skal endres, så ordner vi det.',

@@ -107,7 +107,7 @@ export function lagBilag(d) {
   p.rekt(V, y - boksH, H - V, boksH, FLATE);
   p.rekt(V, y - boksH, 3, boksH, AKSENT);
 
-  p.tekst(V + 18, y - 21, 'RESERVASJONSBETALING', { fet: true, str: 8, f: AKSENT });
+  p.tekst(V + 18, y - 21, 'FORSKUDDSBETALING FOR RESERVASJON', { fet: true, str: 8, f: AKSENT });
 
   // beløpet stort til venstre
   p.tekst(V + 18, y - 46, kr(d.forskudd), { fet: true, str: 19, f: INK });
@@ -124,8 +124,8 @@ export function lagBilag(d) {
 
   p.rekt(V + 18, y - 92, H - V - 36, 0.5, LINJE);
   p.tekst(V + 18, y - 106, d.henter
-    ? 'Reservasjonen må være betalt før utstyret kan hentes.'
-    : 'Reservasjonen må være betalt før vi kjører ut utstyret.', { str: 9.5, f: INK });
+    ? 'Forskuddet reserverer utstyret og må være betalt før henting.'
+    : 'Forskuddet reserverer utstyret og må være betalt før utkjøring.', { str: 9.5, f: INK });
   p.tekst(V + 18, y - 119, `Resten, ${kr(d.rest)}, faktureres etter at utstyret er levert tilbake.`,
     { str: 9.5, f: DEMPET });
   y -= boksH + 24;

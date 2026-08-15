@@ -704,9 +704,9 @@ function leievilkar() {
     ['Bestilling og bekreftelse',
      ['Forespørsel gjennom nettsiden er uforpliktende. Vi sjekker tilgjengelighet og svarer med et konkret tilbud innen seks timer.',
       'Avtalen er bindende først når du har bekreftet tilbudet vårt skriftlig.',
-      'Det er <strong>50 % reservasjonsbetaling</strong> på bookingen. Den faktureres når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.',
+      'Bookingen krever en <strong>forskuddsbetaling på 50 %</strong> som reserverer utstyret til deg. Den faktureres når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.',
       'Resten faktureres etter at utstyret er levert tilbake.',
-      'Reservasjonsbetalingen er bindende. Se punktet om avbestilling.']],
+      'Forskuddet er bindende. Se punktet om avbestilling.']],
 
     ['Henting og levering',
      ['Henter du selv, er det gratis. Lageret ligger i Sørliveien 78 i Halden, rett ved E6, og vi hjelper deg med lastingen.',
@@ -737,10 +737,10 @@ function leievilkar() {
       'Meld fra så snart som mulig hvis noe blir ødelagt. Det er både enklere og billigere enn at vi oppdager det ved retur.']],
 
     ['Avbestilling',
-     ['<strong>Reservasjonsbetalingen refunderes ikke ved avbestilling.</strong> Når du har bekreftet avtalen, har vi satt av utstyret til deg og takket nei til andre kunder på samme dato. Den er derfor en bindende sum.',
-      'Avbestiller du før avtalen er bekreftet og reservasjonen fakturert, koster det ingenting.',
-      'Resterende 50 % faktureres ikke ved avbestilling – du betaler aldri mer enn reservasjonen.',
-      'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer. Da flyttes reservasjonen med til den nye datoen, framfor at du taper det.']],
+     ['<strong>Forskuddet refunderes ikke ved avbestilling.</strong> Når du har bekreftet avtalen, har vi reservert utstyret til deg og takket nei til andre kunder på samme dato. Det er derfor en bindende sum.',
+      'Avbestiller du før avtalen er bekreftet og forskuddet fakturert, koster det ingenting.',
+      'Resterende 50 % faktureres ikke ved avbestilling – du betaler aldri mer enn forskuddet.',
+      'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer. Da flyttes forskuddet med til den nye datoen, framfor at du taper det.']],
 
     ['Reklamasjon',
      ['Er noe galt med utstyret du har fått, si fra til oss med én gang, og senest før arrangementet starter, så vi rekker å ordne opp.',
