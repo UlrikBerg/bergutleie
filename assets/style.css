@@ -443,6 +443,12 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   background: transparent; color: var(--muted-2); transition: all .15s;
 }
 .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.hente-sted {
+  margin: 12px 0 0; padding: 12px 14px;
+  background: var(--line-soft); border-radius: 9px; border-left: 3px solid var(--ink);
+}
+.hente-adresse { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--ink); }
+.hente-note { margin: 3px 0 0; font-size: 12.5px; color: var(--muted-2); line-height: 1.45; }
 .rute-treff { margin: 10px 0 0; font-size: 13.5px; color: var(--gronn); font-weight: 600; line-height: 1.5; }
 .sone-note { margin: 10px 0 0; font-size: 13px; color: var(--muted-2); line-height: 1.5; }
 .sum-lines { border-top: 1px solid var(--line-soft); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
@@ -561,16 +567,16 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .hero::after {
     content: ""; position: absolute; inset: 0; z-index: 1;
     background: linear-gradient(to top,
-      rgba(10,30,32,.80) 0%, rgba(10,30,32,.70) 44%,
-      rgba(10,30,32,.46) 70%, rgba(10,30,32,.16) 90%, rgba(10,30,32,0) 100%);
+      rgba(10,30,32,.62) 0%, rgba(10,30,32,.50) 46%,
+      rgba(10,30,32,.28) 72%, rgba(10,30,32,.06) 92%, rgba(10,30,32,0) 100%);
   }
   .hero-tekst { position: relative; z-index: 2; padding: 30px 20px 30px; width: 100%; }
-  .hero h1 { color: #fff; font-size: 34px; margin-bottom: 14px; text-shadow: 0 2px 14px rgba(8,24,26,.55); }
-  .hero .lead { color: #fff; font-size: 15.5px; line-height: 1.55; margin-bottom: 22px; text-shadow: 0 1px 10px rgba(8,24,26,.6); }
+  .hero h1 { color: #fff; font-size: 34px; margin-bottom: 14px; text-shadow: 0 2px 16px rgba(8,24,26,.8), 0 1px 3px rgba(8,24,26,.5); }
+  .hero .lead { color: #fff; font-size: 15.5px; line-height: 1.55; margin-bottom: 22px; text-shadow: 0 1px 12px rgba(8,24,26,.85), 0 1px 3px rgba(8,24,26,.5); }
   .hero-actions { margin-bottom: 20px; }
   .hero .btn-ghost { border-color: rgba(255,255,255,.5); color: #fff; background: rgba(255,255,255,.08); }
   .hero .btn-ghost:hover { background: rgba(255,255,255,.18); border-color: #fff; color: #fff; }
-  .usp { color: #fff; font-size: 13.5px; text-shadow: 0 1px 8px rgba(8,24,26,.6); }
+  .usp { color: #fff; font-size: 13.5px; text-shadow: 0 1px 10px rgba(8,24,26,.85), 0 1px 3px rgba(8,24,26,.5); }
   .site-header .wrap { gap: 14px; }
 
   /* Menyen legger seg under topplinjen når den åpnes */
@@ -629,7 +635,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .prod-kort .legg-i-kurv { width: 100%; height: 42px; }
   .prod-tekst h3 a { display: block; padding: 3px 0; }
   .kjop-rad .btn { flex: 1 1 100%; }
-  .antall-boks { width: 100%; justify-content: space-between; }
+  .kjop-rad .antall-boks { width: 100%; justify-content: space-between; }
   .filtre a { padding: 12px 18px; }
   .mini { width: 64px; height: 50px; }
   .gal-nav { width: 42px; height: 42px; }
@@ -640,6 +646,36 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .prod-bilde.contain { padding: 10px; }
 
   /* Større trykkflater i bunnlinjen */
+  /* 3. Stegbåndet er forklaring som gjentas i teksten ellers – bort på mobil */
+  .band { display: none; }
+
+  /* 4. Kompakt handlekurv: navn og pris på samme linje, mindre høyde */
+  .kurv-tittel { font-size: 28px; margin: 14px 0 24px; }
+  .kurv-rad {
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px; padding: 13px 14px; align-items: start;
+  }
+  .kurv-navn .navn { font-size: 14.5px; line-height: 1.3; }
+  .kurv-navn .enhet { font-size: 12px; margin-top: 2px; }
+  .kurv-sum { grid-column: 2; grid-row: 1; text-align: right; font-size: 14.5px; min-width: 0; white-space: nowrap; }
+  .antall-boks.synlig { grid-column: 1; grid-row: 2; justify-self: start; width: auto; }
+  .antall-boks.synlig button { height: 36px; width: 36px; font-size: 16px; }
+  .antall-boks.synlig .val { min-width: 30px; font-size: 14px; }
+  .fjern { grid-column: 2; grid-row: 2; justify-self: end; align-self: center; font-size: 19px; padding: 6px; }
+  .summary { padding: 20px; gap: 17px; }
+  .oppsett { padding: 16px 16px 13px; }
+  .innsikt { padding: 18px; }
+  .innsikt-tekst { font-size: 13.5px; }
+
+  /* 6. Ryddigere bunnlinje */
+  .footer-grid { padding-top: 46px; padding-bottom: 30px; gap: 30px; }
+  .footer-bottom .wrap {
+    flex-direction: column; align-items: flex-start;
+    gap: 14px; padding-top: 18px; padding-bottom: 26px;
+  }
+  .footer-bottom .legal { gap: 22px; }
+  .footer-bottom .legal a { padding: 4px 0; }
+
   .section { padding-top: 74px; }
   .band .wrap { padding-top: 46px; padding-bottom: 50px; }
   .faq { padding-top: 78px; }
@@ -666,9 +702,6 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
   .side-intro h1 { font-size: 27px; }
   .prod-topp h1 { font-size: 28px; }
   .felt-rad, .dato-rad { grid-template-columns: 1fr; }
-  .kurv-rad { grid-template-columns: 1fr auto; row-gap: 12px; }
-  .kurv-sum { grid-column: 1; text-align: left; min-width: 0; }
-  .fjern { grid-column: 2; }
   .kurv-tittel { font-size: 28px; }
   .tilbud-intro h1 { font-size: 28px; }
   .tilbud-skjema { padding: 24px; }

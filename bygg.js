@@ -68,6 +68,10 @@ ${jsonld.map(j => `<script type="application/ld+json">\n${JSON.stringify(j, null
       <a href="/tilbud/">Få tilbud</a>
     </nav>
     <div class="header-actions">
+      <button type="button" class="meny-knapp" data-meny
+              aria-label="Åpne menyen" aria-expanded="false" aria-controls="hovedmeny">
+        <span></span><span></span><span></span>
+      </button>
       <a class="btn kurv-knapp" href="/handlekurv/" aria-label="Handlekurv">
         <svg class="kurv-ikon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <path d="M1.5 1.5h2.2l1.9 9.4a1.4 1.4 0 0 0 1.4 1.1h7a1.4 1.4 0 0 0 1.4-1.1L18 4.6H5.1"
@@ -77,10 +81,6 @@ ${jsonld.map(j => `<script type="application/ld+json">\n${JSON.stringify(j, null
         </svg>
         <span class="kurv-ord">Handlekurv</span><span class="kurv-teller" data-kurv-teller>0</span>
       </a>
-      <button type="button" class="meny-knapp" data-meny
-              aria-label="Åpne menyen" aria-expanded="false" aria-controls="hovedmeny">
-        <span></span><span></span><span></span>
-      </button>
     </div>
   </div>
 </header>
@@ -103,7 +103,7 @@ ${innhold}
       <p class="eyebrow">Selskapet</p>
       <div class="footer-links">
         <a href="/selskapspakker/">Selskapspakker</a>
-        <a href="/#slik">Slik fungerer det</a>
+        <a href="/tilbud/">Få tilbud</a>
         <a href="/#levering">Henting og levering</a>
         <a href="/leievilkar/">Leievilkår</a>
       </div>
@@ -612,6 +612,10 @@ function handlekurv() {
         <div class="seg" data-seg-modus>
           <button type="button" data-val="hent" aria-pressed="true">Hent selv · 0 kr</button>
           <button type="button" data-val="lev" aria-pressed="false">Få det levert</button>
+        </div>
+        <div class="hente-sted" data-hente-sted>
+          <p class="hente-adresse">Sørliveien 78, 1788 Halden</p>
+          <p class="hente-note">Rett ved E6 · Man–fre 09–18 · Søndag 12–15</p>
         </div>
         <div data-adresse-felt hidden style="margin-top: 12px;">
           <input type="text" data-adresse list="stederliste"

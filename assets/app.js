@@ -297,6 +297,8 @@ function tegnKurvside() {
   if (aNote) { aNote.textContent = s.adresseNote; aNote.hidden = !s.adresseNote; }
   const aFelt = document.querySelector('[data-adresse-felt]');
   if (aFelt) aFelt.hidden = bestilling.modus !== 'lev';
+  const hFelt = document.querySelector('[data-hente-sted]');
+  if (hFelt) hFelt.hidden = bestilling.modus !== 'hent';
 
   tegnOppsett();
   tegnInnsikt();
