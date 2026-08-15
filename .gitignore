@@ -1,3 +1,6 @@
 .DS_Store
 *.tmp
 node_modules/
+
+# Bygges av `npm run bygg` – Cloudflare bygger selv ved hver push
+dist/

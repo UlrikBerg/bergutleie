@@ -1,0 +1,494 @@
+/* ===========================================================================
+   Berg Utleie – stilark
+
+   Farger og typografi er hentet direkte fra designet:
+   bunn #F7F6F1 · tekst #113B3F · aksent #E8562E (hover #CF4520)
+   Schibsted Grotesk, vekt 400–800.
+   ======================================================================== */
+
+:root {
+  --bg: #F7F6F1;
+  --ink: #113B3F;
+  --accent: #E8562E;
+  --accent-dark: #CF4520;
+  --accent-soft: #FDEBE4;
+  --muted: #435654;
+  --muted-2: #5A6E6D;
+  --muted-3: #7C8D8B;
+  --line: #E5E7E1;
+  --line-soft: #EEF0EA;
+  --on-dark: #BCD0CE;
+  --on-dark-2: #7FA09E;
+  --on-dark-3: #D9E2E0;
+  --gronn: #1F7A4D;
+  --kort: #FBFAF6;
+  --wrap: 1200px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--ink); text-decoration: none; }
+a:hover { color: var(--accent); }
+::selection { background: var(--accent); color: #fff; }
+
+/* height:auto er nødvendig fordi <img> har width/height-attributter –
+   uten den overstyrer attributtene aspect-ratio og bildene strekkes. */
+img { max-width: 100%; height: auto; }
+
+h1, h2, h3 { letter-spacing: -0.02em; }
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 32px; }
+
+.visuelt-skjult {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- knapper ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--accent); color: #fff; border: none;
+  font: inherit; font-weight: 700; font-size: 15px;
+  padding: 11px 22px; border-radius: 8px; cursor: pointer; text-align: center;
+}
+.btn:hover { background: var(--accent-dark); color: #fff; }
+.btn-lg { font-size: 16px; padding: 15px 28px; }
+.btn-xl { font-size: 17px; padding: 16px 34px; }
+.bred { width: 100%; }
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1.5px solid #C3CFCB; background: none; font: inherit;
+  font-weight: 600; font-size: 16px; padding: 15px 28px;
+  border-radius: 8px; cursor: pointer; transition: background .15s, border-color .15s;
+}
+.btn-ghost:hover { background: var(--line-soft); border-color: var(--ink); color: var(--ink); }
+.btn-link {
+  background: none; border: none; font: inherit; font-weight: 700;
+  font-size: 15px; color: var(--accent); cursor: pointer; padding: 0; white-space: nowrap;
+}
+.btn-link:hover { color: var(--accent-dark); }
+.btn-liten {
+  background: var(--accent-soft); color: var(--accent); border: none;
+  font: inherit; font-weight: 700; font-size: 13.5px;
+  padding: 9px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+}
+.btn-liten:hover { background: var(--accent); color: #fff; }
+.blink { animation: blink .4s ease; }
+@keyframes blink { 50% { transform: scale(1.12); } }
+
+/* ---------- topplinje ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap {
+  height: 68px; display: flex; align-items: center;
+  justify-content: space-between; gap: 24px;
+}
+.site-header .logo { display: flex; align-items: center; flex-shrink: 0; }
+.site-header .logo img { display: block; height: 42px; width: auto; }
+.site-nav { display: flex; align-items: center; gap: 26px; font-size: 15px; font-weight: 500; }
+.header-actions { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+.kurv-lenke { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.kurv-teller {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 21px; height: 21px; padding: 0 6px;
+  background: var(--accent); color: #fff;
+  border-radius: 999px; font-size: 12px; font-weight: 800;
+}
+
+/* ---------- hero ---------- */
+.hero {
+  display: grid; grid-template-columns: 1.05fr 0.95fr;
+  gap: 64px; align-items: center; padding-top: 72px; padding-bottom: 80px;
+}
+.hero h1 { margin: 0 0 20px; font-size: 54px; line-height: 1.05; font-weight: 800; letter-spacing: -0.025em; text-wrap: balance; }
+.hero .lead { margin: 0 0 32px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 52ch; text-wrap: pretty; }
+.hero-actions { display: flex; gap: 14px; margin-bottom: 40px; flex-wrap: wrap; }
+.usp { display: flex; gap: 28px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+.usp span { display: flex; align-items: center; gap: 8px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.hero-media img { display: block; width: 100%; aspect-ratio: 4 / 3.2; object-fit: cover; border-radius: 16px; }
+
+/* ---------- stegbånd ---------- */
+.band { background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.band .wrap { padding-top: 52px; padding-bottom: 56px; }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+.step-head { display: flex; align-items: center; gap: 11px; margin-bottom: 9px; }
+.step-num {
+  display: flex; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: #fff; align-items: center;
+  justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;
+}
+.steps h3 { margin: 0; font-size: 16.5px; font-weight: 700; }
+.steps p { margin: 0; font-size: 14.5px; color: var(--muted-2); line-height: 1.55; padding-left: 39px; }
+
+/* ---------- seksjoner ---------- */
+.section { padding-top: 88px; }
+.section-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; gap: 24px; flex-wrap: wrap; }
+.section-head h2 { margin: 0 0 10px; font-size: 34px; font-weight: 800; }
+.section-head p { margin: 0; font-size: 16px; color: var(--muted); }
+.section-head-center { text-align: center; margin-bottom: 40px; }
+.section-head-center h2 { margin: 0 0 10px; font-size: 34px; font-weight: 800; }
+.section-head-center p { margin: 0 auto; font-size: 16px; color: var(--muted); max-width: 60ch; }
+
+/* ---------- kategorikort ---------- */
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.cat-card { display: block; background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; color: inherit; }
+.cat-card:hover { border-color: var(--ink); color: inherit; }
+.cat-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
+.cat-card .meta { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; gap: 12px; }
+.cat-card .navn { display: block; font-weight: 700; font-size: 16.5px; }
+.cat-card .fra { display: block; font-size: 13.5px; color: var(--muted-2); margin-top: 2px; }
+.cat-card .arrow { color: var(--accent); font-weight: 800; font-size: 18px; }
+
+/* ---------- henting / levering ---------- */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+.card-light { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 36px; }
+.card-dark { background: var(--ink); color: #fff; border-radius: 16px; padding: 36px; }
+.eyebrow { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-2); }
+.card-light h3, .card-dark h3 { margin: 0 0 4px; font-size: 24px; font-weight: 800; }
+.big-price { margin: 0 0 24px; font-size: 30px; font-weight: 800; color: var(--accent); }
+.card-dark .big-price { margin-bottom: 20px; color: #F2A48C; }
+.ticks { margin: 0 0 28px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 15px; color: #344845; }
+.ticks li { display: flex; gap: 10px; }
+.ticks.lys { color: var(--on-dark-3); margin-bottom: 22px; }
+.ticks.lys .tick { color: #F2A48C; }
+.tick { color: var(--accent); font-weight: 800; flex-shrink: 0; }
+.zones { border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; margin-bottom: 18px; font-size: 14.5px; }
+.zones div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.zones div:last-child { border-bottom: none; }
+.zones span:first-child { color: var(--on-dark); }
+.zones span:last-child { font-weight: 700; }
+.fine { margin: 0; font-size: 13.5px; color: var(--on-dark-2); line-height: 1.55; }
+
+/* ---------- FAQ ---------- */
+.faq { max-width: 900px; margin: 0 auto; padding-top: 96px; }
+.faq h2 { margin: 0 0 32px; font-size: 34px; font-weight: 800; text-align: center; }
+.faq-list { display: flex; flex-direction: column; gap: 12px; }
+.faq details { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; }
+.faq summary { font-weight: 700; font-size: 16px; cursor: pointer; }
+.faq p { margin: 12px 0 0; font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+/* ---------- CTA ---------- */
+.cta-outer { padding: 88px 32px 96px; max-width: var(--wrap); margin: 0 auto; }
+.cta { background: var(--ink); border-radius: 20px; padding: 64px 48px; text-align: center; color: #fff; }
+.cta h2 { margin: 0 0 12px; font-size: 36px; font-weight: 800; }
+.cta p { margin: 0 0 32px; font-size: 17px; color: var(--on-dark); }
+
+/* ---------- undersider ---------- */
+.side { padding-top: 52px; padding-bottom: 96px; }
+.side-intro { max-width: 62ch; margin-bottom: 44px; }
+.side-intro.midt { max-width: 56ch; margin-left: auto; margin-right: auto; text-align: center; }
+.side-intro h1 { margin: 0 0 12px; font-size: 42px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.08; }
+.side-intro p { margin: 0; font-size: 16.5px; color: var(--muted); line-height: 1.6; }
+
+/* ---------- katalog ---------- */
+.filtre { display: flex; gap: 10px; flex-wrap: wrap; margin: -16px 0 40px; }
+.filtre a {
+  border: 1.5px solid #D9DED6; background: #fff; color: var(--muted);
+  font-size: 14px; font-weight: 700; padding: 9px 18px; border-radius: 999px;
+}
+.filtre a:hover { border-color: var(--ink); color: var(--ink); }
+.katalog { display: flex; flex-direction: column; gap: 52px; }
+.kat-tittel {
+  margin: 0 0 16px; font-size: 14px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
+  scroll-margin-top: 88px;
+}
+.prod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.prod-kort {
+  background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.prod-kort:hover { border-color: var(--ink); }
+.prod-media {
+  display: block; position: relative; aspect-ratio: 4 / 3;
+  background: var(--kort); overflow: hidden; border-bottom: 1px solid var(--line-soft);
+}
+.prod-bilde { width: 100%; height: 100%; object-fit: cover; display: block; }
+.prod-bilde.contain { object-fit: contain; padding: 12px; }
+.tom-media { display: block; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, #EDEBE2 0 14px, #E5E3D8 14px 28px); }
+.prod-tekst { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.prod-tekst h3 { margin: 0; font-weight: 700; font-size: 16px; }
+.prod-tekst .desc { margin: 3px 0 0; font-size: 13.5px; color: var(--muted-2); line-height: 1.45; }
+.prod-bunn { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; }
+.prod-bunn .pris { font-weight: 800; font-size: 16px; }
+.prod-bunn .pris-tag { font-size: 12.5px; color: var(--muted-3); }
+.prod-kort .legg-i-kurv {
+  background: var(--accent-soft); color: var(--accent); border: none;
+  font: inherit; font-weight: 800; font-size: 18px;
+  width: 34px; height: 34px; border-radius: 8px; cursor: pointer; flex-shrink: 0;
+}
+.prod-kort .legg-i-kurv:hover { background: var(--accent); color: #fff; }
+
+/* ---------- produktside ---------- */
+.brodsmuler { margin: 0 0 28px; font-size: 14px; color: var(--muted-2); }
+.brodsmuler a { color: var(--muted-2); font-weight: 600; }
+.brodsmuler span { margin: 0 8px; }
+.brodsmuler .naa { color: var(--ink); font-weight: 600; margin: 0; }
+.prod-topp { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: start; }
+.galleri-hoved {
+  position: relative; aspect-ratio: 4 / 3; background: var(--kort);
+  border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+}
+.galleri-hoved img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.galleri-hoved img.contain { object-fit: contain; padding: 20px; }
+.gal-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 38px; height: 38px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.92); color: var(--ink);
+  font: inherit; font-size: 20px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(17,59,63,0.18);
+  display: flex; align-items: center; justify-content: center;
+}
+.gal-nav:hover { background: #fff; }
+.gal-nav.forrige { left: 12px; }
+.gal-nav.neste { right: 12px; }
+.miniatyrer { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.mini {
+  width: 76px; height: 58px; border-radius: 8px; overflow: hidden;
+  cursor: pointer; padding: 0; background: var(--kort);
+  border: 1.5px solid var(--line); flex-shrink: 0;
+}
+.mini.aktiv { border: 2px solid var(--accent); }
+.mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.prod-topp h1 { margin: 0 0 14px; font-size: 36px; font-weight: 800; line-height: 1.1; }
+.prod-lang { margin: 0 0 22px; font-size: 16px; color: var(--muted); line-height: 1.6; }
+.spesifikasjoner { display: flex; flex-direction: column; gap: 9px; margin-bottom: 26px; }
+.spesifikasjoner p { margin: 0; display: flex; gap: 10px; font-size: 14.5px; color: #344845; }
+.kjopsboks { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+.pris-stor { margin: 0 0 2px; font-size: 28px; font-weight: 800; }
+.pris-sub { margin: 0 0 18px; font-size: 13.5px; color: var(--muted-2); }
+.kjop-rad { display: flex; gap: 12px; align-items: center; }
+.antall-boks { display: flex; align-items: center; border: 1.5px solid #D9E2E0; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.antall-boks button { width: 38px; height: 46px; border: none; background: #fff; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; }
+.antall-boks .dec { color: var(--muted-2); }
+.antall-boks .dec:hover { background: var(--line-soft); }
+.antall-boks .inc { color: var(--accent); }
+.antall-boks .inc:hover { background: var(--accent-soft); }
+.antall-boks .val { min-width: 36px; text-align: center; font-weight: 700; font-size: 15px; }
+.i-kurv-note { margin: 12px 0 0; font-size: 13.5px; color: var(--gronn); font-weight: 600; }
+.i-kurv-note a { color: var(--accent); font-weight: 700; }
+.mva { margin: 12px 0 0; font-size: 12.5px; color: var(--muted-3); line-height: 1.5; }
+
+.anbefalt { margin-top: 72px; max-width: 860px; }
+.anbefalt h2 { margin: 0 0 6px; font-size: 27px; font-weight: 800; }
+.anbefalt-intro { margin: 0 0 20px; font-size: 15px; color: var(--muted); }
+.pakkeboks {
+  background: var(--ink); color: #fff; border-radius: 14px;
+  padding: 22px 26px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+}
+.pakke-navn { margin: 0; font-weight: 800; font-size: 18px; }
+.pakke-innhold { margin: 4px 0 0; font-size: 13.5px; color: var(--on-dark); line-height: 1.5; }
+.pakkeboks > div:first-child { flex: 1; min-width: 240px; }
+.pakke-hoyre { text-align: right; flex-shrink: 0; }
+.pakke-hoyre .pakke-pris { margin: 0 0 10px; font-weight: 800; font-size: 19px; }
+.anbefalt-liste { display: flex; flex-direction: column; gap: 10px; }
+.anbefalt-rad {
+  display: flex; align-items: center; gap: 16px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px 16px 12px 12px;
+}
+.anbefalt-media {
+  display: block; width: 74px; height: 58px; border-radius: 8px;
+  background: var(--kort); overflow: hidden; flex-shrink: 0; border: 1px solid var(--line-soft);
+}
+.anbefalt-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.anbefalt-rad > div:nth-child(2) { flex: 1; min-width: 0; }
+.anbefalt-navn { margin: 0; font-weight: 700; font-size: 15.5px; }
+.anbefalt-navn .antall { color: var(--accent); }
+.anbefalt-why { margin: 2px 0 0; font-size: 13.5px; color: var(--muted-2); line-height: 1.45; }
+.anbefalt-hoyre { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.anbefalt-pris { font-size: 14px; font-weight: 700; white-space: nowrap; }
+
+/* ---------- selskapspakker ---------- */
+.bordvalg { display: flex; justify-content: center; gap: 10px; margin: -16px 0 0; }
+.bordknapp {
+  border: 1.5px solid #D9DED6; background: #fff; color: var(--muted);
+  font: inherit; font-size: 14.5px; font-weight: 700;
+  padding: 11px 24px; border-radius: 999px; cursor: pointer;
+}
+.bordknapp.aktiv { border-color: var(--ink); background: var(--ink); color: #fff; }
+.rund-note { margin: 16px 0 0; text-align: center; font-size: 13.5px; color: var(--muted-3); }
+.pakke-grid {
+  margin-top: 28px; display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 20px; align-items: start;
+}
+.pakke-kort { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+.pakke-media {
+  display: block; position: relative; aspect-ratio: 16 / 7;
+  background: #F6F8F2; border-bottom: 1px solid var(--line-soft);
+  cursor: grab; touch-action: none; user-select: none;
+}
+.pakke-media.drar { cursor: grabbing; }
+.pakke-media svg { display: block; width: 100%; height: 100%; }
+.dra-hint {
+  position: absolute; right: 10px; bottom: 8px;
+  background: rgba(17,59,63,0.55); color: #fff;
+  font-size: 11px; font-weight: 600; padding: 4px 10px;
+  border-radius: 999px; pointer-events: none;
+}
+.pakke-tekst { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; }
+.pakke-tekst h3 { margin: 0 0 6px; font-size: 19px; font-weight: 800; }
+.pakke-tekst .pakke-pris { margin: 0; font-size: 24px; font-weight: 800; }
+.pakke-innhold { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.pakke-innhold p { margin: 0; display: flex; gap: 9px; font-size: 14px; color: #344845; }
+.pakke-note { margin: 8px 0 0; font-size: 12px; color: var(--muted-3); text-align: center; }
+.pakke-fot { margin: 32px auto 0; text-align: center; font-size: 14px; color: var(--muted-2); max-width: 60ch; }
+.pakke-fot a { color: var(--accent); font-weight: 700; }
+
+/* ---------- handlekurv ---------- */
+.kurv-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+.kurv-tom { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 40px; text-align: center; }
+.kurv-tom p { margin: 0 0 18px; font-size: 16px; color: var(--muted-2); }
+.kurv-liste { display: flex; flex-direction: column; gap: 10px; }
+.kurv-rad {
+  display: grid; grid-template-columns: 74px 1fr auto auto auto;
+  gap: 16px; align-items: center;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px 16px 12px 12px;
+}
+.kurv-media { display: block; width: 74px; height: 58px; border-radius: 8px; background: var(--kort); overflow: hidden; border: 1px solid var(--line-soft); }
+.kurv-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kurv-navn { min-width: 0; }
+.kurv-navn .navn { margin: 0; font-weight: 700; font-size: 15.5px; }
+.kurv-navn .enhet { margin: 2px 0 0; font-size: 13px; color: var(--muted-2); }
+.antall-boks.synlig button { height: 34px; width: 34px; }
+.kurv-sum { font-weight: 800; font-size: 15.5px; white-space: nowrap; }
+.fjern { background: none; border: none; font: inherit; font-size: 20px; color: var(--muted-3); cursor: pointer; padding: 0 4px; }
+.fjern:hover { color: var(--accent); }
+
+.innsikt { margin-top: 32px; }
+.innsikt h2 { margin: 0 0 14px; font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.innsikt-rad {
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 8px;
+}
+.innsikt-prikk { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.innsikt-prikk.ok { background: var(--ink); }
+.innsikt-tekst { flex: 1; font-size: 14px; color: #344845; line-height: 1.45; }
+
+.summary {
+  position: sticky; top: 92px; background: #fff;
+  border: 1px solid var(--line); border-radius: 16px; padding: 26px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.field-label { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: var(--muted-2); }
+.dato-rad { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dato-rad label, .foresporsel-skjema label {
+  display: flex; flex-direction: column; gap: 5px;
+  font-size: 13px; font-weight: 700; color: var(--muted-2);
+}
+input[type="date"], input[type="text"], input[type="tel"], input[type="email"], textarea, select {
+  width: 100%; font: inherit; font-size: 14.5px;
+  padding: 11px 12px; border: 1.5px solid #D9E2E0;
+  border-radius: 8px; background: #fff; color: var(--ink);
+}
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+textarea { resize: vertical; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--line-soft); border-radius: 9px; padding: 4px; }
+.seg button {
+  border: none; font: inherit; font-size: 13.5px; font-weight: 700;
+  padding: 9px 6px; border-radius: 7px; cursor: pointer;
+  background: transparent; color: var(--muted-2); transition: all .15s;
+}
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.sone-note { margin: 10px 0 0; font-size: 13px; color: var(--muted-2); line-height: 1.5; }
+.sum-lines { border-top: 1px solid var(--line-soft); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
+.sum-lines > div { display: flex; justify-content: space-between; gap: 16px; }
+.sum-lines .k { color: var(--muted-2); }
+.sum-lines .v { font-weight: 700; }
+.sum-total { border-top: 2px solid var(--ink); padding-top: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.sum-total .label { font-weight: 800; font-size: 17px; }
+.sum-total .value { font-weight: 800; font-size: 26px; }
+
+/* ---------- skjema ---------- */
+.skjema-seksjon { margin-top: 56px; max-width: 680px; }
+.skjema-seksjon h2 { margin: 0 0 20px; font-size: 27px; font-weight: 800; }
+.foresporsel-skjema {
+  display: flex; flex-direction: column; gap: 16px;
+  background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 28px;
+}
+.felt-rad { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.honningkrukke { position: absolute; left: -9999px; opacity: 0; height: 0; }
+.skjema-status { margin: 0; font-size: 14px; color: var(--muted-2); text-align: center; }
+.skjema-status.feil { color: var(--accent); font-weight: 600; }
+.uforpliktende { margin: 0; font-size: 12.5px; color: var(--muted-3); text-align: center; }
+.kvittering { text-align: center; padding: 20px 0; }
+.kvittering-tittel { margin: 0 0 10px; font-size: 20px; font-weight: 800; color: var(--gronn); }
+.kvittering p { margin: 0 0 20px; font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+/* ---------- bunnlinje ---------- */
+.site-footer { background: var(--ink); color: #fff; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.2fr; gap: 48px; padding-top: 64px; padding-bottom: 40px; }
+.site-footer img { display: block; height: 48px; width: auto; margin: 0 0 16px; }
+.site-footer .blurb { margin: 0 0 16px; font-size: 14px; color: var(--on-dark); line-height: 1.6; }
+.site-footer .parent { color: #F2A48C; font-size: 14px; font-weight: 600; }
+.site-footer .parent:hover { color: var(--accent); }
+.footer-col p.eyebrow { color: var(--on-dark-2); margin-bottom: 14px; }
+.footer-links { display: flex; flex-direction: column; gap: 9px; font-size: 14.5px; }
+.footer-links a, .footer-col span { color: var(--on-dark-3); }
+.footer-links a:hover { color: #fff; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); }
+.footer-bottom .wrap { padding-top: 20px; padding-bottom: 20px; display: flex; justify-content: space-between; font-size: 13px; color: var(--on-dark-2); gap: 20px; flex-wrap: wrap; }
+.footer-bottom a { color: var(--on-dark-2); }
+.footer-bottom a:hover { color: #fff; }
+.footer-bottom .legal { display: flex; gap: 20px; }
+
+/* ---------- responsivt ---------- */
+@media (max-width: 1050px) {
+  .site-nav { display: none; }
+  .hero { grid-template-columns: 1fr; gap: 40px; padding-top: 48px; padding-bottom: 56px; }
+  .hero h1 { font-size: 40px; }
+  .steps { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .cat-grid, .prod-grid { grid-template-columns: repeat(2, 1fr); }
+  .split { grid-template-columns: 1fr; }
+  .prod-topp { grid-template-columns: 1fr; gap: 32px; }
+  .kurv-layout { grid-template-columns: 1fr; }
+  .summary { position: static; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+  .section { padding-top: 64px; }
+  .side-intro h1 { font-size: 32px; }
+}
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 20px; }
+  .hero h1 { font-size: 32px; }
+  .hero .lead { font-size: 16.5px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .usp { gap: 12px; flex-direction: column; }
+  .steps, .cat-grid, .prod-grid { grid-template-columns: 1fr; }
+  .section-head h2, .section-head-center h2, .faq h2 { font-size: 26px; }
+  .card-light, .card-dark, .foresporsel-skjema { padding: 24px; }
+  .cta { padding: 40px 24px; }
+  .cta h2 { font-size: 26px; }
+  .cta-outer { padding: 64px 20px 72px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer-bottom .wrap { flex-direction: column; gap: 12px; }
+  .side-intro h1 { font-size: 27px; }
+  .prod-topp h1 { font-size: 28px; }
+  .felt-rad, .dato-rad { grid-template-columns: 1fr; }
+  .kurv-rad { grid-template-columns: 56px 1fr auto; row-gap: 10px; }
+  .kurv-media { width: 56px; height: 46px; }
+  .kurv-sum { grid-column: 2; text-align: right; }
+  .fjern { grid-column: 3; }
+  .anbefalt-rad { flex-wrap: wrap; }
+  .anbefalt-hoyre { width: 100%; justify-content: space-between; }
+  .header-actions .btn { display: none; }
+  .pakkeboks { flex-direction: column; align-items: stretch; }
+  .pakke-hoyre { text-align: left; }
+}
