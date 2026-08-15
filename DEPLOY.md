@@ -34,7 +34,7 @@ Cloudflare bygger og publiserer automatisk ved push. Live på ca. ett minutt.
 | `bygg.js` | Genererer alle sidene til `dist/`. |
 | `assets/app.js` | Handlekurv, galleri, prisberegning i nettleseren. |
 | `assets/style.css` | Alle stiler. |
-| `functions/api/foresporsel.js` | Tar imot skjemaet og sender e-post. |
+|  `src/foresporsel.js` | Tar imot skjemaet og sender e-post. |
 | `_redirects` | Ekte 301-omdirigeringer. Legg inn en linje når en URL endres. |
 | `_headers` | Cache og sikkerhetsheadere. |
 | `sitemap.xml` | Genereres automatisk av `bygg.js`. |
@@ -43,13 +43,13 @@ Cloudflare bygger og publiserer automatisk ved push. Live på ca. ett minutt.
 
 ## Innstillinger i Cloudflare
 
-Prosjektet må ha disse (Settings → Builds & deployments):
+Prosjektet må ha disse (Settings → Build):
 
 - **Build command:** `npm run bygg`
-- **Build output directory:** `dist`
+- **Deploy command:** `npx wrangler deploy`
 - **Root directory:** `/`
 
-Og under Settings → Environment variables (for skjemaet):
+Og under Settings → Variables and Secrets (for skjemaet):
 
 - `RESEND_API_KEY` – API-nøkkel fra resend.com
 - `VARSEL_TIL` – `post@bergutleie.no`

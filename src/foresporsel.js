@@ -2,10 +2,9 @@
    POST /api/foresporsel
 
    Tar imot forespørselen fra handlekurven og sender den som e-post til
-   post@bergutleie.no. Kjører som en Cloudflare Pages Function – ingen
-   egen server å drifte.
+   post@bergutleie.no. Kalles fra src/index.js – ingen egen server å drifte.
 
-   Krever to miljøvariabler i Cloudflare (Settings → Environment variables):
+   Krever to miljøvariabler i Cloudflare (Settings → Variables and Secrets):
      RESEND_API_KEY   API-nøkkel fra resend.com
      VARSEL_TIL       e-postadressen forespørslene skal til
 
@@ -14,7 +13,7 @@
 
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
 
-export async function onRequestPost({ request, env }) {
+export async function handterForesporsel(request, env) {
   let data;
   try {
     data = await request.json();

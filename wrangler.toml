@@ -1,0 +1,15 @@
+# Cloudflare Workers – konfigurasjon for bergutleie.no
+#
+# Nettstedet er statiske filer i dist/ (bygget av bygg.js).
+# Worker-koden i src/index.js kjører bare for det som ikke er en fil –
+# i praksis kun POST /api/foresporsel.
+
+name = "bergutleie"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Serverer dist/404.html når adressen ikke finnes
+not_found_handling = "404-page"
