@@ -213,6 +213,45 @@ flytting og avbestilling. Det står allerede i `/leievilkar/`.
 
 ---
 
+# NÅR TESTMILJØET IKKE VIRKER
+
+**Sjekk statussiden før du feilsøker deg selv:**
+[status-test.vippsmobilepay.com](https://status-test.vippsmobilepay.com/)
+
+Testmiljøet (MT) er langt mindre stabilt enn produksjon, og feilene ser ut
+som dine egne. 17. august 2026 brukte vi en kveld på å feilsøke en
+innlogging som hadde vært nede hos Vipps siden 14. august.
+
+Slik skiller du:
+
+| Symptom | Sjekk |
+|---|---|
+| «Uffda, noe gikk galt» på landingssiden | Statussiden – ofte app-innlogging |
+| Kommer ikke inn i MT-appen | Statussiden. Produksjon er upåvirket |
+| Betalingen opprettes ikke i det hele tatt | Da er det oss – les feilen fra API-et |
+
+Er `ePayments API` merket *Operational* mens `App Login` er degradert, virker
+integrasjonen din – du kommer bare ikke gjennom appen.
+
+## Innlogging i MT-appen
+
+```
+Telefonnummer:    919 71 497        (testbruker, portalen → Testbrukere)
+Fødselsnummer:    05094098612
+Kode:             1236              tre ganger:
+                                      1. bekreft telefonnummer
+                                      2. lag personkode
+                                      3. bekreft personkode
+```
+
+Du skal ikke finne på din egen personkode – bruk `1236` hele veien.
+Vanlige Vipps-innlogginger virker ikke i testmiljøet.
+
+Ser du ingen betalingsforespørsel i appen: trykk *Payments* nederst og dra
+ned for å oppdatere. Push-varsler er ustabile i MT.
+
+---
+
 # TING SOM ER LETT Å GJØRE FEIL
 
 - **Ikke bruk Vippsnummer til nettbetaling.** Feil regelverk, ikke bare feil
