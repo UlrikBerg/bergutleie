@@ -16,6 +16,12 @@ import { FORSKUDD_PROSENT, REST_PROSENT } from './data/vilkar.js';
 const ROT = dirname(fileURLToPath(import.meta.url));
 const UT = join(ROT, 'dist');
 const NETTSTED = 'https://bergutleie.no';
+const EPOST = 'post@bergutleie.no';
+// Vipps krever at navn, org.nr., adresse, telefon og e-post står godt synlig
+// før «Vipps på nett» godkjennes. Nummeret er det samme som på teltdeler.no.
+const TELEFON = '412 41 285';
+const TELEFON_LENKE = 'tel:+47' + TELEFON.replace(/\s/g, '');
+const ORGNR = '919 326 581';
 
 /* --- små hjelpere --- */
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -112,7 +118,8 @@ ${innhold}
     <div class="footer-col">
       <p class="eyebrow">Kontakt</p>
       <div class="footer-links">
-        <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>
+        <a href="mailto:${EPOST}">${EPOST}</a>
+        <a href="${TELEFON_LENKE}">${TELEFON}</a>
         <span>Sørliveien 78, 1788 Halden</span>
         <span>Rett ved E6 · Man–fre 09–18 · Søn 12–15</span>
       </div>
@@ -120,7 +127,7 @@ ${innhold}
   </div>
   <div class="footer-bottom">
     <div class="wrap">
-      <span>© 2026 Berg Utleie · Org.nr. 919 326 581</span>
+      <span>© 2026 Berg Utleie · Org.nr. ${ORGNR}</span>
       <span class="legal"><a href="/personvern/">Personvern</a><a href="/leievilkar/">Leievilkår</a></span>
     </div>
   </div>
@@ -161,7 +168,8 @@ function forside() {
   const jsonld = [
     {
       '@context': 'https://schema.org', '@type': 'LocalBusiness',
-      name: 'Berg Utleie', url: NETTSTED + '/', email: 'post@bergutleie.no',
+      name: 'Berg Utleie', url: NETTSTED + '/', email: EPOST,
+      telephone: '+47' + TELEFON.replace(/\s/g, ''),
       image: NETTSTED + '/uploads/hageselskap.webp',
       description: 'Utleie av partytelt, bord, stoler, duker, lyd og lys til faste priser. Henting i Halden eller levering på Østlandet.',
       priceRange: 'kr',
