@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRODUKTER, PAKKER, KATEGORIER, SONER, STEDER, finn, kr, fraPris } from './data/produkter.js';
 import { teltSvg } from './data/telt-svg.js';
-import { FORSKUDD_PROSENT, REST_PROSENT } from './data/vilkar.js';
+import { FORSKUDD_PROSENT, REST_PROSENT, VIPPS_I_DRIFT } from './data/vilkar.js';
 
 const ROT = dirname(fileURLToPath(import.meta.url));
 const UT = join(ROT, 'dist');
@@ -728,11 +728,19 @@ function leievilkar() {
       'Leieperioden regnes fra utstyret hentes eller leveres, til det er tilbake hos oss.']],
 
     ['Bestilling og bekreftelse',
-     ['Forespørsel gjennom nettsiden er uforpliktende. Vi sjekker tilgjengelighet og svarer med et konkret tilbud innen seks timer.',
-      'Avtalen er bindende først når du har bekreftet tilbudet vårt skriftlig.',
-      `Bookingen krever en <strong>forskuddsbetaling på ${FORSKUDD_PROSENT} %</strong> som reserverer utstyret til deg. Den faktureres når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.`,
-      'Resten faktureres etter at utstyret er levert tilbake.',
-      'Forskuddet er bindende. Se punktet om avbestilling.']],
+     VIPPS_I_DRIFT
+       ? ['Du kan bestille på to måter.',
+          `<strong>Betal forskuddet med Vipps i handlekurven.</strong> Da er utstyret reservert til deg med det samme, og avtalen er bindende i det betalingen er gjennomført. Du får kvittering på skjermen og en bekreftelse på e-post.`,
+          '<strong>Eller send en uforpliktende forespørsel.</strong> Da svarer vi med et konkret tilbud innen seks timer, og avtalen er bindende først når du har bekreftet tilbudet skriftlig. Forskuddet faktureres da når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.',
+          `Uansett hvilken vei du velger, krever bookingen en <strong>forskuddsbetaling på ${FORSKUDD_PROSENT} %</strong> av totalen. Den reserverer utstyret til deg.`,
+          `Resterende ${REST_PROSENT} % faktureres etter at utstyret er levert tilbake.`,
+          'Ligger leveringsadressen utenfor de faste fraktsonene våre, kan ikke bookingen betales på nett. Da setter vi prisen for utkjøring for hånd og sender deg et tilbud.',
+          'Forskuddet er bindende. Se punktet om avbestilling.']
+       : ['Forespørsel gjennom nettsiden er uforpliktende. Vi sjekker tilgjengelighet og svarer med et konkret tilbud innen seks timer.',
+          'Avtalen er bindende først når du har bekreftet tilbudet vårt skriftlig.',
+          `Bookingen krever en <strong>forskuddsbetaling på ${FORSKUDD_PROSENT} %</strong> som reserverer utstyret til deg. Den faktureres når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.`,
+          `Resterende ${REST_PROSENT} % faktureres etter at utstyret er levert tilbake.`,
+          'Forskuddet er bindende. Se punktet om avbestilling.']],
 
     ['Henting og levering',
      ['Henter du selv, er det gratis. Lageret ligger i Sørliveien 78 i Halden, rett ved E6, og vi hjelper deg med lastingen.',
@@ -764,7 +772,9 @@ function leievilkar() {
 
     ['Avbestilling',
      ['<strong>Forskuddet refunderes ikke ved avbestilling.</strong> Når du har bekreftet avtalen, har vi reservert utstyret til deg og takket nei til andre kunder på samme dato. Det er derfor en bindende sum.',
-      'Avbestiller du før avtalen er bekreftet og forskuddet fakturert, koster det ingenting.',
+      VIPPS_I_DRIFT
+        ? 'Har du sendt en forespørsel uten å betale, koster det ingenting å trekke seg. Avtalen er ikke inngått før forskuddet er betalt.'
+        : 'Avbestiller du før avtalen er bekreftet og forskuddet fakturert, koster det ingenting.',
       `Resterende ${REST_PROSENT} % faktureres ikke ved avbestilling – du betaler aldri mer enn forskuddet.`,
       'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer. Da flyttes forskuddet med til den nye datoen, framfor at du taper det.']],
 

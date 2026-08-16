@@ -21,3 +21,22 @@ export const RESTANDEL = 1 - FORSKUDD_ANDEL;
 /** Til bruk i tekst: 25, ikke 0.25. */
 export const FORSKUDD_PROSENT = Math.round(FORSKUDD_ANDEL * 100);
 export const REST_PROSENT = 100 - FORSKUDD_PROSENT;
+
+/* ---------------------------------------------------------------------------
+   Er Vipps i drift?
+
+   Leievilkårene beskriver to ulike flyter: en der kunden betaler forskuddet
+   i handlekurven, og en der det faktureres etterpå. Hvilken som er sann,
+   avhenger av om Vipps-nøklene er satt i Cloudflare.
+
+   Byggeskriptet kan ikke vite det – nøklene er Worker-hemmeligheter, og
+   sidene bygges før Worker-en kjører. Derfor denne bryteren.
+
+   Står den `false`, beskriver vilkårene fakturaflyten, som er det som
+   faktisk skjer. Sier vilkårene at man betaler i kassa før kassen finnes,
+   er vi verre stilt enn å si ingenting.
+
+   NÅR DU SETTER NØKLENE: sett denne til `true` og push i samme slengen.
+   Se VIPPS.md.
+   ------------------------------------------------------------------------ */
+export const VIPPS_I_DRIFT = false;

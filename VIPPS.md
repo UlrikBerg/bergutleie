@@ -148,6 +148,23 @@ npx wrangler secret put VIPPS_MSN
 npx wrangler secret put VIPPS_API              # https://api.vipps.no
 ```
 
+## Skru på vilkårsteksten
+
+Nøklene alene endrer ikke leievilkårene. Sidene bygges før Worker-en kjører,
+så byggeskriptet kan ikke se hemmelighetene. Bryteren står i
+`data/vilkar.js`:
+
+```js
+export const VIPPS_I_DRIFT = false;   // → true når nøklene er satt
+```
+
+`false` beskriver fakturaflyten. `true` beskriver at forskuddet betales i
+handlekurven, at avtalen er bindende ved betaling, og at leveringer utenfor
+fraktsonene fortsatt må gå som forespørsel.
+
+**Sett den til `true` og push i samme slengen som du setter nøklene.** Ellers
+står vilkårene og virkeligheten i strid – i den ene eller andre retningen.
+
 ## Registrer webhooken – ikke hopp over dette
 
 Uten webhook taper du bookinger stille. Godkjenner kunden i appen og så
