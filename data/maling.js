@@ -16,6 +16,6 @@
               konto-ID-en: send_to: 'AW-123456789/AbC-D_efGhIjK'.
    ======================================================================== */
 
-export const GA4_ID = '';
+export const GA4_ID = 'G-H47JC9G245';
 export const ADS_ID = '';
 export const ADS_LABEL = '';
