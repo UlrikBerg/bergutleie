@@ -118,7 +118,7 @@ export function lagBilag(d) {
 
   // beløpet stort til venstre
   p.tekst(V + 18, y - 46, kr(d.forskudd), { fet: true, str: 19, f: INK });
-  p.tekst(V + 18, y - 61, '50 % av totalen', { str: 9, f: DEMPET2 });
+  p.tekst(V + 18, y - 61, `${d.forskuddProsent} % av totalen`, { str: 9, f: DEMPET2 });
 
   // konto og merking til høyre, satt opp som en giro
   const kx = V + 205;

@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRODUKTER, PAKKER, KATEGORIER, SONER, STEDER, finn, kr, fraPris } from './data/produkter.js';
 import { teltSvg } from './data/telt-svg.js';
+import { FORSKUDD_PROSENT, REST_PROSENT } from './data/vilkar.js';
 
 const ROT = dirname(fileURLToPath(import.meta.url));
 const UT = join(ROT, 'dist');
@@ -709,7 +710,7 @@ function leievilkar() {
     ['Bestilling og bekreftelse',
      ['Forespørsel gjennom nettsiden er uforpliktende. Vi sjekker tilgjengelighet og svarer med et konkret tilbud innen seks timer.',
       'Avtalen er bindende først når du har bekreftet tilbudet vårt skriftlig.',
-      'Bookingen krever en <strong>forskuddsbetaling på 50 %</strong> som reserverer utstyret til deg. Den faktureres når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.',
+      `Bookingen krever en <strong>forskuddsbetaling på ${FORSKUDD_PROSENT} %</strong> som reserverer utstyret til deg. Den faktureres når avtalen er bekreftet, og må være betalt før utstyret hentes eller kjøres ut.`,
       'Resten faktureres etter at utstyret er levert tilbake.',
       'Forskuddet er bindende. Se punktet om avbestilling.']],
 
@@ -744,7 +745,7 @@ function leievilkar() {
     ['Avbestilling',
      ['<strong>Forskuddet refunderes ikke ved avbestilling.</strong> Når du har bekreftet avtalen, har vi reservert utstyret til deg og takket nei til andre kunder på samme dato. Det er derfor en bindende sum.',
       'Avbestiller du før avtalen er bekreftet og forskuddet fakturert, koster det ingenting.',
-      'Resterende 50 % faktureres ikke ved avbestilling – du betaler aldri mer enn forskuddet.',
+      `Resterende ${REST_PROSENT} % faktureres ikke ved avbestilling – du betaler aldri mer enn forskuddet.`,
       'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer. Da flyttes forskuddet med til den nye datoen, framfor at du taper det.']],
 
     ['Reklamasjon',
