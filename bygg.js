@@ -22,6 +22,11 @@ const EPOST = 'post@bergutleie.no';
 const TELEFON = '412 41 285';
 const TELEFON_LENKE = 'tel:+47' + TELEFON.replace(/\s/g, '');
 const ORGNR = '919 326 581';
+// Registrert foretaksnavn i Brønnøysund. «Berg Utleie» er et varemerke, ikke
+// en egen juridisk enhet – alt ligger under samme enkeltpersonforetak.
+// Navnet må stå synlig: både Vipps og forbrukerlovgivningen krever at kunden
+// kan se hvem de faktisk handler med. Derfor i bunnteksten, ikke i toppen.
+const FIRMA = 'Berg Event';
 
 /* --- små hjelpere --- */
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -127,7 +132,7 @@ ${innhold}
   </div>
   <div class="footer-bottom">
     <div class="wrap">
-      <span>© 2026 Berg Utleie · Org.nr. ${ORGNR}</span>
+      <span>© 2026 Berg Utleie · Et varemerke av ${FIRMA} · Org.nr. ${ORGNR}</span>
       <span class="legal"><a href="/personvern/">Personvern</a><a href="/leievilkar/">Leievilkår</a></span>
     </div>
   </div>
