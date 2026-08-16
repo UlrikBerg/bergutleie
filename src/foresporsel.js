@@ -122,7 +122,10 @@ export async function klargjor(data, env) {
   const gclid = tekst(data.gclid, 200);
   const gclidType = tekst(data.gclidType, 20) || 'gclid';
 
-  const naa = new Date();
+  // Worker-en kjører i UTC, Norge ligger 1–2 timer foran. Uten omregning
+  // dateres alt som sendes mellom midnatt og klokka to til gårsdagen – og
+  // da blir «gyldig i 2 dager fra …» en dag for kort.
+  const naa = norskNaa();
   const tilbudsnr = await nesteTilbudsnr(env);
 
   const felles = { navn, mobil, epost, periode, dagerLabel, levering, henter,
@@ -132,7 +135,7 @@ export async function klargjor(data, env) {
                    returDato: til ? norskDato(til) : 'avtales',
                    tilbudsnr,
                    kontonr: KONTONR, orgnr: ORGNR, epostFirma: EPOST,
-                   utstedt: `${naa.getDate()}. ${MANEDER[naa.getMonth()]} ${naa.getFullYear()}`,
+                   utstedt: `${naa.dag}. ${MANEDER[naa.maned]} ${naa.aar}`,
                    gyldigDager: GYLDIG_DAGER,
                    forskudd: Math.round(total * FORSKUDD_ANDEL),
                    rest: total - Math.round(total * FORSKUDD_ANDEL),
@@ -455,6 +458,14 @@ function esc(s) {
 
 function nok(n) {
   return (Number(n) || 0).toLocaleString('nb-NO').replace(/ /g, ' ') + ' kr';
+}
+
+/** Dagens dato slik den er i Norge, ikke i UTC. Returnerer {dag, maned, aar}. */
+function norskNaa() {
+  const deler = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Oslo', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).format(new Date()).split('-');            // «2026-08-17»
+  return { aar: +deler[0], maned: +deler[1] - 1, dag: +deler[2] };
 }
 
 /** 2026-07-04 → 4. juli 2026 */
