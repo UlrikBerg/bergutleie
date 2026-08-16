@@ -8,6 +8,7 @@
 
 import { handterForesporsel } from './foresporsel.js';
 import { handterAdressesok } from './adresse.js';
+import { handterStartBetaling, handterRetur } from './betaling.js';
 
 export default {
   async fetch(request, env) {
@@ -22,6 +23,19 @@ export default {
 
     if (url.pathname === '/api/adresse') {
       return handterAdressesok(request);
+    }
+
+    // Starter en Vipps-betaling og returnerer adressen kunden skal til.
+    if (url.pathname === '/api/betaling') {
+      if (request.method !== 'POST') {
+        return new Response('Kun POST', { status: 405, headers: { allow: 'POST' } });
+      }
+      return handterStartBetaling(request, env);
+    }
+
+    // Hit sender Vipps kunden tilbake. Status hentes fra Vipps, ikke herfra.
+    if (url.pathname === '/betalt') {
+      return handterRetur(request, env);
     }
 
     if (url.pathname === '/api/foresporsel') {

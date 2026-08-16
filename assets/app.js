@@ -12,6 +12,7 @@ import { teltSvg } from '/data/telt-svg.js';
 import { lagAdressesok } from '/assets/adressesok.js';
 import { oppsettSvg } from '/data/oppsett-svg.js';
 import { startMaling, hentGclid, sporForesporsel } from '/assets/maling.js';
+import { FORSKUDD_ANDEL } from '/data/vilkar.js';
 
 const NOKKEL = 'bergutleie-kurv';
 const ADRESSE_NOKKEL = 'bergutleie-adresse';
@@ -598,16 +599,29 @@ function settOppTilbud() {
 
   tegnSammendrag();
 
-  skjema.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const status = skjema.querySelector('[data-skjema-status]');
-    const knapp = skjema.querySelector('button[type="submit"]');
-    const data = Object.fromEntries(new FormData(skjema));
-    if (data.firma) return;                      // honningkrukke – bot fylte den ut
+  /* Vipps-knappen vises bare når det finnes en pris å ta betalt for.
+     Ligger adressen utenfor fraktsonene, er totalen ufullstendig – da må
+     bookingen gå som forespørsel, og serveren avviser den uansett. */
+  const vippsKnapp = skjema.querySelector('[data-vipps]');
+  const vippsNote = skjema.querySelector('[data-vipps-note]');
 
+  function tegnVipps() {
+    if (!vippsKnapp) return;
+    const s = summer();
+    const kan = s.total > 0 && !s.tilbudspris;
+    vippsKnapp.hidden = !kan;
+    vippsNote.hidden = !kan;
+    if (kan) {
+      skjema.querySelector('[data-vipps-belop]').textContent =
+        '· ' + kr(Math.round(s.total * FORSKUDD_ANDEL));
+    }
+  }
+  tegnVipps();
+
+  function byggKropp(data) {
     const s = summer();
     const klikk = hentGclid();
-    const kropp = {
+    return {
       ...data,
       gclid: klikk ? klikk.id : null,
       gclidType: klikk ? klikk.type : null,
@@ -624,6 +638,17 @@ function settOppTilbud() {
       linjer: PRODUKTER.filter(p => antall(p.id) > 0)
         .map(p => ({ id: p.id, antall: antall(p.id) }))
     };
+  }
+
+  const status = skjema.querySelector('[data-skjema-status]');
+  const settFeil = (t) => { status.className = 'skjema-status feil'; status.textContent = t; };
+
+  /* --- send forespørsel --- */
+  skjema.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const knapp = skjema.querySelector('button[type="submit"]');
+    const data = Object.fromEntries(new FormData(skjema));
+    if (data.firma) return;                      // honningkrukke – bot fylte den ut
 
     knapp.disabled = true;
     status.textContent = 'Sender …';
@@ -632,11 +657,11 @@ function settOppTilbud() {
       const svar = await fetch('/api/foresporsel', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(kropp)
+        body: JSON.stringify(byggKropp(data))
       });
       if (!svar.ok) throw new Error('Serveren svarte ' + svar.status);
       const kvittering = await svar.json().catch(() => ({}));
-      sporForesporsel(kvittering.total ?? s.total);
+      sporForesporsel(kvittering.total ?? summer().total);
       skjema.outerHTML = `<div class="kvittering">
         <span class="kvittering-hake">✓</span>
         <h2>Takk for forespørselen!</h2>
@@ -647,8 +672,37 @@ function settOppTilbud() {
       lagre();
     } catch (feil) {
       knapp.disabled = false;
-      status.className = 'skjema-status feil';
-      status.textContent = 'Noe gikk galt. Prøv igjen, eller send e-post til post@bergutleie.no.';
+      settFeil('Noe gikk galt. Prøv igjen, eller send e-post til post@bergutleie.no.');
+    }
+  });
+
+  /* --- betal forskuddet med Vipps --- */
+  vippsKnapp?.addEventListener('click', async () => {
+    // Skjemaet er ikke submittet, så nettleseren har ikke validert det ennå.
+    if (!skjema.reportValidity()) return;
+
+    const data = Object.fromEntries(new FormData(skjema));
+    if (data.firma) return;
+
+    vippsKnapp.disabled = true;
+    status.className = 'skjema-status';
+    status.textContent = 'Åpner Vipps …';
+    try {
+      const svar = await fetch('/api/betaling', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(byggKropp(data))
+      });
+      const res = await svar.json().catch(() => ({}));
+      if (!svar.ok || !res.redirectUrl) {
+        throw new Error(res.feil || 'Serveren svarte ' + svar.status);
+      }
+      // Kurven tømmes ikke her – først når betalingen faktisk er gjennomført.
+      // Avbryter kunden i Vipps, skal handlekurven ligge der som den var.
+      window.location.href = res.redirectUrl;
+    } catch (feil) {
+      vippsKnapp.disabled = false;
+      settFeil(feil.message || 'Fikk ikke åpnet Vipps. Prøv igjen, eller send forespørsel i stedet.');
     }
   });
 }

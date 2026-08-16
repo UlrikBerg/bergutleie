@@ -59,12 +59,40 @@ export async function handterForesporsel(request, env) {
   // Vi svarer 200 så boten ikke skjønner at den ble avvist.
   if (data.firma) return svar(200, { ok: true });
 
+  const klar = await klargjor(data, env);
+  if (klar.feil) return svar(400, { feil: klar.feil });
+
+  if (!env.RESEND_API_KEY) {
+    return svar(500, { feil: 'E-post er ikke satt opp ennå.' });
+  }
+  if (!await sendVarsel(env, klar.felles)) {
+    return svar(502, { feil: 'Klarte ikke å sende e-posten.' });
+  }
+
+  // Totalen sendes tilbake så konverteringen til Google Ads får serverens
+  // tall, ikke nettleserens. Ellers kunne annonsestatistikken vise
+  // ordreverdier som aldri fantes.
+  return svar(200, {
+    ok: true,
+    total: klar.felles.total,
+    tilbudspris: klar.felles.tilbudspris
+  });
+}
+
+/**
+ * Validerer det klienten sendte, regner prisen og bygger bookingen.
+ * Delt mellom forespørselsflyten og betalingsflyten, slik at en booking
+ * som betales med Vipps er nøyaktig samme objekt som en som faktureres.
+ *
+ * @returns { feil } ved ugyldige data, ellers { felles, pris }
+ */
+export async function klargjor(data, env) {
   const navn = tekst(data.navn, 100)
     || [tekst(data.fornavn, 60), tekst(data.etternavn, 60)].filter(Boolean).join(' ');
   const mobil = tekst(data.mobil, 40) || 'Ikke oppgitt';
   const epost = tekst(data.epost, 120);
   if (!navn || !epost || !epost.includes('@')) {
-    return svar(400, { feil: 'Fyll ut navn og e-post.' });
+    return { feil: 'Fyll ut navn og e-post.' };
   }
 
   const fra = tekst(data.fra, 20), til = tekst(data.til, 20);
@@ -77,7 +105,7 @@ export async function handterForesporsel(request, env) {
     modus: tekst(data.modus, 10),
     kommune: tekst(data.kommune, 80)
   });
-  if (!pris.ok) return svar(400, { feil: pris.feil });
+  if (!pris.ok) return { feil: pris.feil };
 
   const { varer, leie, frakt, total, dagerLabel } = pris;
   const utenMva = Math.round(total / (1 + MVA_SATS));
@@ -110,9 +138,24 @@ export async function handterForesporsel(request, env) {
                    rest: total - Math.round(total * FORSKUDD_ANDEL),
                    forskuddProsent: FORSKUDD_PROSENT };
 
-  if (!env.RESEND_API_KEY) {
-    return svar(500, { feil: 'E-post er ikke satt opp ennå.' });
-  }
+  return { felles, pris };
+}
+
+/**
+ * Sender varselet til lageret, med bookingdetaljene som PDF.
+ *
+ * @param betalt  true når forskuddet allerede er trukket i Vipps. Da er
+ *                dette ikke en forespørsel å svare på, men en bekreftet
+ *                booking – og emnefeltet må si det, ellers behandles den
+ *                som om den fortsatt venter på et tilbud.
+ * @returns true hvis e-posten gikk ut
+ */
+export async function sendVarsel(env, d, { betalt = false } = {}) {
+  if (!env.RESEND_API_KEY) return false;
+
+  const emne = betalt
+    ? `BETALT #${d.tilbudsnr} – ${d.navn} – ${nok(d.forskudd)} av ${nok(d.total)}`
+    : `Forespørsel #${d.tilbudsnr} fra ${d.navn} – ${nok(d.total)}`;
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -123,29 +166,22 @@ export async function handterForesporsel(request, env) {
     body: JSON.stringify({
       from: AVSENDER,
       to: [env.VARSEL_TIL || 'kontakt@bergevent.no'],
-      reply_to: epost,
-      subject: `Forespørsel #${tilbudsnr} fra ${navn} – ${nok(total)}${fra ? ' – ' + norskDato(fra) : ''}`,
-      html: htmlEpost(felles),
-      text: tekstEpost(felles),
+      reply_to: d.epost,
+      subject: emne + (d.periode !== 'Ikke valgt' ? ' – ' + d.periode : ''),
+      html: htmlEpost(d, betalt),
+      text: tekstEpost(d, betalt),
       attachments: [{
-        filename: `Tilbud-${tilbudsnr}-Berg-Utleie.pdf`,
-        content: lagBilag(felles)
+        filename: `${betalt ? 'Booking' : 'Tilbud'}-${d.tilbudsnr}-Berg-Utleie.pdf`,
+        content: lagBilag(d)
       }]
     })
   });
-
-  if (!res.ok) {
-    return svar(502, { feil: 'Klarte ikke å sende e-posten.' });
-  }
-  // Totalen sendes tilbake så konverteringen til Google Ads får serverens
-  // tall, ikke nettleserens. Ellers kunne annonsestatistikken vise
-  // ordreverdier som aldri fantes.
-  return svar(200, { ok: true, total, tilbudspris: pris.tilbudspris });
+  return res.ok;
 }
 
 /* ---------------------------------------------------------------- HTML --- */
 
-function htmlEpost(d) {
+function htmlEpost(d, betalt = false) {
   const rad = (v) => `
     <tr>
       <td style="padding:11px 8px 11px 0;border-bottom:1px solid ${C.linje};font-size:15px;color:${C.ink};">
@@ -188,8 +224,8 @@ function htmlEpost(d) {
 
   <tr><td style="background:${C.ink};padding:26px 30px;">
     <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#7FA09E;">Berg Utleie</p>
-    <h1 style="margin:0;font-size:23px;font-weight:800;color:#ffffff;">Ny forespørsel</h1>
-    <p style="margin:6px 0 0;font-size:14px;color:#BCD0CE;">${esc(d.navn)} · ${nok(d.total)} · Tilbud #${d.tilbudsnr}</p>
+    <h1 style="margin:0;font-size:23px;font-weight:800;color:#ffffff;">${betalt ? 'Booking betalt' : 'Ny forespørsel'}</h1>
+    <p style="margin:6px 0 0;font-size:14px;color:#BCD0CE;">${esc(d.navn)} · ${nok(d.total)} · ${betalt ? 'Booking' : 'Tilbud'} #${d.tilbudsnr}</p>
   </td></tr>
 
   <tr><td style="padding:26px 30px 6px;">
@@ -247,6 +283,18 @@ function htmlEpost(d) {
     </p>
   </td></tr>` : ''}
 
+  ${betalt ? `
+  <tr><td style="padding:0 30px 30px;">
+    <div style="background:#EAF5EE;border-left:3px solid #1E7A44;border-radius:8px;padding:16px 18px;">
+      <p style="margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1E7A44;">Forskuddet er betalt med Vipps</p>
+      <p style="margin:0;font-size:15px;color:${C.ink};line-height:1.6;">
+        <strong>${nok(d.forskudd)}</strong> er trukket. Utstyret er reservert, og
+        kunden har fått kvittering. Restbeløpet på <strong>${nok(d.rest)}</strong>
+        faktureres etter at utstyret er levert tilbake.
+      </p>
+      ${d.vippsRef ? `<p style="margin:8px 0 0;font-size:12px;color:${C.dempet2};">Vipps-referanse: <span style="font-family:ui-monospace,Menlo,monospace;">${esc(d.vippsRef)}</span></p>` : ''}
+    </div>
+  </td></tr>` : `
   <tr><td style="padding:0 30px 30px;">
     <a href="${svarmal(d)}"
        style="display:inline-block;background:${C.aksent};color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:13px 26px;border-radius:8px;">
@@ -256,7 +304,7 @@ function htmlEpost(d) {
       Åpner en ferdig bekreftelse med hentetidspunkt, forskudd og forespørselen sitert under.
       Bookingdetaljene ligger vedlagt som PDF – den kan videresendes til kunden.
     </p>
-  </td></tr>
+  </td></tr>`}
 
   <tr><td style="background:${C.bg};padding:16px 30px;border-top:1px solid ${C.linje};">
     <p style="margin:0;font-size:12px;color:${C.dempet2};">
@@ -346,11 +394,11 @@ function svarmal(d) {
 
 /* ----------------------------------------------------------- ren tekst --- */
 
-function tekstEpost(d) {
+function tekstEpost(d, betalt = false) {
   const bredde = 46;
   const linje = (a, b) => a.padEnd(bredde - String(b).length, ' ') + b;
   return [
-    'NY FORESPØRSEL FRA BERGUTLEIE.NO',
+    betalt ? 'BETALT BOOKING FRA BERGUTLEIE.NO' : 'NY FORESPØRSEL FRA BERGUTLEIE.NO',
     '='.repeat(bredde),
     '',
     'KUNDE',
@@ -374,6 +422,13 @@ function tekstEpost(d) {
     linje('  TOTALT INKL. MVA', nok(d.total)),
     '',
     ...(d.kommentar ? ['KOMMENTAR FRA KUNDEN', d.kommentar, ''] : []),
+    ...(betalt ? [
+      'BETALING',
+      `  Forskudd trukket med Vipps:  ${nok(d.forskudd)}`,
+      `  Restbeløp å fakturere:       ${nok(d.rest)}`,
+      ...(d.vippsRef ? [`  Vipps-referanse:             ${d.vippsRef}`] : []),
+      ''
+    ] : []),
     ...(d.gclid ? [`Fra Google-annonse (${d.gclidType}): ${d.gclid}`, ''] : []),
     'Svar på denne e-posten går rett til kunden.'
   ].join('\n');

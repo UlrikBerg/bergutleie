@@ -694,7 +694,14 @@ function tilbud() {
     <label><span>Kommentar <em>valgfritt</em></span><textarea name="kommentar" placeholder="Noe vi bør vite? Tidspunkt for henting, adkomst, eller spørsmål."></textarea></label>
 
     <input type="text" name="firma" tabindex="-1" autocomplete="off" class="honningkrukke" aria-hidden="true">
-    <div>
+    <div class="valg">
+      <button type="button" class="btn btn-lg bred btn-vipps" data-vipps hidden>
+        Reserver med Vipps <span data-vipps-belop></span>
+      </button>
+      <p class="uforpliktende" data-vipps-note hidden>
+        Betal ${FORSKUDD_PROSENT} % nå, så er utstyret ditt. Resten faktureres etter at det er levert tilbake.
+      </p>
+
       <button type="submit" class="btn btn-lg bred">Send forespørsel</button>
       <p class="uforpliktende">Uforpliktende – vi svarer innen 6 timer</p>
     </div>
