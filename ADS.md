@@ -170,7 +170,7 @@ Overskrifter (maks 30 tegn):
 Leie partytelt billig
 Faste priser på nett
 Se prisen med en gang
-Partytelt fra 1500 kr
+Partytelt fra 1900 kr
 Ingen skjulte kostnader
 Hent selv og spar penger
 Alt til festen på ett sted

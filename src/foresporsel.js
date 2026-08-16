@@ -15,6 +15,7 @@
    ======================================================================== */
 
 import { lagBilag } from './bilag.js';
+import { regnUt } from './pris.js';
 import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '../data/vilkar.js';
 
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
@@ -66,20 +67,27 @@ export async function handterForesporsel(request, env) {
     return svar(400, { feil: 'Fyll ut navn og e-post.' });
   }
 
-  const varer = Array.isArray(data.varer) ? data.varer.slice(0, 60) : [];
-  if (!varer.length) return svar(400, { feil: 'Handlekurven er tom.' });
+  const fra = tekst(data.fra, 20), til = tekst(data.til, 20);
 
-  const leie = varer.reduce((a, v) => a + (Number(v.sum) || 0), 0);
-  const frakt = Number(data.fraktpris) || 0;
-  const total = leie + frakt;
+  // Prisen regnes her, ikke i nettleseren. Klienten sier bare hva som er
+  // valgt – se src/pris.js for hvorfor det er verdt et eget steg.
+  const pris = regnUt({
+    linjer: data.linjer,
+    fra, til,
+    modus: tekst(data.modus, 10),
+    kommune: tekst(data.kommune, 80)
+  });
+  if (!pris.ok) return svar(400, { feil: pris.feil });
+
+  const { varer, leie, frakt, total, dagerLabel } = pris;
   const utenMva = Math.round(total / (1 + MVA_SATS));
   const mva = total - utenMva;
 
-  const dagerLabel = tekst(data.dagerLabel, 30) || '1–4 dager';
-  const fra = tekst(data.fra, 20), til = tekst(data.til, 20);
   const periode = fra && til ? `${norskDato(fra)} – ${norskDato(til)}` : 'Ikke valgt';
   const levering = tekst(data.levering, 200) || 'Ikke oppgitt';
-  const henter = /henter selv/i.test(levering);
+  // Samme kilde som frakten regnes ut fra. Leses den av teksten i stedet,
+  // kan e-posten si «Henting» om en booking det er tatt betalt utkjøring for.
+  const henter = tekst(data.modus, 10) !== 'lev';
   const kommentar = tekst(data.kommentar, 2000);
   // Kom kunden fra en annonse, følger klikk-ID-en med. Den trengs for å
   // rapportere den faktiske ordreverdien tilbake til Google senere.
@@ -91,7 +99,7 @@ export async function handterForesporsel(request, env) {
 
   const felles = { navn, mobil, epost, periode, dagerLabel, levering, henter,
                    varer, leie, frakt, total, utenMva, mva, kommentar,
-                   gclid, gclidType,
+                   gclid, gclidType, tilbudspris: pris.tilbudspris,
                    hentDato: fra ? norskDato(fra) : 'avtales',
                    returDato: til ? norskDato(til) : 'avtales',
                    tilbudsnr,
@@ -129,7 +137,10 @@ export async function handterForesporsel(request, env) {
   if (!res.ok) {
     return svar(502, { feil: 'Klarte ikke å sende e-posten.' });
   }
-  return svar(200, { ok: true });
+  // Totalen sendes tilbake så konverteringen til Google Ads får serverens
+  // tall, ikke nettleserens. Ellers kunne annonsestatistikken vise
+  // ordreverdier som aldri fantes.
+  return svar(200, { ok: true, total, tilbudspris: pris.tilbudspris });
 }
 
 /* ---------------------------------------------------------------- HTML --- */
@@ -214,7 +225,7 @@ function htmlEpost(d) {
   <tr><td style="padding:18px 30px 26px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       ${sumRad('Leie av utstyr', nok(d.leie))}
-      ${sumRad(d.henter ? 'Henting på lager' : 'Levering og henting', d.frakt ? nok(d.frakt) : '0 kr')}
+      ${sumRad(d.henter ? 'Henting på lager' : 'Levering og henting', fraktTekst(d))}
       ${sumRad(`Herav mva (${MVA_SATS * 100} %)`, nok(d.mva))}
       ${sumRad('Sum eks. mva', nok(d.utenMva))}
       ${sumRad('Totalt inkl. mva', nok(d.total), true)}
@@ -356,7 +367,7 @@ function tekstEpost(d) {
     '',
     '-'.repeat(bredde),
     linje('  Leie av utstyr', nok(d.leie)),
-    linje(d.henter ? '  Henting på lager' : '  Levering og henting', d.frakt ? nok(d.frakt) : '0 kr'),
+    linje(d.henter ? '  Henting på lager' : '  Levering og henting', fraktTekst(d)),
     linje(`  Herav mva (${MVA_SATS * 100} %)`, nok(d.mva)),
     linje('  Sum eks. mva', nok(d.utenMva)),
     '='.repeat(bredde),
@@ -372,6 +383,13 @@ function tekstEpost(d) {
 
 function tekst(v, maks) {
   return typeof v === 'string' ? v.trim().slice(0, maks) : '';
+}
+
+/** Ligger adressen utenfor sonene, er frakten ikke null – den er ikke satt
+    ennå. «0 kr» ville lest som gratis utkjøring. */
+function fraktTekst(d) {
+  if (d.tilbudspris) return 'Etter avtale';
+  return d.frakt ? nok(d.frakt) : '0 kr';
 }
 
 function esc(s) {

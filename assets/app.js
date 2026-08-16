@@ -616,17 +616,13 @@ function settOppTilbud() {
       dager: s.d.har ? s.d.n : null,
       levering: bestilling.modus === 'lev' ? (bestilling.adresse || '(ikke oppgitt)') : 'Henter selv',
       koordinater: bestilling.valgt ? { lat: bestilling.valgt.lat, lon: bestilling.valgt.lon } : null,
-      fraktpris: s.levering,
-      dagerLabel: s.d.har ? (s.d.n === 1 ? '1 døgn' : s.d.n + ' dager') : '1–4 dager',
-      leie: s.leie,
-      varer: PRODUKTER.filter(p => antall(p.id) > 0)
-        .map(p => ({
-          navn: p.navn,
-          antall: antall(p.id),
-          enhet: enhetspris(p, s.d.n),
-          fast: !!p.fast,
-          sum: antall(p.id) * enhetspris(p, s.d.n)
-        }))
+      // Vi sender hva som er valgt, ikke hva det koster. Serveren regner
+      // prisen selv – se src/pris.js. Sender vi summen herfra, kan hvem som
+      // helst endre den i utviklerverktøyet før den går til Vipps.
+      modus: bestilling.modus,
+      kommune: bestilling.valgt?.kommune || null,
+      linjer: PRODUKTER.filter(p => antall(p.id) > 0)
+        .map(p => ({ id: p.id, antall: antall(p.id) }))
     };
 
     knapp.disabled = true;
@@ -639,7 +635,8 @@ function settOppTilbud() {
         body: JSON.stringify(kropp)
       });
       if (!svar.ok) throw new Error('Serveren svarte ' + svar.status);
-      sporForesporsel(s.total);
+      const kvittering = await svar.json().catch(() => ({}));
+      sporForesporsel(kvittering.total ?? s.total);
       skjema.outerHTML = `<div class="kvittering">
         <span class="kvittering-hake">✓</span>
         <h2>Takk for forespørselen!</h2>
