@@ -605,16 +605,24 @@ function settOppTilbud() {
   const vippsKnapp = skjema.querySelector('[data-vipps]');
   const vippsNote = skjema.querySelector('[data-vipps-note]');
 
-  function tegnVipps() {
+  async function tegnVipps() {
     if (!vippsKnapp) return;
     const s = summer();
-    const kan = s.total > 0 && !s.tilbudspris;
-    vippsKnapp.hidden = !kan;
-    vippsNote.hidden = !kan;
-    if (kan) {
-      skjema.querySelector('[data-vipps-belop]').textContent =
-        '· ' + kr(Math.round(s.total * FORSKUDD_ANDEL));
-    }
+    if (!(s.total > 0 && !s.tilbudspris)) return;   // ingen pris å ta betalt for
+
+    // Serveren avgjør om betaling er mulig. Uten nøkler skal knappen aldri
+    // vises – en betalingsknapp som svarer med feil er verre enn ingen.
+    let tilgjengelig = false;
+    try {
+      const res = await fetch('/api/betaling');
+      tilgjengelig = res.ok && (await res.json()).tilgjengelig === true;
+    } catch { /* nettverksfeil – da står knappen skjult */ }
+    if (!tilgjengelig) return;
+
+    skjema.querySelector('[data-vipps-belop]').textContent =
+      '· ' + kr(Math.round(s.total * FORSKUDD_ANDEL));
+    vippsKnapp.hidden = false;
+    vippsNote.hidden = false;
   }
   tegnVipps();
 

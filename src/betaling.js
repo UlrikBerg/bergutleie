@@ -36,6 +36,15 @@ const NETTSTED = 'https://bergutleie.no';
 const VENTETID = 60 * 60 * 2;        // bookingen holdes i KV i to timer mens kunden betaler
 const FERDIG_TID = 60 * 60 * 24 * 30; // og i 30 dager etterpå, så en oppfrisket side svarer likt
 
+/* --------------------------------------------------------------- status --- */
+
+/** Sier om betaling er mulig i det hele tatt. Nettleseren spør om dette før
+    den viser Vipps-knappen – ellers ville knappen dukket opp i produksjon
+    før nøklene finnes, og kunden fått en feilmelding i stedet for en app. */
+export function handterBetalingStatus(env) {
+  return json(200, { tilgjengelig: erSattOpp(env), forskuddProsent: FORSKUDD_PROSENT });
+}
+
 /* ------------------------------------------------------- steg 1: start --- */
 
 export async function handterStartBetaling(request, env) {
