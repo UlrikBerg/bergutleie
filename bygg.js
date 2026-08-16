@@ -768,9 +768,16 @@ function leievilkar() {
       `Resterende ${REST_PROSENT} % faktureres ikke ved avbestilling – du betaler aldri mer enn forskuddet.`,
       'Blir arrangementet flyttet, prøver vi alltid å finne en ny dato som passer. Da flyttes forskuddet med til den nye datoen, framfor at du taper det.']],
 
+    ['Angrerett',
+     ['Leien gjelder en bestemt dato, som avtales når du bestiller. Utleie av utstyr til et arrangement på en fastsatt dato regnes som en tjeneste knyttet til fritidsaktiviteter, og er unntatt fra angreretten etter angrerettloven § 22 bokstav m.',
+      'Det er nettopp derfor forskuddet er bindende: når du har bestilt, tar vi utstyret av markedet for din dato og takker nei til andre som spør om det samme.',
+      'Vi strekker oss likevel langt. Blir arrangementet flyttet, flytter vi forskuddet til den nye datoen framfor at du taper det. Ta kontakt så tidlig du kan, så finner vi en løsning.',
+      'Er du i tvil om noe passer, spør før du bestiller. Vi svarer innen seks timer.']],
+
     ['Reklamasjon',
      ['Er noe galt med utstyret du har fått, si fra til oss med én gang, og senest før arrangementet starter, så vi rekker å ordne opp.',
-      'Innsigelser til leieavtalen må komme senest 14 dager før leieperioden starter.']]
+      'Innsigelser til leieavtalen må komme senest 14 dager før leieperioden starter.',
+      'Kommer vi ikke til enighet, kan du bringe saken inn for Forbrukertilsynet eller Forbrukerklageutvalget.']]
   ];
 
   const innhold = `
