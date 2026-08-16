@@ -1,7 +1,12 @@
 # Vipps på bergutleie.no – steg for steg
 
-Skrevet 17. august 2026. Nettsidekravene er oppfylt; integrasjonen er ikke
-bygget ennå.
+Skrevet 17. august 2026.
+
+**Status:** integrasjonen er bygget og verifisert mot testmiljøet.
+Produksjonssalgsstedet ble bestilt 17. august, med oppgitt behandlingstid på
+én uke – altså svar rundt **24. august 2026**. Nettsidekravene er oppfylt og
+publisert. Det som gjenstår er nøklene, én full gjennomkjøring med testappen,
+og vilkårsteksten.
 
 **25 % forskudd betales med Vipps i handlekurven, resten faktureres.**
 Grunnen til at forskuddet er lavt: Vipps tar gebyr av beløpet som går
@@ -99,14 +104,26 @@ har betalt men før de kommer tilbake.
 
 ---
 
-# FASE 3 – PRODUKSJON (10 virkedager, start nå)
+# FASE 3 – PRODUKSJON (bestilt 17. aug, svar ca. 24. aug)
 
-```
-portal.vipps.no
-  → Bestill løsninger
-  → betalingsintegrasjon / Vipps på Nett
-  → nytt salgssted, navn: Berg Utleie
-```
+Bestillingen er inne. Slik ble den fylt ut, i tilfelle den må gjøres om:
+
+| Felt | Svar |
+|---|---|
+| Produkt | Integrert betaling (2,99 % + 1 kr per transaksjon) |
+| Implementeres av | oss selv, egen nettside |
+| Faste betalinger | av |
+| Salgsstedets navn | Berg Utleie |
+| Nettsted | bergutleie.no |
+| Salgsvilkår | bergutleie.no/leievilkar/ |
+| Konto | 9803 22 90426 |
+| Omsetning / andel via Vipps | 2 500 000 kr / 10 % |
+| Leie av varer eller tjenester | ja |
+| Gavekort | nei |
+
+Salgsstedet vises i appen som «Berg Utleie» med «BERG EVENT» under – det
+siste kommer fra foretaket og kan ikke endres. Derfor står foretaksnavnet
+også i bunnteksten på nettstedet, så kunden kjenner igjen navnet.
 
 **Ikke gjenbruk salgsstedet «Berg Event».** Kunden ser salgsstedets navn i
 Vipps-appen når betalingen bekreftes. Står det «Berg Event» på en booking
