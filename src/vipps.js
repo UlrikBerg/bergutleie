@@ -122,6 +122,90 @@ export async function tilbakebetal(env, referanse, ore) {
   return res.json();
 }
 
+/* --------------------------------------------------------------- webhook --- */
+
+/** Hendelsene vi trenger. Godkjenning er den viktige – den forteller oss at
+    pengene er reservert, også når kunden aldri kom tilbake til nettsiden. */
+export const WEBHOOK_HENDELSER = [
+  'epayments.payment.authorized.v1',
+  'epayments.payment.aborted.v1',
+  'epayments.payment.expired.v1'
+];
+
+/** Registreres én gang per miljø. Returnerer hemmeligheten som signaturen
+    skal kontrolleres mot – den vises bare her, så den må lagres med én gang. */
+export async function registrerWebhook(env, url) {
+  const res = await fetch(`${env.VIPPS_API}/webhooks/v1/webhooks`, {
+    method: 'POST',
+    headers: await hoder(env),
+    body: JSON.stringify({ url, events: WEBHOOK_HENDELSER })
+  });
+  if (!res.ok) throw new VippsFeil('Klarte ikke å registrere webhook', res.status, await res.text());
+  return res.json();                       // { id, secret }
+}
+
+export async function listWebhooks(env) {
+  const res = await fetch(`${env.VIPPS_API}/webhooks/v1/webhooks`, { headers: await hoder(env) });
+  if (!res.ok) throw new VippsFeil('Fikk ikke listet webhooks', res.status, await res.text());
+  return res.json();
+}
+
+export async function slettWebhook(env, id) {
+  const res = await fetch(`${env.VIPPS_API}/webhooks/v1/webhooks/${encodeURIComponent(id)}`, {
+    method: 'DELETE', headers: await hoder(env)
+  });
+  if (!res.ok && res.status !== 204) {
+    throw new VippsFeil('Klarte ikke å slette webhook', res.status, await res.text());
+  }
+  return true;
+}
+
+/**
+ * Kontrollerer at kallet faktisk kommer fra Vipps.
+ *
+ * Uten dette kan hvem som helst POSTe «betaling godkjent» til oss og få en
+ * booking registrert uten å ha betalt. Signaturen er en HMAC-SHA256 over
+ * metode, sti, dato, vert og innholdshash – alt må stemme.
+ *
+ * @param kropp  rå tekst, ikke parset JSON. Én endret mellomrom og hashen ryker.
+ */
+export async function verifiserWebhook(request, kropp, hemmelighet) {
+  const dato = request.headers.get('x-ms-date');
+  const innholdshash = request.headers.get('x-ms-content-sha256');
+  const auth = request.headers.get('authorization') || '';
+  if (!dato || !innholdshash || !auth) return false;
+
+  const enc = new TextEncoder();
+
+  // 1. Stemmer hashen med det som faktisk ble sendt?
+  const egenHash = base64(await crypto.subtle.digest('SHA-256', enc.encode(kropp)));
+  if (!likeStrenger(egenHash, innholdshash)) return false;
+
+  // 2. Bygg strengen som ble signert, og regn ut vår egen signatur.
+  const url = new URL(request.url);
+  const tilSignering = `POST\n${url.pathname}${url.search}\n${dato};${url.host};${innholdshash}`;
+
+  const nokkel = await crypto.subtle.importKey(
+    'raw', base64TilBytes(hemmelighet),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const egen = base64(await crypto.subtle.sign('HMAC', nokkel, enc.encode(tilSignering)));
+
+  const oppgitt = /Signature=([^&,\s]+)/.exec(auth)?.[1] || '';
+  return likeStrenger(egen, oppgitt);
+}
+
+/** Sammenligning som bruker like lang tid uansett hvor de er ulike, så en
+    angriper ikke kan gjette seg fram tegn for tegn. */
+function likeStrenger(a, b) {
+  if (a.length !== b.length) return false;
+  let ulikt = 0;
+  for (let i = 0; i < a.length; i++) ulikt |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return ulikt === 0;
+}
+
+const base64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const base64TilBytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
 /** Er Vipps satt opp i det hele tatt? Uten nøkler skal knappen ikke vises. */
 export function erSattOpp(env) {
   return !!(env.VIPPS_API && env.VIPPS_MSN && env.VIPPS_CLIENT_ID

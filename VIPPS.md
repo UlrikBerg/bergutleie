@@ -145,7 +145,48 @@ npx wrangler secret put VIPPS_CLIENT_ID
 npx wrangler secret put VIPPS_CLIENT_SECRET
 npx wrangler secret put VIPPS_SUBSCRIPTION_KEY
 npx wrangler secret put VIPPS_MSN
+npx wrangler secret put VIPPS_API              # https://api.vipps.no
 ```
+
+## Registrer webhooken – ikke hopp over dette
+
+Uten webhook taper du bookinger stille. Godkjenner kunden i appen og så
+lukker nettleseren, kommer hen aldri til `/betalt`, og trekket – som ligger i
+returflyten – skjer aldri. Pengene står reservert til de faller bort, og
+verken du eller kunden får vite det.
+
+Registreringen gjøres én gang per miljø:
+
+```sh
+node registrer-webhook.js --list     # se hva som er registrert
+node registrer-webhook.js            # registrer (testmiljø, leser .dev.vars)
+
+# produksjon – med nøklene fra portalen:
+VIPPS_API=https://api.vipps.no VIPPS_MSN=… VIPPS_CLIENT_ID=… \
+VIPPS_CLIENT_SECRET=… VIPPS_SUBSCRIPTION_KEY=… node registrer-webhook.js
+```
+
+Under panseret er kallet `POST /webhooks/v1/webhooks` med:
+
+```json
+{ "url": "https://bergutleie.no/api/vipps-webhook",
+  "events": ["epayments.payment.authorized.v1",
+             "epayments.payment.aborted.v1",
+             "epayments.payment.expired.v1"] }
+```
+
+Svaret inneholder en **hemmelighet som bare vises denne ene gangen**. Den må
+lagres med det samme:
+
+```sh
+npx wrangler secret put VIPPS_WEBHOOK_SECRET
+```
+
+Mister du den, må webhooken slettes og registreres på nytt.
+
+Signaturen kontrolleres i `verifiserWebhook()` i `src/vipps.js`. Uten den
+kunne hvem som helst POSTet «betaling godkjent» til nettstedet og fått en
+booking registrert uten å ha betalt en krone.
 
 ---
 

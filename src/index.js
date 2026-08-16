@@ -8,7 +8,7 @@
 
 import { handterForesporsel } from './foresporsel.js';
 import { handterAdressesok } from './adresse.js';
-import { handterStartBetaling, handterRetur, handterBetalingStatus } from './betaling.js';
+import { handterStartBetaling, handterRetur, handterBetalingStatus, handterWebhook } from './betaling.js';
 
 export default {
   async fetch(request, env) {
@@ -37,6 +37,14 @@ export default {
     // Hit sender Vipps kunden tilbake. Status hentes fra Vipps, ikke herfra.
     if (url.pathname === '/betalt') {
       return handterRetur(request, env);
+    }
+
+    // Vipps melder fra hit uavhengig av om kunden kom tilbake i nettleseren.
+    if (url.pathname === '/api/vipps-webhook') {
+      if (request.method !== 'POST') {
+        return new Response('Kun POST', { status: 405, headers: { allow: 'POST' } });
+      }
+      return handterWebhook(request, env);
     }
 
     if (url.pathname === '/api/foresporsel') {

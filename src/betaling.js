@@ -29,7 +29,7 @@
    ======================================================================== */
 
 import { klargjor, sendVarsel } from './foresporsel.js';
-import { opprettBetaling, hentBetaling, trekk, erSattOpp, VippsFeil } from './vipps.js';
+import { opprettBetaling, hentBetaling, trekk, erSattOpp, verifiserWebhook, VippsFeil } from './vipps.js';
 import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '../data/vilkar.js';
 
 const NETTSTED = 'https://bergutleie.no';
@@ -132,23 +132,85 @@ export async function handterRetur(request, env) {
     return avbrutt(d);
   }
 
-  // Godkjent betyr reservert, ikke trukket. Nå hentes pengene.
-  const ore = betaling.amount?.value ?? Math.round(d.total * FORSKUDD_ANDEL) * 100;
+  const res = await fullfor(env, referanse, d, betaling);
+  if (res === 'ferdig') return kvittering({ ...d, vippsRef: referanse });
+  return side(200, 'Betalingen er reservert',
+    'Vi fikk reservert beløpet, men ikke fullført trekket. Bookingen er registrert, og vi tar kontakt for å bekrefte. Du trenger ikke gjøre noe.');
+}
+
+/* ------------------------------------------------------------- webhook --- */
+
+/**
+ * Vipps melder fra her når noe skjer med en betaling.
+ *
+ * Uten dette taper vi bookinger stille: godkjenner kunden i appen og så
+ * lukker nettleseren, kommer hen aldri til /betalt, og trekket – som ligger
+ * i returflyten – skjer aldri. Pengene står reservert til de faller bort,
+ * og verken du eller kunden får vite det.
+ *
+ * Registreres én gang per miljø. Se VIPPS.md.
+ */
+export async function handterWebhook(request, env) {
+  const kropp = await request.text();
+
+  if (!env.VIPPS_WEBHOOK_SECRET) return new Response('Ikke satt opp', { status: 503 });
+  if (!await verifiserWebhook(request, kropp, env.VIPPS_WEBHOOK_SECRET)) {
+    // Uten denne kontrollen kunne hvem som helst POSTet «betalt» hit.
+    return new Response('Ugyldig signatur', { status: 401 });
+  }
+
+  let hendelse;
+  try { hendelse = JSON.parse(kropp); } catch { return new Response('ok', { status: 200 }); }
+
+  const referanse = hendelse.reference;
+  const navn = hendelse.name || '';
+  if (!referanse) return new Response('ok', { status: 200 });
+
+  const raa = await env.TELLER.get(`booking:${referanse}`);
+  if (!raa) return new Response('ok', { status: 200 });   // ukjent hos oss – ikke vår sak
+  const d = JSON.parse(raa);
+  if (d.status === 'ferdig') return new Response('ok', { status: 200 });
+
+  if (navn === 'AUTHORIZED' || navn.includes('authorized')) {
+    await fullfor(env, referanse, d);
+  } else {
+    await env.TELLER.put(`booking:${referanse}`,
+      JSON.stringify({ ...d, status: 'avbrutt' }), { expirationTtl: VENTETID });
+  }
+
+  // Vipps prøver på nytt hvis vi ikke svarer 200, så vi kvitterer alltid ut
+  // så lenge signaturen var ekte – ellers får vi den samme hendelsen i loop.
+  return new Response('ok', { status: 200 });
+}
+
+/* ------------------------------------------------------------ fullføring --- */
+
+/**
+ * Trekker pengene og varsler. Kalles både fra returflyten og fra webhooken,
+ * og må derfor tåle å bli kalt to ganger for samme betaling.
+ *
+ * Dobbelttrekk er umulig uansett: capture bruker referansen som
+ * idempotensnøkkel, så Vipps utfører det bare én gang. Statussjekken her
+ * sparer oss for en dobbel e-post i det vanlige tilfellet.
+ */
+async function fullfor(env, referanse, d, betaling) {
+  const fersk = await env.TELLER.get(`booking:${referanse}`);
+  if (fersk && JSON.parse(fersk).status === 'ferdig') return 'ferdig';
+
+  const ore = betaling?.amount?.value ?? Math.round(d.total * FORSKUDD_ANDEL) * 100;
   try {
     await trekk(env, referanse, ore);
   } catch {
-    // Reservasjonen står. Vi lyver ikke til kunden, men vi mister heller
-    // ikke bookingen – varselet går ut, og trekket tas for hånd.
+    // Reservasjonen står. Vi mister ikke bookingen – varselet går ut, og
+    // trekket tas for hånd.
     await sendVarsel(env, { ...d, vippsRef: referanse }, { betalt: false }).catch(() => {});
-    return side(200, 'Betalingen er reservert',
-      'Vi fikk reservert beløpet, men ikke fullført trekket. Bookingen er registrert, og vi tar kontakt for å bekrefte. Du trenger ikke gjøre noe.');
+    return 'reservert';
   }
 
   const ferdig = { ...d, vippsRef: referanse, status: 'ferdig' };
   await env.TELLER.put(`booking:${referanse}`, JSON.stringify(ferdig), { expirationTtl: FERDIG_TID });
   await sendVarsel(env, ferdig, { betalt: true }).catch(() => {});
-
-  return kvittering(ferdig);
+  return 'ferdig';
 }
 
 /* ----------------------------------------------------------- kvittering --- */
