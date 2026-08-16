@@ -17,5 +17,5 @@
    ======================================================================== */
 
 export const GA4_ID = 'G-H47JC9G245';
-export const ADS_ID = '';
-export const ADS_LABEL = '';
+export const ADS_ID = 'AW-603503615';
+export const ADS_LABEL = 'SLAqCNz23OIcEP_34p8C';
