@@ -8,6 +8,12 @@ name = "bergutleie"
 main = "src/index.js"
 compatibility_date = "2026-08-01"
 
+# Vipps-endepunktet er ingen hemmelighet, så det står her framfor som secret.
+# Lokalt overstyrer .dev.vars denne med testmiljøet – wrangler lar .dev.vars
+# vinne i dev, slik at `wrangler dev` aldri treffer produksjon ved et uhell.
+[vars]
+VIPPS_API = "https://api.vipps.no"
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"
