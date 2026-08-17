@@ -104,8 +104,10 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .felt-dag {
   display: block; margin: -.15rem 0 .35rem;
   font-size: .85rem; font-weight: 600; color: var(--accent, #E8562E);
-  text-transform: capitalize;
 }
+/* Bare ukedagen skal ha stor forbokstav. `capitalize` ville gitt
+   «Torsdag 20. August» – månedsnavn skrives med liten bokstav på norsk. */
+.felt-dag::first-letter { text-transform: uppercase; }
 .tid-note { margin: -.35rem 0 1rem; font-size: .85rem; color: var(--muted, #5A6E6D); line-height: 1.5; }
 .tid-note.feil { color: #B4341C; font-weight: 600; }
 

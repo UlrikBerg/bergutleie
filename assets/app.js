@@ -690,8 +690,8 @@ function settOppTilbud() {
       note.textContent = 'Velg datoer i handlekurven først.';
       note.className = 'tid-note feil';
     } else {
-      note.textContent = 'Utenfor betjent tid er henting og tilbakelevering selvbetjent. '
-        + APNINGSTID_TEKST + '.';
+      note.textContent = 'Lageret er betjent man–fre 09–18 og søndag 12–15. '
+        + 'Utenom det er henting og tilbakelevering selvbetjent.';
       note.className = 'tid-note';
     }
   }
