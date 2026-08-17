@@ -146,6 +146,28 @@ avklart om etterspørselen finnes før du satser i høysesong.
   med. Bytt til konverteringer når du har ~30 forespørsler i måneden.
 - Budsjett: 100–150 kr/dag
 
+## Det som er nytt siden planen ble skrevet
+
+Nettstedet tar nå imot betaling. Det er den sterkeste forskjellen mot alle
+konkurrentene, og mot Berg Event: **kunden kan booke og betale på nett, uten
+å vente på et tilbud.** Det bør stå i annonsene, ikke bare i planen.
+
+Overskrifter som utnytter det (maks 30 tegn):
+
+```
+Book og betal på nett
+Reserver med Vipps
+Bekreftet med en gang
+Ingen venting på tilbud
+Se pris og book direkte
+Betal 25 % nå, resten etter
+Hent selv, når det passer
+Selvbetjent henting
+```
+
+Konverteringen er nå «Berg Utleie – booking betalt» med reell kroneverdi,
+ikke bare et innsendt skjema.
+
 ## Annonsegruppe 1 – Billig og pris
 
 Landingsside: `https://bergutleie.no/`
