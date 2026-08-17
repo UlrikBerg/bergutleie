@@ -31,4 +31,4 @@ export const ADS_LABEL = 'SLAqCNz23OIcEP_34p8C';
      Telling:   Én
    Den bør på sikt være PRIMÆR, og lead-handlingen sekundær – det er
    betalte bookinger Google skal by etter, ikke forespørsler. */
-export const ADS_KJOP_LABEL = '';
+export const ADS_KJOP_LABEL = 'bKObCPWtouMcEP_34p8C';
