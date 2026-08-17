@@ -135,9 +135,37 @@ export function nyPdf(logoBase64, logoB, logoH) {
   };
 }
 
+/* Typografiske tegn som finnes i WinAnsiEncoding, men på andre kodepunkter
+   enn i Unicode. Uten denne tabellen blir en tankestrek (U+2013) maskert
+   ned til 0x13 – et kontrolltegn – og teksten får et hull midt i seg.
+   Det er ikke synlig før noen leser en ferdig PDF. */
+const WINANSI = new Map([
+  [0x2013, 0x96], [0x2014, 0x97],                   // – —
+  [0x2018, 0x91], [0x2019, 0x92],                   // ' '
+  [0x201C, 0x93], [0x201D, 0x94],                   // " "
+  [0x2020, 0x86], [0x2021, 0x87],                   // † ‡
+  [0x2022, 0x95], [0x2026, 0x85],                   // • …
+  [0x2030, 0x89], [0x20AC, 0x80],                   // ‰ €
+  [0x2039, 0x8B], [0x203A, 0x9B],                   // ‹ ›
+  [0x0160, 0x8A], [0x0161, 0x9A],                   // Š š
+  [0x017D, 0x8E], [0x017E, 0x9E],                   // Ž ž
+  [0x0152, 0x8C], [0x0153, 0x9C],                   // Œ œ
+  [0x2122, 0x99], [0x0178, 0x9F]                    // ™ Ÿ
+]);
+
+/** Tynne og harde mellomrom er usynlige i kilden, men bryter i WinAnsi. */
+const MELLOMROM = new Set([0x2009, 0x202F, 0x2007, 0x2060]);
+
 function latin1Bytes(s) {
   const ut = new Uint8Array(s.length);
-  for (let i = 0; i < s.length; i++) ut[i] = s.charCodeAt(i) & 0xff;
+  for (let i = 0; i < s.length; i++) {
+    const k = s.charCodeAt(i);
+    if (k < 256) { ut[i] = k; continue; }
+    const kart = WINANSI.get(k);
+    if (kart !== undefined) ut[i] = kart;
+    else if (MELLOMROM.has(k)) ut[i] = 0x20;
+    else ut[i] = 0x3F;                               // ? framfor søppel
+  }
   return ut;
 }
 

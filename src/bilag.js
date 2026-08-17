@@ -1,13 +1,24 @@
 /* ===========================================================================
-   Bookingbilaget som legges ved forespørsels-e-posten som PDF.
+   Bilaget som følger e-posten som PDF.
 
-   Stilrent og minimalistisk: logo, kundeopplysninger, leieperiode,
-   utstyrsliste med enhetspris og sum, og et prissammendrag med mva
-   og forskudd. Samme farger som nettstedet.
+   Dokumentet er to ting, avhengig av `d.betalt`:
+
+     BOOKING   forskuddet er trukket i Vipps. Da er dette en kvittering og
+               en bekreftelse – kunden skal kunne finne fram til lageret og
+               se hva som gjenstår å betale.
+     TILBUD    ikke betalt ennå. Da er det et pristilbud med gyldighet.
+
+   MERK at kontonummer og KID med vilje IKKE står her lenger. Forskuddet
+   betales med Vipps i kassen, og en giro ved siden av ville invitert til
+   en dobbeltbetaling. Restbeløpet faktureres separat.
+
+   Layouten holder seg til tre virkemidler: vekt, størrelse og luft.
+   Streker brukes bare der øyet trenger å stoppe – ikke som dekor.
    ======================================================================== */
 
 import { nyPdf, bredde, tilBase64 } from './pdf.js';
 import { LOGO_JPEG, LOGO_B, LOGO_H } from './logo.js';
+import { APNINGSTID_TEKST } from '../data/apningstid.js';
 
 /* Fargene fra nettstedet, som PDF-verdier 0–1 */
 const INK = [0.067, 0.231, 0.247];      // #113B3F
@@ -16,6 +27,8 @@ const DEMPET = [0.353, 0.431, 0.427];   // #5A6E6D
 const DEMPET2 = [0.486, 0.553, 0.545];  // #7C8D8B
 const LINJE = [0.898, 0.906, 0.882];    // #E5E7E1
 const FLATE = [0.969, 0.965, 0.945];    // #F7F6F1
+const GRONN = [0.118, 0.478, 0.267];    // #1E7A44 – betalt
+const GRONN_FLATE = [0.918, 0.961, 0.933];
 
 const V = 52;                            // venstre marg
 const H = 543;                           // høyre kant
@@ -23,147 +36,148 @@ const kr = (n) => (Number(n) || 0).toLocaleString('nb-NO').replace(/ /g, ' ') +
 
 export function lagBilag(d) {
   const p = nyPdf(LOGO_JPEG, LOGO_B, LOGO_H);
-  let y = 790;
+  const betalt = !!d.betalt;
+  let y = 792;
 
-  /* --- topp: logo og dokumenttype --- */
-  p.logo(V, y - 34, 104);
+  /* ------------------------------------------------------------- topp --- */
+  p.logo(V, y - 36, 100);
 
-  // Logoen er allerede en kraftig oransje flate. Tilbudsnummeret settes
-  // derfor i mørk skrift, med en kort strek som eneste aksent - to sterke
-  // oransje elementer på samme linje drar i hver sin retning.
-  p.rekt(H - 26, y + 23, 26, 2, AKSENT);
-  p.tekst(H, y + 6, 'TILBUD', { fet: true, str: 7.5, f: DEMPET2, hoyre: true, sperre: 2.4 });
+  p.tekst(H, y + 2, betalt ? 'BOOKING' : 'TILBUD',
+    { fet: true, str: 7.5, f: DEMPET2, hoyre: true, sperre: 2.6 });
   const nr = String(d.tilbudsnr);
-  p.tekst(H - bredde(nr, 20, true) - 4.5, y - 16, '#', { fet: true, str: 12, f: DEMPET2 });
-  p.tekst(H, y - 16, nr, { fet: true, str: 20, f: INK, hoyre: true });
-  p.tekst(H, y - 34, d.utstedt, { str: 8.5, f: DEMPET2, hoyre: true });
+  p.tekst(H - bredde(nr, 21, true) - 5, y - 21, '#', { fet: true, str: 12, f: DEMPET2 });
+  p.tekst(H, y - 21, nr, { fet: true, str: 21, f: INK, hoyre: true });
+  p.tekst(H, y - 38, d.utstedt, { str: 8.5, f: DEMPET2, hoyre: true });
 
-  y -= 62;
-  p.rekt(V, y, H - V, 1.2, INK);
-  y -= 34;
+  y -= 66;
+  p.rekt(V, y, H - V, 1, INK);
+  y -= 36;
 
-  /* --- kunde og leieperiode side om side --- */
-  const kol2 = 310;
-  p.tekst(V, y, 'KUNDE', { fet: true, str: 8, f: AKSENT });
-  p.tekst(kol2, y, 'LEIEPERIODE', { fet: true, str: 8, f: AKSENT });
-  y -= 17;
+  /* ------------------------------------------- kunde og leieperiode ----- */
+  const kol2 = 300;
+  const overskrift = (x, t) => p.tekst(x, y, t, { fet: true, str: 7.5, f: AKSENT, sperre: 1.4 });
 
-  const rad = (venstre, hoyre2) => {
-    if (venstre) p.tekst(V, y, venstre, { str: 10.5, f: INK });
-    if (hoyre2) p.tekst(kol2, y, hoyre2, { str: 10.5, f: INK });
-    y -= 15;
-  };
-  rad(d.navn, d.periode);
-  rad(d.mobil, d.dagerLabel);
-  rad(d.epost, '');
-  y -= 6;
+  overskrift(V, 'KUNDE');
+  overskrift(kol2, d.henter ? 'HENTING OG RETUR' : 'LEVERING OG RETUR');
+  y -= 18;
 
-  p.tekst(V, y, d.henter ? 'HENTING' : 'LEVERINGSADRESSE', { fet: true, str: 8, f: AKSENT });
-  y -= 17;
-  p.tekst(V, y, d.henter ? 'Sørliveien 78, 1788 Halden (ved E6)' : d.levering, { str: 10.5, f: INK });
-  y -= 14;
-  p.tekst(V, y, d.henter ? 'Åpent man-fre 09-18 og søndag 12-15' : 'Utkjøring og henting er inkludert', { str: 9.5, f: DEMPET });
+  const venstre = [d.navn, d.mobil, d.epost].filter(Boolean);
+  const hoyre = [
+    [d.henter ? 'Hentes' : 'Leveres ut', d.hentDato],
+    [d.henter ? 'Leveres tilbake' : 'Hentes igjen', d.returDato]
+  ];
 
-  /* --- utstyrstabell --- */
-  y -= 42;
-  p.tekst(V, y, 'UTSTYR', { fet: true, str: 8, f: AKSENT });
-  y -= 16;
-
-  const kAntall = 330, kPris = 430, kSum = H;
-  p.tekst(V, y, 'Produkt', { fet: true, str: 8, f: DEMPET2 });
-  p.tekst(kAntall, y, 'Antall', { fet: true, str: 8, f: DEMPET2, hoyre: true });
-  p.tekst(kPris, y, 'Pris', { fet: true, str: 8, f: DEMPET2, hoyre: true });
-  p.tekst(kSum, y, 'Sum', { fet: true, str: 8, f: DEMPET2, hoyre: true });
-  y -= 7;
-  p.rekt(V, y, H - V, 0.8, LINJE);
-  y -= 17;
-
-  d.varer.forEach(v => {
-    p.tekst(V, y, kutt(v.navn, 42), { str: 10.5, f: INK });
-    p.tekst(kAntall, y, String(v.antall), { str: 10.5, f: DEMPET, hoyre: true });
-    p.tekst(kPris, y, v.enhet ? kr(v.enhet) + (v.fast ? ' fast' : '') : '', { str: 10.5, f: DEMPET, hoyre: true });
-    p.tekst(kSum, y, kr(v.sum), { fet: true, str: 10.5, f: INK, hoyre: true });
-    y -= 8;
-    p.rekt(V, y, H - V, 0.5, LINJE);
-    y -= 15;
+  // To kolonner side om side. Venstre er ren liste, høyre er etikett + verdi
+  // under hverandre, fordi datoene trenger mer plass enn en linje gir.
+  let yv = y, yh = y;
+  venstre.forEach(t => { p.tekst(V, yv, t, { str: 10.5, f: INK }); yv -= 15; });
+  hoyre.forEach(([etikett, verdi]) => {
+    p.tekst(kol2, yh, etikett, { str: 8.5, f: DEMPET2 });
+    p.tekst(kol2, yh - 13, verdi || 'avtales', { fet: true, str: 10.5, f: INK });
+    yh -= 31;
   });
 
-  /* --- sammendrag --- */
-  y -= 12;
+  y = Math.min(yv, yh) - 12;
+
+  /* --- hvor --- */
+  overskrift(V, d.henter ? 'HENT PÅ LAGERET' : 'LEVERINGSADRESSE');
+  y -= 18;
+  p.tekst(V, y, d.henter ? 'Sørliveien 78, 1788 Halden' : d.levering, { str: 10.5, f: INK });
+  y -= 14;
+  p.tekst(V, y, d.henter ? `Rett ved E6 · ${APNINGSTID_TEKST}` : 'Utkjøring og henting er inkludert i prisen',
+    { str: 9, f: DEMPET });
+
+  /* -------------------------------------------------------- utstyret --- */
+  y -= 40;
+  overskrift(V, 'UTSTYR');
+  y -= 17;
+
+  const kAntall = 348, kPris = 438, kSum = H;
+  p.tekst(V, y, 'Produkt', { str: 8, f: DEMPET2 });
+  p.tekst(kAntall, y, 'Antall', { str: 8, f: DEMPET2, hoyre: true });
+  p.tekst(kPris, y, 'Enhetspris', { str: 8, f: DEMPET2, hoyre: true });
+  p.tekst(kSum, y, 'Sum', { str: 8, f: DEMPET2, hoyre: true });
+  y -= 8;
+  p.rekt(V, y, H - V, 0.8, LINJE);
+  y -= 18;
+
+  d.varer.forEach((v, i) => {
+    // Annenhver rad får en svak flate i stedet for en strek. Øyet følger
+    // linja like godt, og siden blir roligere.
+    if (i % 2 === 1) p.rekt(V - 6, y - 6, H - V + 12, 20, FLATE);
+    p.tekst(V, y, kutt(v.navn, 44), { str: 10.5, f: INK });
+    p.tekst(kAntall, y, String(v.antall), { str: 10.5, f: DEMPET, hoyre: true });
+    p.tekst(kPris, y, v.enhet ? kr(v.enhet) + (v.fast ? ' fast' : '') : '', { str: 10, f: DEMPET, hoyre: true });
+    p.tekst(kSum, y, kr(v.sum), { fet: true, str: 10.5, f: INK, hoyre: true });
+    y -= 23;
+  });
+
+  /* ------------------------------------------------------ sammendrag --- */
+  y -= 4;
+  const sumX = kPris;
   const sumLinje = (etikett, verdi, { fet = false, f = DEMPET } = {}) => {
-    p.tekst(kPris, y, etikett, { str: fet ? 11 : 10, f: fet ? INK : f, fet, hoyre: true });
-    p.tekst(kSum, y, verdi, { str: fet ? 13 : 10, f: INK, fet: true, hoyre: true });
-    y -= fet ? 20 : 15;
+    p.tekst(sumX, y, etikett, { str: fet ? 11 : 9.5, f: fet ? INK : f, fet, hoyre: true });
+    p.tekst(kSum, y, verdi, { str: fet ? 14 : 9.5, f: INK, fet: true, hoyre: true });
+    y -= fet ? 22 : 15;
   };
 
   sumLinje('Leie av utstyr', kr(d.leie));
   sumLinje(d.henter ? 'Henting på lager' : 'Levering og henting', d.frakt ? kr(d.frakt) : '0 kr');
-  y -= 3;
-  p.rekt(kPris - 120, y + 8, H - kPris + 120, 0.5, LINJE);
-  y -= 8;
-  sumLinje('Sum eks. mva', kr(d.utenMva));
-  sumLinje('Mva 25 %', kr(d.mva));
-  y -= 2;
-  p.rekt(kPris - 120, y + 10, H - kPris + 120, 1.2, INK);
-  y -= 6;
-  sumLinje('Totalt inkl. mva', kr(d.total), { fet: true });
+  y -= 4;
+  p.rekt(sumX - 132, y + 9, H - sumX + 132, 1, INK);
+  y -= 10;
+  sumLinje('Totalt', kr(d.total), { fet: true });
+  p.tekst(kSum, y + 6, `herav mva 25 % · ${kr(d.mva)}`, { str: 8.5, f: DEMPET2, hoyre: true });
+  y -= 12;
 
-  /* --- betaling --- */
-  y -= 18;
-  const boksH = 128;
-  p.rekt(V, y - boksH, H - V, boksH, FLATE);
-  p.rekt(V, y - boksH, 3, boksH, AKSENT);
+  /* --------------------------------------------------------- betaling --- */
+  y -= 22;
+  const boksH = betalt ? 86 : 76;
+  p.rekt(V, y - boksH, H - V, boksH, betalt ? GRONN_FLATE : FLATE);
+  p.rekt(V, y - boksH, 3, boksH, betalt ? GRONN : AKSENT);
 
-  p.tekst(V + 18, y - 21, 'FORSKUDDSBETALING FOR RESERVASJON', { fet: true, str: 8, f: AKSENT });
+  if (betalt) {
+    p.tekst(V + 20, y - 22, 'BETALT MED VIPPS', { fet: true, str: 7.5, f: GRONN, sperre: 1.4 });
+    p.tekst(V + 20, y - 46, kr(d.forskudd), { fet: true, str: 20, f: INK });
+    p.tekst(V + 20 + bredde(kr(d.forskudd), 20, true) + 10, y - 46,
+      `${d.forskuddProsent} % forskudd`, { str: 9.5, f: DEMPET });
+    p.tekst(V + 20, y - 66,
+      `Utstyret er reservert til deg. Restbeløpet, ${kr(d.rest)}, faktureres`,
+      { str: 9.5, f: INK });
+    p.tekst(V + 20, y - 78, 'etter at utstyret er levert tilbake.', { str: 9.5, f: INK });
+  } else {
+    p.tekst(V + 20, y - 22, 'FORSKUDDSBETALING FOR RESERVASJON', { fet: true, str: 7.5, f: AKSENT, sperre: 1.4 });
+    p.tekst(V + 20, y - 46, kr(d.forskudd), { fet: true, str: 20, f: INK });
+    p.tekst(V + 20 + bredde(kr(d.forskudd), 20, true) + 10, y - 46,
+      `${d.forskuddProsent} % av totalen`, { str: 9.5, f: DEMPET });
+    p.tekst(V + 20, y - 66,
+      `Betales med Vipps når du bestiller. Resten, ${kr(d.rest)}, faktureres etter retur.`,
+      { str: 9.5, f: INK });
+  }
+  y -= boksH + 26;
 
-  // beløpet stort til venstre
-  p.tekst(V + 18, y - 46, kr(d.forskudd), { fet: true, str: 19, f: INK });
-  p.tekst(V + 18, y - 61, `${d.forskuddProsent} % av totalen`, { str: 9, f: DEMPET2 });
-
-  // konto og merking til høyre, satt opp som en giro
-  const kx = V + 205;
-  p.tekst(kx, y - 40, 'Kontonummer', { str: 8.5, f: DEMPET2 });
-  p.tekst(kx + 100, y - 40, d.kontonr, { fet: true, str: 12, f: INK });
-  p.tekst(kx, y - 60, 'Merkes med', { str: 8.5, f: DEMPET2 });
-  p.tekst(kx + 100, y - 60, 'Tilbud ' + d.tilbudsnr, { fet: true, str: 12, f: AKSENT });
-  p.tekst(kx, y - 78, 'Beløp', { str: 8.5, f: DEMPET2 });
-  p.tekst(kx + 100, y - 78, kr(d.forskudd), { fet: true, str: 12, f: INK });
-
-  p.rekt(V + 18, y - 92, H - V - 36, 0.5, LINJE);
-  p.tekst(V + 18, y - 106, d.henter
-    ? 'Forskuddet reserverer utstyret og må være betalt før henting.'
-    : 'Forskuddet reserverer utstyret og må være betalt før utkjøring.', { str: 9.5, f: INK });
-  p.tekst(V + 18, y - 119, `Resten, ${kr(d.rest)}, faktureres etter at utstyret er levert tilbake.`,
-    { str: 9.5, f: DEMPET });
-  y -= boksH + 24;
-
-  /* --- kommentar --- */
+  /* -------------------------------------------------------- kommentar --- */
   if (d.kommentar) {
-    p.tekst(V, y, 'KOMMENTAR FRA KUNDEN', { fet: true, str: 8, f: AKSENT });
+    overskrift(V, 'KOMMENTAR FRA KUNDEN');
     y -= 16;
-    brytTekst(d.kommentar, 88).slice(0, 4).forEach(l => {
-      p.tekst(V, y, l, { str: 10, f: INK });
-      y -= 14;
+    brytTekst(d.kommentar, 92).slice(0, 3).forEach(l => {
+      p.tekst(V, y, l, { str: 9.5, f: DEMPET });
+      y -= 13;
     });
   }
 
-  /* --- bunnlinje --- */
-  p.rekt(V, 82, H - V, 0.5, LINJE);
+  /* -------------------------------------------------------- bunnlinje --- */
+  p.rekt(V, 74, H - V, 0.8, LINJE);
 
-  // Venstre: hvem vi er.  Høyre: hvor og når.  Nederst: forbehold.
-  p.tekst(V, 66, 'Berg Utleie', { fet: true, str: 9.5, f: INK });
-  p.tekst(V, 54, `Org.nr. ${d.orgnr}   ·   Konto ${d.kontonr}`, { str: 9, f: DEMPET });
-  p.tekst(V, 42, `${d.epostFirma}   ·   bergutleie.no`, { str: 9, f: DEMPET });
+  p.tekst(V, 58, 'Berg Utleie', { fet: true, str: 9.5, f: INK });
+  p.tekst(V, 46, `Et varemerke av Berg Event · Org.nr. ${d.orgnr}`, { str: 8.5, f: DEMPET });
+  p.tekst(V, 34, `${d.epostFirma} · 412 41 285 · bergutleie.no`, { str: 8.5, f: DEMPET });
 
-  p.tekst(H, 54, 'Sørliveien 78, 1788 Halden', { str: 9, f: DEMPET, hoyre: true });
-  p.tekst(H, 42, 'Man-fre 09-18  ·  Søndag 12-15', { str: 9, f: DEMPET, hoyre: true });
-
-  // Forbeholdet er ikke kontaktinfo, så det hører hjemme på den nederste
-  // linjen sammen med gyldigheten.
-  p.rekt(V, 32, H - V, 0.5, LINJE);
-  p.tekst(V, 20, `Tilbud #${d.tilbudsnr}  ·  gyldig i ${d.gyldigDager} dager fra ${d.utstedt}`,
-    { str: 8.5, f: DEMPET2 });
-  p.tekst(H, 20, 'Alle priser inkl. mva  ·  montering inngår ikke',
+  p.tekst(H, 58, 'Sørliveien 78, 1788 Halden', { str: 8.5, f: DEMPET, hoyre: true });
+  p.tekst(H, 46, APNINGSTID_TEKST, { str: 8.5, f: DEMPET, hoyre: true });
+  p.tekst(H, 34, betalt
+    ? 'Alle priser inkl. mva · montering inngår ikke'
+    : `Gyldig i ${d.gyldigDager} dager · priser inkl. mva`,
     { str: 8.5, f: DEMPET2, hoyre: true });
 
   return tilBase64(p.bygg());

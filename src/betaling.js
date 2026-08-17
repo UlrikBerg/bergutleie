@@ -208,7 +208,9 @@ async function fullfor(env, referanse, d, betaling) {
     return 'reservert';
   }
 
-  const ferdig = { ...d, vippsRef: referanse, status: 'ferdig' };
+  // `betalt` styrer om PDF-en er en booking eller et tilbud. Settes først
+  // her, etter at trekket faktisk gikk gjennom – ikke når kunden trykket.
+  const ferdig = { ...d, vippsRef: referanse, status: 'ferdig', betalt: true };
   await env.TELLER.put(`booking:${referanse}`, JSON.stringify(ferdig), { expirationTtl: FERDIG_TID });
 
   // Varsel til lageret og bekreftelse til kunden. Begge feiler stille –
