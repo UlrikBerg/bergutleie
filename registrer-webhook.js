@@ -9,7 +9,10 @@
 
      VIPPS_API=https://api.vipps.no VIPPS_MSN=… VIPPS_CLIENT_ID=… \
      VIPPS_CLIENT_SECRET=… VIPPS_SUBSCRIPTION_KEY=… \
-     NETTSTED=https://bergutleie.no node registrer-webhook.js
+     node registrer-webhook.js
+
+   Webhook-adressen er hardkodet til https://bergutleie.no. Vipps avviser
+   både HTTP og localhost, så den kan ikke testes mot en lokal server.
 
    Hemmeligheten i svaret vises bare denne ene gangen. Lagre den med
    `npx wrangler secret put VIPPS_WEBHOOK_SECRET` med det samme.
@@ -31,15 +34,19 @@ function lesDevVars() {
 
 // Miljøvariabler vinner over .dev.vars, så produksjon aldri leser testnøkler.
 const env = { ...lesDevVars(), ...Object.fromEntries(
-  Object.entries(process.env).filter(([k]) => k.startsWith('VIPPS_') || k === 'NETTSTED')) };
+  Object.entries(process.env).filter(([k]) => k.startsWith('VIPPS_'))) };
 
 for (const n of ['VIPPS_API', 'VIPPS_MSN', 'VIPPS_CLIENT_ID', 'VIPPS_CLIENT_SECRET', 'VIPPS_SUBSCRIPTION_KEY']) {
   if (!env[n]) { console.error(`Mangler ${n}.`); process.exit(1); }
 }
 
 const erProd = env.VIPPS_API.includes('//api.vipps');
-const nettsted = env.NETTSTED || (erProd ? 'https://bergutleie.no' : 'https://bergutleie.no');
-const url = `${nettsted}/api/vipps-webhook`;
+
+// Vipps krever HTTPS og et offentlig domene – localhost avvises med 400.
+// NETTSTED i .dev.vars peker på localhost for lokal testing av retursiden,
+// og den må aldri lekke inn hit. Derfor leses den ikke i det hele tatt:
+// webhooken skal alltid til det ekte domenet, uansett miljø.
+const url = 'https://bergutleie.no/api/vipps-webhook';
 
 const [flagg, arg] = process.argv.slice(2);
 
