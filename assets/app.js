@@ -408,7 +408,9 @@ function tegnOppsett() {
   const note = document.querySelector('[data-oppsett-note]');
   const deler = [];
   if (!res.teltId) {
-    deler.push('Legg et telt i kurven for å se oppsettet under duk.');
+    // Uten telt er dette ikke en feilmelding – utstyret vises, det står bare
+    // under åpen himmel. Teksten er et tips, ikke en beskjed om at noe mangler.
+    deler.push('Legg til et telt for å se hvordan alt står under duk.');
   } else if (res.notater.length) {
     deler.push('Får ikke plass i teltet og står sammenklappet ved siden av: ' + res.notater.join(', ') + '.');
   } else {

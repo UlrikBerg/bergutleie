@@ -39,7 +39,12 @@ const F = {
 };
 
 /** Projeksjon og tegneprimitiver for en scene med gitt utstrekning og kamera. */
-function lagScene(minX, maksX, minY, maksY, kam) {
+/**
+ * @param takhoyde  meter som må få plass over bakken. Et telt er høyt; en
+ *                  rad stoler er det ikke. Reserverer vi teltets høyde
+ *                  uansett, krymper en stolbestilling til en flekk.
+ */
+function lagScene(minX, maksX, minY, maksY, kam, takhoyde = 3.4) {
   const az = kam.az || 0;
   const elev = Math.max(0.18, Math.min(0.92, kam.elev ?? 0.5));
   const zoom = Math.max(0.5, Math.min(4, kam.zoom || 1));
@@ -65,7 +70,7 @@ function lagScene(minX, maksX, minY, maksY, kam) {
     if (Y < minYu) minYu = Y;
     if (Y > maksYu) maksYu = Y;
   });
-  minYu -= 3.4 * kHoyde;                // plass til telttoppen
+  minYu -= takhoyde * kHoyde;
 
   // Rammen er fast, slik at seksjonen på siden ikke hopper i høyde når
   // man snur eller zoomer. Innholdet skaleres for å passe inn i den.
@@ -139,13 +144,27 @@ export function oppsettSvg(kurv, finn, kam = {}) {
   const teltIder = Object.keys(TELT).filter(id => q(id) > 0);
   const teltId = teltIder.sort((a, b) => (TELT[b][0] * TELT[b][1]) - (TELT[a][0] * TELT[a][1]))[0] || null;
 
+  // Bare stoler i kurven? Da settes de opp i rader på bakken, og flaten må
+  // vokse med antallet – ellers havner bakerste rad utenfor bildet.
+  const bordTotalt = q('kbord') + q('trebord') + q('rbord') + q('stabord');
+  const frittstaaende = !teltId && bordTotalt === 0 ? q('stol') : 0;
+  const stolPerRad = frittstaaende
+    ? Math.max(1, Math.min(8, Math.ceil(Math.sqrt(frittstaaende * 1.6)))) : 0;
+  const stolRader = frittstaaende ? Math.ceil(frittstaaende / stolPerRad) : 0;
+
   let Ld, Wd;
   if (teltId) {
     [Ld, Wd] = TELT[teltId];
   } else {
-    const bord = q('kbord') + q('trebord') + q('rbord') + q('stabord');
-    Ld = Math.max(6, Math.min(14, 3 + bord * 1.1));
-    Wd = 5;
+    if (frittstaaende) {
+      // Bare stoler: ram dem tett inn. Uten dette arver scenen minstemålet
+      // for en teltflate, og fem stoler blir en flekk midt i en eng.
+      Ld = Math.max(3, 1.1 + stolPerRad * 0.72);
+      Wd = Math.max(2.4, 1.0 + stolRader * 0.9);
+    } else {
+      Ld = Math.max(6, Math.min(14, 3 + bordTotalt * 1.1));
+      Wd = 5;
+    }
   }
 
   /* --- fordel møbler mellom teltet og plassen ved siden --- */
@@ -176,9 +195,14 @@ export function oppsettSvg(kurv, finn, kam = {}) {
   let stadukIgjen = q('staduk-hvit') + q('staduk-sort');
 
   const harStabel = plan.kbord.ute + plan.trebord.ute + plan.rbord.ute + plan.stabord.ute > 0;
-  const lagerBredde = harStabel || stolerIgjen > 0 ? 3.8 : 0;
+  // Stoler som settes opp i rader trenger ingen lagerplass ved siden av.
+  // Reserverte vi den likevel, ville scenen fått 3,8 meter tomrom til høyre.
+  const lagerBredde = harStabel || (stolerIgjen > 0 && !frittstaaende) ? 3.8 : 0;
 
-  const S = lagScene(-1.3, Ld + 1.3 + lagerBredde, -1.3, Wd + 1.3, kam);
+  // Telt 3,4 m · bord og stabler ~1,6 m · bare stoler ~1,1 m
+  const takhoyde = teltId ? 3.4 : (frittstaaende ? 1.1 : 1.6);
+  const marg = frittstaaende ? 0.6 : 1.3;
+  const S = lagScene(-marg, Ld + marg + lagerBredde, -marg, Wd + marg, kam, takhoyde);
   const { pt, dep, poly, ln, cir, ell, skjort, skygge, etikett, s, yStrekk, RAMME_B, RAMME_H } = S;
   const Cd = dep(Ld / 2, Wd / 2);
 
@@ -401,10 +425,31 @@ export function oppsettSvg(kurv, finn, kam = {}) {
     }
   }
 
+  /* --- stoler uten bord å stå ved --- */
+  // Bestiller noen bare stoler, finnes det verken telt eller bord å plassere
+  // dem ved, og scenen ville stått tom. Da settes de opp i rader på bakken
+  // i stedet – det er tross alt sånn de faktisk brukes.
+  if (frittstaaende && stolerIgjen > 0) {
+    const perRad = stolPerRad, rader = stolRader;
+    const dx = 0.72, dy = 0.9;
+    const startX = Ld / 2 - (perRad - 1) * dx / 2;
+    const startY = Wd / 2 - (rader - 1) * dy / 2;
+    for (let i = 0; i < stolerIgjen; i++) {
+      const kol = i % perRad, rad = Math.floor(i / perRad);
+      // Siste rad sentreres under de fulle radene, ellers henger den skjevt.
+      const iRaden = Math.min(perRad, stolerIgjen - rad * perRad);
+      const justering = (perRad - iRaden) * dx / 2;
+      stol(startX + kol * dx + justering, startY + rad * dy, 0, -1);
+    }
+    stolerIgjen = 0;
+  }
+
   /* --- det som står sammenklappet ved siden --- */
   const notater = [];
   const merker = [];
-  if (teltId && (harStabel || stolerIgjen > 0 || benkerIgjen > 0)) {
+  // Ikke lenger avhengig av telt: har du flere stoler enn sitteplasser ved
+  // bordene, skal de vises uansett om det står et telt over eller ikke.
+  if (harStabel || stolerIgjen > 0 || benkerIgjen > 0) {
     const lagerX = Ld + 1.7, lagerY = Wd / 2;
 
     const stabelBord = (x, y, antall, L, B, plate, z0) => {
