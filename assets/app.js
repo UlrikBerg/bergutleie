@@ -645,7 +645,7 @@ function settOppTilbud() {
 
       <div class="sammendrag-sum">
         <div class="rad total"><span>Totalt</span><span>${s.utenforSone ? '—' : kr(s.total)}</span></div>
-        ${s.kanBookes ? `<div class="rad na"><span>Du betaler nå (${FORSKUDD_PROSENT} %)</span><span>${kr(forskudd)}</span></div>
+        ${s.kanBookes ? `<div class="rad na"><span>Du betaler nå</span><span>${kr(forskudd)}</span></div>
         <div class="rad rest"><span>Faktureres etter retur</span><span>${kr(s.total - forskudd)}</span></div>` : ''}
       </div>`;
   };
