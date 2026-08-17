@@ -240,7 +240,7 @@ function kvittering(d) {
       faktureres etter at utstyret er levert tilbake.</p>
     <p class="dempet">Skal noe endres, svar på bekreftelsen eller skriv til
       <a href="mailto:post@bergutleie.no">post@bergutleie.no</a>.</p>`,
-    { sporTotal: d.total });
+    { sporTotal: d.total, ordreId: d.vippsRef });
 }
 
 function avbrutt(d) {
@@ -254,7 +254,7 @@ function avbrutt(d) {
 /* -------------------------------------------------------------- hjelpere --- */
 
 /** Enkel side i nettstedets drakt. Serveres av Worker-en, ikke fra dist/. */
-function side(status, tittel, kropp, { sporTotal } = {}) {
+function side(status, tittel, kropp, { sporTotal, ordreId } = {}) {
   const html = `<!doctype html>
 <html lang="no"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -279,11 +279,17 @@ function side(status, tittel, kropp, { sporTotal } = {}) {
   ${kropp}
   <p style="margin-top:2.5rem"><a href="/">Til forsiden</a></p>
 </main>
-${sporTotal ? `<script>
+${sporTotal ? `<script type="module">
   // Konverteringen telles her, ikke i handlekurven – først nå er pengene
-  // faktisk trukket. Verdien er serverens tall.
-  try { window.dataLayer = window.dataLayer || [];
-        window.sporKjop && window.sporKjop(${Number(sporTotal) || 0}); } catch (e) {}
+  // faktisk trukket. Verdien er serverens tall, ikke nettleserens.
+  //
+  // Siden serveres av Worker-en og har ingen av nettstedets skript, så
+  // målingen må startes eksplisitt. startMaling() setter opp samtykke;
+  // uten samtykke lastes ingen tagg og sporKjop gjør ingenting.
+  import { startMaling, sporKjop } from '/assets/maling.js';
+  startMaling();
+  addEventListener('load', () => setTimeout(
+    () => sporKjop(${Number(sporTotal) || 0}, ${JSON.stringify(String(ordreId || ''))}), 400));
 </script>` : ''}
 </body></html>`;
   return new Response(html, {

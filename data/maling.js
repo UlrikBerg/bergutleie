@@ -19,3 +19,16 @@
 export const GA4_ID = 'G-H47JC9G245';
 export const ADS_ID = 'AW-603503615';
 export const ADS_LABEL = 'SLAqCNz23OIcEP_34p8C';
+
+/* Egen konverteringshandling for BETALTE bookinger. Står den tom, brukes
+   ADS_LABEL over, slik at betalinger måles som lead framfor ikke i det
+   hele tatt.
+
+   Lag den i Ads → Mål → Konverteringer → + → Nettsted → Google-tag:
+     Kategori:  Kjøp
+     Navn:      Berg Utleie – booking betalt
+     Verdi:     Bruk ulike verdier
+     Telling:   Én
+   Den bør på sikt være PRIMÆR, og lead-handlingen sekundær – det er
+   betalte bookinger Google skal by etter, ikke forespørsler. */
+export const ADS_KJOP_LABEL = '';

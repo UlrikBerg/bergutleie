@@ -19,7 +19,7 @@
    nettstedet kjøre uten sporing i det hele tatt.
    ======================================================================== */
 
-import { GA4_ID, ADS_ID, ADS_LABEL } from '/data/maling.js';
+import { GA4_ID, ADS_ID, ADS_LABEL, ADS_KJOP_LABEL } from '/data/maling.js';
 
 const SAMTYKKE_NOKKEL = 'bu_samtykke';
 const GCLID_NOKKEL = 'bu_gclid';
@@ -141,6 +141,42 @@ export function sporForesporsel(verdi) {
       send_to: ADS_ID + '/' + ADS_LABEL,
       currency: 'NOK',
       value: Number(verdi) || 0
+    });
+  }
+}
+
+/**
+ * Kalles på kvitteringssiden når forskuddet faktisk er trukket.
+ *
+ * Dette er den viktige konverteringen. En forespørsel er et løfte; en
+ * betalt booking er penger. Måler vi bare forespørsler, byr Google etter
+ * feil ting – og det var nøyaktig feilen som gjorde Berg Event dyr.
+ *
+ * @param verdi    hele bookingens verdi, ikke bare forskuddet. Det er den
+ *                 summen som sier hvor mye kunden er verdt.
+ * @param ordreId  Vipps-referansen. Brukes som transaction_id, slik at en
+ *                 oppfrisket kvitteringsside ikke telles to ganger.
+ */
+export function sporKjop(verdi, ordreId) {
+  if (!window.gtag) return;
+  const v = Number(verdi) || 0;
+
+  if (GA4_ID) {
+    window.gtag('event', 'purchase', {
+      transaction_id: ordreId || undefined,
+      currency: 'NOK',
+      value: v
+    });
+  }
+  // Egen konverteringshandling for betalte bookinger hvis den finnes.
+  // Ellers brukes lead-etiketten, så noe måles framfor ingenting.
+  const etikett = ADS_KJOP_LABEL || ADS_LABEL;
+  if (ADS_ID && etikett) {
+    window.gtag('event', 'conversion', {
+      send_to: ADS_ID + '/' + etikett,
+      transaction_id: ordreId || undefined,
+      currency: 'NOK',
+      value: v
     });
   }
 }
