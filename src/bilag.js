@@ -183,6 +183,74 @@ export function lagBilag(d) {
   return tilBase64(p.bygg());
 }
 
+/* ===========================================================================
+   Kvittering for forskuddet.
+
+   Kort med vilje. Kunden har allerede hele bookingen i e-posten – det som
+   mangler er dokumentasjon på at pengene er betalt. Derfor bare beløp,
+   dato, referanse og hvem som har mottatt dem.
+   ======================================================================== */
+export function lagKvittering(d) {
+  const p = nyPdf(LOGO_JPEG, LOGO_B, LOGO_H);
+  let y = 760;
+
+  p.logo(V, y - 36, 100);
+  p.tekst(H, y + 2, 'KVITTERING', { fet: true, str: 7.5, f: DEMPET2, hoyre: true, sperre: 2.6 });
+  const nr = String(d.tilbudsnr);
+  p.tekst(H - bredde(nr, 21, true) - 5, y - 21, '#', { fet: true, str: 12, f: DEMPET2 });
+  p.tekst(H, y - 21, nr, { fet: true, str: 21, f: INK, hoyre: true });
+  p.tekst(H, y - 38, d.utstedt, { str: 8.5, f: DEMPET2, hoyre: true });
+
+  y -= 66;
+  p.rekt(V, y, H - V, 1, INK);
+  y -= 44;
+
+  /* --- beløpet, stort og alene --- */
+  p.tekst(V, y, 'BETALT MED VIPPS', { fet: true, str: 7.5, f: GRONN, sperre: 1.4 });
+  y -= 34;
+  p.tekst(V, y, kr(d.forskudd), { fet: true, str: 30, f: INK });
+  y -= 20;
+  p.tekst(V, y, `${d.forskuddProsent} % forskudd for reservasjon · alle priser inkl. mva`,
+    { str: 9.5, f: DEMPET });
+
+  /* --- hva det gjelder --- */
+  y -= 40;
+  const rad = (etikett, verdi, { fet = false } = {}) => {
+    p.tekst(V, y, etikett, { str: 10, f: DEMPET });
+    p.tekst(H, y, verdi, { fet: true, str: fet ? 12 : 10.5, f: INK, hoyre: true });
+    y -= 19;
+  };
+
+  p.rekt(V, y + 13, H - V, 0.8, LINJE);
+  y -= 9;
+  rad('Gjelder booking', '#' + nr);
+  rad('Leieperiode', d.periode);
+  rad('Kunde', d.navn);
+  rad('Totalbeløp for leien', kr(d.total));
+  p.rekt(V, y + 13, H - V, 0.5, LINJE);
+  y -= 9;
+  rad('Betalt nå', kr(d.forskudd), { fet: true });
+  rad('Gjenstår, faktureres etter retur', kr(d.rest));
+
+  /* --- fotnote --- */
+  y -= 16;
+  p.rekt(V, y - 44, H - V, 44, FLATE);
+  p.tekst(V + 16, y - 18, 'Restbeløpet trekkes ikke automatisk.', { str: 9.5, f: INK });
+  p.tekst(V + 16, y - 31, 'Du får faktura etter at utstyret er levert tilbake.', { str: 9.5, f: DEMPET });
+
+  /* --- bunnlinje --- */
+  p.rekt(V, 74, H - V, 0.8, LINJE);
+  p.tekst(V, 58, 'Berg Utleie', { fet: true, str: 9.5, f: INK });
+  p.tekst(V, 46, `Et varemerke av Berg Event · Org.nr. ${d.orgnr}`, { str: 8.5, f: DEMPET });
+  p.tekst(V, 34, `${d.epostFirma} · 412 41 285 · bergutleie.no`, { str: 8.5, f: DEMPET });
+  p.tekst(H, 46, 'Sørliveien 78, 1788 Halden', { str: 8.5, f: DEMPET, hoyre: true });
+  if (d.vippsRef) {
+    p.tekst(H, 34, 'Vipps-ref. ' + d.vippsRef, { str: 8, f: DEMPET2, hoyre: true });
+  }
+
+  return tilBase64(p.bygg());
+}
+
 function kutt(s, maks) {
   return s.length > maks ? s.slice(0, maks - 1) + '…' : s;
 }

@@ -14,7 +14,7 @@
    Se DEPLOY.md for oppsettet.
    ======================================================================== */
 
-import { lagBilag } from './bilag.js';
+import { lagBilag, lagKvittering } from './bilag.js';
 import { regnUt } from './pris.js';
 import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '../data/vilkar.js';
 import { APNINGSTID_TEKST, erBetjent } from '../data/apningstid.js';
@@ -182,10 +182,15 @@ export async function sendVarsel(env, d, { betalt = false } = {}) {
       subject: emne + (d.periode !== 'Ikke valgt' ? ' – ' + d.periode : ''),
       html: htmlEpost(d, betalt),
       text: tekstEpost(d, betalt),
-      attachments: [{
-        filename: `${betalt ? 'Booking' : 'Tilbud'}-${d.tilbudsnr}-Berg-Utleie.pdf`,
-        content: lagBilag(d)
-      }]
+      // Ved betalt booking står alt i e-posten, og kunden har fått sin egen
+      // kvittering. Da er et vedlegg hit bare støy. Ved forespørsel er
+      // PDF-en et tilbud som kan videresendes – der har den en jobb.
+      ...(betalt ? {} : {
+        attachments: [{
+          filename: `Tilbud-${d.tilbudsnr}-Berg-Utleie.pdf`,
+          content: lagBilag(d)
+        }]
+      })
     })
   });
   return res.ok;
@@ -214,9 +219,11 @@ export async function sendKundebekreftelse(env, d) {
       subject: `Bookingen din er bekreftet – Berg Utleie #${d.tilbudsnr}`,
       html: kundeHtml(d),
       text: kundeTekst(d),
+      // Kvittering, ikke bookingdokument. Hele bookingen står i e-posten
+      // over – det kunden mangler er dokumentasjon på betalingen.
       attachments: [{
-        filename: `Booking-${d.tilbudsnr}-Berg-Utleie.pdf`,
-        content: lagBilag(d)
+        filename: `Kvittering-${d.tilbudsnr}-Berg-Utleie.pdf`,
+        content: lagKvittering(d)
       }]
     })
   });
