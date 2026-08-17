@@ -69,8 +69,48 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .btn-vipps { background: #FF5B24; }
 .btn-vipps:hover { background: #E64A16; }
 .btn-vipps[hidden] { display: none; }
+.btn-vipps:disabled { background: #C9CFCD; cursor: not-allowed; }
 .valg .btn-vipps { margin-bottom: .35rem; }
-.valg > .btn:not(.btn-vipps) { margin-top: 1.1rem; }
+
+/* Hvordan bookingen faktisk fungerer, sagt før kunden fyller ut noe.
+   Uten dette er «betal 25 %» en overraskelse i siste steg. */
+.slik-virker {
+  list-style: none; counter-reset: steg; margin: 0 0 2rem; padding: 1.25rem 1.4rem;
+  background: var(--line-soft, #F1F3F0); border-radius: 12px;
+  display: grid; gap: .85rem;
+}
+.slik-virker li {
+  counter-increment: steg; display: grid; grid-template-columns: 1.6rem 1fr;
+  gap: .1rem .7rem; align-items: baseline;
+}
+.slik-virker li::before {
+  content: counter(steg); grid-row: span 2;
+  width: 1.6rem; height: 1.6rem; border-radius: 50%;
+  background: var(--ink, #113B3F); color: #fff;
+  font-size: .8rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.slik-virker strong { font-size: .98rem; }
+.slik-virker span { grid-column: 2; font-size: .88rem; color: var(--muted, #5A6E6D); }
+
+.tid-note { margin: -.35rem 0 1rem; font-size: .85rem; color: var(--muted, #5A6E6D); }
+.tid-note.feil { color: #B4341C; font-weight: 600; }
+
+.forskudd-linje {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: .5rem; padding-top: .6rem; border-top: 1px dashed var(--line, #E5E7E1);
+  font-size: .92rem; color: var(--muted, #5A6E6D);
+}
+.forskudd-linje .v { font-weight: 700; color: var(--ink, #113B3F); }
+.forskudd-linje[hidden] { display: none; }
+
+/* Vises i stedet for «Gå videre» når vi ikke kjører til adressen. */
+.kurv-sperre {
+  margin-top: .5rem; padding: 1rem 1.1rem;
+  background: #FDF1ED; border-radius: 10px; border-left: 3px solid var(--accent, #E8562E);
+}
+.kurv-sperre[hidden] { display: none; }
+.kurv-sperre p { margin: 0 0 .8rem; font-size: .9rem; line-height: 1.55; }
 
 .btn-ghost {
   display: inline-flex; align-items: center; justify-content: center;

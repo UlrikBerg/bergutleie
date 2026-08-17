@@ -11,17 +11,48 @@
    var det ufarlig – du ville sett at noe var rart. Et beløp som går rett
    til trekk i Vipps, ser ingen over.
 
-   Faller adressen utenfor de faste sonene, får bookingen `tilbudspris` og
-   ingen total. Da kan den ikke betales på nett, bare svares på manuelt –
-   for vi vet ikke hva utkjøringen koster ennå.
+   Faller adressen utenfor de faste sonene, avvises bookingen. Levering dit
+   er ikke en tjeneste vi tilbyr – ikke noe som prises i etterkant. Kunden
+   henvises til forespørselsskjemaet, som er en helt annen flyt uten
+   betaling. Alternativet ville vært å ta imot penger for en booking der
+   totalsummen ennå ikke fantes.
    ======================================================================== */
 
 import { PRODUKTER, SONER, enhetspris } from '../data/produkter.js';
 import { soneForKommune } from '../data/kommuner.js';
+import { gyldigTid, erStengt } from '../data/apningstid.js';
 
 const MAKS_LINJER = 60;      // flere varelinjer enn dette er ikke en ekte booking
 const MAKS_ANTALL = 99;      // per varelinje
 const MAKS_DAGER = 365;
+
+/**
+ * Sjekker at bookingdetaljene faktisk kan gjennomføres. Kalles bare når det
+ * skal tas betalt – en forespørsel kan godt være løs i kantene, men en
+ * reservasjon som er betalt må ha dato og klokkeslett vi kan møte opp på.
+ *
+ * @returns { ok: true } eller { ok: false, feil }
+ */
+export function sjekkBooking({ fra, til, hentetid, returtid, modus, adresse }) {
+  if (!fra || !til) return { ok: false, feil: 'Velg datoer for leieperioden.' };
+  const d = antallDager(fra, til);
+  if (!d.har) return { ok: false, feil: 'Returdatoen må være etter hentedatoen.' };
+
+  if (erStengt(fra)) return { ok: false, feil: 'Lageret er stengt på lørdager. Velg en annen hentedag.' };
+  if (erStengt(til)) return { ok: false, feil: 'Lageret er stengt på lørdager. Velg en annen returdag.' };
+
+  if (!gyldigTid(fra, hentetid)) {
+    return { ok: false, feil: 'Velg et tidspunkt for henting innenfor åpningstiden.' };
+  }
+  if (!gyldigTid(til, returtid)) {
+    return { ok: false, feil: 'Velg et tidspunkt for tilbakelevering innenfor åpningstiden.' };
+  }
+
+  if (modus === 'lev' && !adresse) {
+    return { ok: false, feil: 'Velg leveringsadressen fra listen.' };
+  }
+  return { ok: true };
+}
 
 /** Antall leiedøgn mellom to ISO-datoer. Samme regnestykke som i nettleseren. */
 function antallDager(fra, til) {
@@ -39,8 +70,8 @@ function antallDager(fra, til) {
  * @param modus    'lev' for utkjøring, alt annet regnes som henting
  * @param kommune  kommunenavn fra adressesøket, avgjør fraktsonen
  *
- * @returns { ok, feil?, varer, leie, frakt, total, dager, dagerLabel,
- *            tilbudspris, sonenavn }
+ * @returns { ok, feil?, utenforSone?, varer, leie, frakt, total, dager,
+ *            dagerLabel, sonenavn }
  */
 export function regnUt({ linjer, fra, til, modus, kommune }) {
   if (!Array.isArray(linjer) || !linjer.length) {
@@ -74,17 +105,18 @@ export function regnUt({ linjer, fra, til, modus, kommune }) {
   const leie = varer.reduce((a, v) => a + v.sum, 0);
 
   /* --- frakt --- */
-  let frakt = 0, tilbudspris = false, sonenavn = '';
+  let frakt = 0, sonenavn = '';
   if (modus === 'lev') {
     const nr = soneForKommune(kommune);
-    if (nr && SONER[nr - 1]) {
-      frakt = SONER[nr - 1].pris;
-      sonenavn = SONER[nr - 1].navn;
-    } else {
-      // Kjent adresse utenfor sonene, eller ingen adresse valgt. Begge deler
-      // betyr at prisen må settes for hånd.
-      tilbudspris = true;
+    if (!nr || !SONER[nr - 1]) {
+      // Utenfor sonene er levering ikke en tjeneste vi tilbyr. Den skal
+      // ikke prises senere heller – da måtte kunden betalt for en booking
+      // med ukjent totalsum. De henvises til forespørselsskjemaet.
+      return { ok: false, feil: 'Vi kjører ikke ut hit. Hent selv i Halden, eller send en forespørsel.',
+               utenforSone: true };
     }
+    frakt = SONER[nr - 1].pris;
+    sonenavn = SONER[nr - 1].navn;
   }
 
   return {
@@ -93,6 +125,6 @@ export function regnUt({ linjer, fra, til, modus, kommune }) {
     total: leie + frakt,
     dager: d.n,
     dagerLabel: d.har ? (d.n === 1 ? '1 døgn' : `${d.n} dager`) : '1–4 dager',
-    tilbudspris, sonenavn
+    sonenavn
   };
 }

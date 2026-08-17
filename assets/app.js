@@ -12,7 +12,8 @@ import { teltSvg } from '/data/telt-svg.js';
 import { lagAdressesok } from '/assets/adressesok.js';
 import { oppsettSvg } from '/data/oppsett-svg.js';
 import { startMaling, hentGclid, sporForesporsel } from '/assets/maling.js';
-import { FORSKUDD_ANDEL } from '/data/vilkar.js';
+import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '/data/vilkar.js';
+import { tiderFor, erStengt, APNINGSTID_TEKST } from '/data/apningstid.js';
 
 const NOKKEL = 'bergutleie-kurv';
 const ADRESSE_NOKKEL = 'bergutleie-adresse';
@@ -272,17 +273,23 @@ function summer() {
   let leie = 0;
   PRODUKTER.forEach(p => { leie += antall(p.id) * enhetspris(p, d.n); });
 
-  let levering = 0, levLabel = '0 kr', ruteMeta = '', adresseNote = '', tilbudspris = false;
+  // utenforSone betyr at vi ikke kjører dit i det hele tatt – ikke at prisen
+  // settes senere. Da kan bookingen ikke betales, og kunden må hente selv
+  // eller sende en forespørsel. Se src/pris.js.
+  let levering = 0, levLabel = '0 kr', ruteMeta = '', adresseNote = '',
+      utenforSone = false, manglerAdresse = false;
+
   if (bestilling.modus === 'lev') {
     const sted = stedTreff();
-    const harValgt = !!bestilling.valgt;
     if (!sted) {
-      if (harValgt) {
-        tilbudspris = true;
-        levLabel = 'Etter avtale';
+      if (bestilling.valgt) {
+        utenforSone = true;
+        levLabel = 'Vi kjører ikke hit';
         adresseNote = (bestilling.valgt.poststed || 'Stedet') +
-          ' ligger utenfor de faste sonene våre – vi gir deg fast pris på forespørsel.';
+          ' ligger utenfor området vi leverer til. Du kan hente selv i Halden, ' +
+          'eller sende en forespørsel så finner vi ut av det.';
       } else {
+        manglerAdresse = true;
         levLabel = 'Legg inn adresse';
         adresseNote = bestilling.adresse.trim().length > 1
           ? 'Velg adressen fra listen, så finner vi fast fraktpris.'
@@ -295,7 +302,9 @@ function summer() {
       ruteMeta = 'Fast fraktpris til ' + sted.navn + ' – både utkjøring og henting er inkludert.';
     }
   }
-  return { d, leie, levering, levLabel, ruteMeta, adresseNote, tilbudspris, total: leie + levering };
+  return { d, leie, levering, levLabel, ruteMeta, adresseNote,
+           utenforSone, manglerAdresse, total: leie + levering,
+           kanBookes: !utenforSone && !manglerAdresse && leie > 0 };
 }
 
 /* --- handlekurvsiden --- */
@@ -332,7 +341,32 @@ function tegnKurvside() {
   sett('[data-periode-tag]', '(' + dagerLabel + ')');
   sett('[data-leie]', kr(s.leie));
   sett('[data-levering]', s.levLabel);
-  sett('[data-total]', s.tilbudspris ? kr(s.total) + ' + levering' : kr(s.total));
+  sett('[data-total]', s.utenforSone ? '—' : kr(s.total));
+
+  // Forskuddet vises allerede i kurven, så beløpet ikke er en overraskelse
+  // i det Vipps åpner.
+  const fLinje = document.querySelector('[data-forskudd-linje]');
+  if (fLinje) {
+    fLinje.hidden = !s.kanBookes;
+    sett('[data-forskudd]', kr(Math.round(s.total * FORSKUDD_ANDEL)));
+  }
+
+  // Kan bookingen ikke betales, skal veien videre stenges her – ikke i
+  // kassen. Kunden skal aldri komme til betalingssiden og få avslag der.
+  const videre = document.querySelector('[data-ga-videre]');
+  const sperre = document.querySelector('[data-kurv-sperre]');
+  const kurvNote = document.querySelector('[data-kurv-note]');
+  if (videre && sperre) {
+    const blokkert = s.utenforSone;
+    videre.hidden = blokkert;
+    if (kurvNote) kurvNote.hidden = blokkert;
+    sperre.hidden = !blokkert;
+    if (blokkert) {
+      sperre.querySelector('[data-kurv-sperre-tekst]').textContent =
+        'Vi kjører ikke ut til denne adressen. Velg «Hent selv», eller send en forespørsel – ' +
+        'ofte finner vi en løsning likevel.';
+    }
+  }
   sett('[data-dager-note]', !s.d.har
     ? 'Velg datoer – 1–4 dagers leie koster det samme.'
     : (s.d.n <= 4 ? dagerLabel + ' – samme pris som én dag.' : s.d.n + ' dager – +15 % per døgn utover 4.'));
@@ -593,38 +627,76 @@ function settOppTilbud() {
         <dt>Leieperiode</dt><dd>${periode}</dd>
         <dt>${bestilling.modus === 'lev' ? 'Levering' : 'Henting'}</dt><dd>${levering}</dd>
       </dl>
-      <p class="sammendrag-sum">Beregnet total: <strong>${s.tilbudspris ? kr(s.total) + ' + levering' : kr(s.total)}</strong></p>
+      <p class="sammendrag-sum">Totalt: <strong>${s.utenforSone ? '—' : kr(s.total)}</strong></p>
       <p class="sammendrag-note"><a href="/handlekurv/">← Endre i handlekurven</a></p>`;
   };
 
   tegnSammendrag();
 
-  /* Vipps-knappen vises bare når det finnes en pris å ta betalt for.
-     Ligger adressen utenfor fraktsonene, er totalen ufullstendig – da må
-     bookingen gå som forespørsel, og serveren avviser den uansett. */
+  /* Forespørselsskjemaet på /tilbud/ har ingen betaling – det er hele
+     poenget med det. Resten her gjelder bare kassen. */
+  const erForesporsel = skjema.hasAttribute('data-foresporsel');
   const vippsKnapp = skjema.querySelector('[data-vipps]');
-  const vippsNote = skjema.querySelector('[data-vipps-note]');
+
+  /* --- klokkeslett, begrenset av åpningstidene --- */
+  const hentetid = skjema.querySelector('[data-hentetid]');
+  const returtid = skjema.querySelector('[data-returtid]');
+
+  function fyllTider() {
+    if (!hentetid || !returtid) return;
+    const note = skjema.querySelector('[data-tid-note]');
+    const lev = bestilling.modus === 'lev';
+
+    skjema.querySelector('[data-hent-etikett]').textContent = lev ? 'Levering' : 'Henting';
+    skjema.querySelector('[data-retur-etikett]').textContent = lev ? 'Vi henter igjen' : 'Tilbakelevering';
+
+    const fyll = (el, iso) => {
+      const tider = tiderFor(iso);
+      el.innerHTML = tider.length
+        ? tider.map(t => `<option value="${t}">${t}</option>`).join('')
+        : '<option value="">—</option>';
+      el.disabled = !tider.length;
+    };
+    fyll(hentetid, bestilling.fra);
+    fyll(returtid, bestilling.til);
+
+    // Lørdag er stengt. Uten dette kunne kunden betalt for en henting
+    // som ikke kan skje.
+    const stengt = [bestilling.fra, bestilling.til].filter(erStengt);
+    if (!bestilling.fra || !bestilling.til) {
+      note.textContent = 'Velg datoer i handlekurven først.';
+      note.className = 'tid-note feil';
+    } else if (stengt.length) {
+      note.textContent = 'Lageret er stengt på lørdager. Velg en annen dag i handlekurven.';
+      note.className = 'tid-note feil';
+    } else {
+      note.textContent = APNINGSTID_TEKST;
+      note.className = 'tid-note';
+    }
+  }
+  fyllTider();
 
   async function tegnVipps() {
     if (!vippsKnapp) return;
     const s = summer();
-    if (!(s.total > 0 && !s.tilbudspris)) return;   // ingen pris å ta betalt for
 
     // Serveren avgjør om betaling er mulig. Uten nøkler skal knappen aldri
-    // vises – en betalingsknapp som svarer med feil er verre enn ingen.
+    // være aktiv – en betalingsknapp som svarer med feil er verre enn ingen.
     let tilgjengelig = false;
     try {
       const res = await fetch('/api/betaling');
       tilgjengelig = res.ok && (await res.json()).tilgjengelig === true;
-    } catch { /* nettverksfeil – da står knappen skjult */ }
-    if (!tilgjengelig) return;
+    } catch { /* nettverksfeil */ }
 
+    const kan = tilgjengelig && s.kanBookes;
+    vippsKnapp.disabled = !kan;
     skjema.querySelector('[data-vipps-belop]').textContent =
-      '· ' + kr(Math.round(s.total * FORSKUDD_ANDEL));
-    vippsKnapp.hidden = false;
-    vippsNote.hidden = false;
+      kan ? '· ' + kr(Math.round(s.total * FORSKUDD_ANDEL)) : '';
+    if (!kan && !tilgjengelig) {
+      vippsKnapp.textContent = 'Betaling er ikke tilgjengelig akkurat nå';
+    }
   }
-  tegnVipps();
+  if (!erForesporsel) tegnVipps();
 
   function byggKropp(data) {
     const s = summer();
@@ -651,12 +723,15 @@ function settOppTilbud() {
   const status = skjema.querySelector('[data-skjema-status]');
   const settFeil = (t) => { status.className = 'skjema-status feil'; status.textContent = t; };
 
-  /* --- send forespørsel --- */
   skjema.addEventListener('submit', async (e) => {
     e.preventDefault();
     const knapp = skjema.querySelector('button[type="submit"]');
     const data = Object.fromEntries(new FormData(skjema));
     if (data.firma) return;                      // honningkrukke – bot fylte den ut
+
+    // Kassen betaler. Forespørselsskjemaet sender e-post. Samme skjema-kode,
+    // to helt ulike utfall – derfor skiller vi tidlig.
+    if (!erForesporsel) return startBetaling(knapp, data);
 
     knapp.disabled = true;
     status.textContent = 'Sender …';
@@ -685,14 +760,8 @@ function settOppTilbud() {
   });
 
   /* --- betal forskuddet med Vipps --- */
-  vippsKnapp?.addEventListener('click', async () => {
-    // Skjemaet er ikke submittet, så nettleseren har ikke validert det ennå.
-    if (!skjema.reportValidity()) return;
-
-    const data = Object.fromEntries(new FormData(skjema));
-    if (data.firma) return;
-
-    vippsKnapp.disabled = true;
+  async function startBetaling(knapp, data) {
+    knapp.disabled = true;
     status.className = 'skjema-status';
     status.textContent = 'Åpner Vipps …';
     try {
@@ -709,10 +778,10 @@ function settOppTilbud() {
       // Avbryter kunden i Vipps, skal handlekurven ligge der som den var.
       window.location.href = res.redirectUrl;
     } catch (feil) {
-      vippsKnapp.disabled = false;
-      settFeil(feil.message || 'Fikk ikke åpnet Vipps. Prøv igjen, eller send forespørsel i stedet.');
+      knapp.disabled = false;
+      settFeil(feil.message || 'Fikk ikke åpnet Vipps. Prøv igjen, eller ring 412 41 285.');
     }
-  });
+  }
 }
 
 

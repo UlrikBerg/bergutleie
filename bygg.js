@@ -37,9 +37,11 @@ const slugify = (s) => s.toLowerCase()
 const sider = [];   // samles opp til sitemap
 
 /* --- felles sidemal --- */
-function layout({ url, tittel, beskrivelse, bilde, innhold, jsonld = [], klasse = '' }) {
+function layout({ url, tittel, beskrivelse, bilde, innhold, jsonld = [], klasse = '', noindex = false }) {
   const full = NETTSTED + url;
-  sider.push(url);
+  // Kassen hører ikke hjemme i søk. Den er meningsløs uten handlekurv, og
+  // en tom kasse i resultatlista er en dårlig førsteopplevelse.
+  if (!noindex) sider.push(url);
   return `<!doctype html>
 <html lang="no">
 <head>
@@ -47,7 +49,7 @@ function layout({ url, tittel, beskrivelse, bilde, innhold, jsonld = [], klasse 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(tittel)}</title>
 <meta name="description" content="${esc(beskrivelse)}">
-<link rel="canonical" href="${full}">
+${noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}<link rel="canonical" href="${full}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Berg Utleie">
 <meta property="og:locale" content="nb_NO">
@@ -235,7 +237,7 @@ function forside() {
         ${[
           ['Velg utstyr og datoer', 'Sett sammen det du trenger – 1–4 dagers leie koster det samme.'],
           ['Se prisen med en gang', 'Handlekurven viser fast totalpris – med eller uten levering.'],
-          ['Vi bekrefter innen 6 timer', 'Send forespørsel, så bekrefter vi tilgjengelighet raskt.'],
+          [`Reserver med Vipps`, `Betal ${FORSKUDD_PROSENT} % forskudd, så er utstyret ditt med en gang. Resten faktureres etter retur.`],
           ['Hent – eller få levert', 'Hent på lageret ved E6, eller få alt kjørt ut og hentet igjen.']
         ].map(([t, b], i) => `
         <div>
@@ -652,9 +654,21 @@ function handlekurv() {
         <span class="label">Totalt</span>
         <span class="value" data-total>0 kr</span>
       </div>
+      <div class="forskudd-linje" data-forskudd-linje hidden>
+        <span class="k">Du betaler nå (${FORSKUDD_PROSENT} %)</span>
+        <span class="v" data-forskudd>0 kr</span>
+      </div>
       <p class="mva">Alle priser er inkl. mva. Montering inngår ikke.</p>
-      <a class="btn btn-lg bred" href="/tilbud/">Gå videre</a>
-      <p class="uforpliktende">Uforpliktende – vi svarer innen 6 timer</p>
+
+      <a class="btn btn-lg bred" href="/reserver/" data-ga-videre>Gå videre til betaling</a>
+      <p class="uforpliktende" data-kurv-note>
+        Du betaler ${FORSKUDD_PROSENT} % for å reservere. Resten faktureres etter retur.
+      </p>
+
+      <div class="kurv-sperre" data-kurv-sperre hidden>
+        <p data-kurv-sperre-tekst></p>
+        <a class="btn-ghost bred" href="/tilbud/">Send en forespørsel i stedet</a>
+      </div>
     </aside>
   </div>
 
@@ -668,19 +682,26 @@ function handlekurv() {
   });
 }
 
-/* --- få tilbud --- */
-function tilbud() {
+/* --- reserver: kassen --- */
+function reserver() {
   const innhold = `
 <main class="wrap tilbud-side">
   <div class="tilbud-intro">
-    <h1>Få et uforpliktende tilbud</h1>
-    <p>Siste steg. Vi sjekker tilgjengelighet og sender tilbudet på e-post innen 6 timer.</p>
+    <h1>Reserver utstyret</h1>
+    <p>Du betaler ${FORSKUDD_PROSENT} % nå, så er utstyret satt av til deg.
+       Resten faktureres etter at det er levert tilbake.</p>
   </div>
+
+  <ol class="slik-virker">
+    <li><strong>Betal ${FORSKUDD_PROSENT} % med Vipps</strong><span>Utstyret reserveres til datoene dine med en gang</span></li>
+    <li><strong>Du får bekreftelse på e-post</strong><span>Med hentetidspunkt og hele bestillingen</span></li>
+    <li><strong>Resten faktureres etter retur</strong><span>Ingenting trekkes automatisk</span></li>
+  </ol>
 
   <div class="kurv-sammendrag" data-kurv-sammendrag hidden></div>
 
   <form class="tilbud-skjema" data-skjema>
-    <p class="skjema-intro">Hvem skal motta tilbudet?</p>
+    <p class="skjema-intro">Hvem booker?</p>
 
     <div class="felt-rad">
       <label><span>Fornavn</span><input type="text" name="fornavn" required autocomplete="given-name"></label>
@@ -688,22 +709,29 @@ function tilbud() {
     </div>
 
     <label><span>E-post</span><input type="email" name="epost" placeholder="navn@epost.no" required autocomplete="email"></label>
+    <label><span>Mobilnummer</span><input type="tel" name="mobil" placeholder="900 00 000" required autocomplete="tel"></label>
 
-    <label><span>Mobilnummer <em>valgfritt</em></span><input type="tel" name="mobil" placeholder="900 00 000" autocomplete="tel"></label>
+    <p class="skjema-intro" data-tid-tittel>Når passer det?</p>
+    <div class="felt-rad">
+      <label><span data-hent-etikett>Henting</span>
+        <select name="hentetid" data-hentetid required></select></label>
+      <label><span data-retur-etikett>Tilbakelevering</span>
+        <select name="returtid" data-returtid required></select></label>
+    </div>
+    <p class="tid-note" data-tid-note></p>
 
-    <label><span>Kommentar <em>valgfritt</em></span><textarea name="kommentar" placeholder="Noe vi bør vite? Tidspunkt for henting, adkomst, eller spørsmål."></textarea></label>
+    <label><span>Kommentar <em>valgfritt</em></span><textarea name="kommentar" placeholder="Noe vi bør vite? Adkomst, hvor teltet skal stå, eller spørsmål."></textarea></label>
 
     <input type="text" name="firma" tabindex="-1" autocomplete="off" class="honningkrukke" aria-hidden="true">
+
     <div class="valg">
-      <button type="button" class="btn btn-lg bred btn-vipps" data-vipps hidden>
+      <button type="submit" class="btn btn-lg bred btn-vipps" data-vipps>
         Reserver med Vipps <span data-vipps-belop></span>
       </button>
-      <p class="uforpliktende" data-vipps-note hidden>
-        Betal ${FORSKUDD_PROSENT} % nå, så er utstyret ditt. Resten faktureres etter at det er levert tilbake.
+      <p class="uforpliktende">
+        Du betaler bare forskuddet nå. Forskuddet er bindende –
+        se <a href="/leievilkar/">leievilkårene</a>.
       </p>
-
-      <button type="submit" class="btn btn-lg bred">Send forespørsel</button>
-      <p class="uforpliktende">Uforpliktende – vi svarer innen 6 timer</p>
     </div>
     <p class="skjema-status" data-skjema-status role="status"></p>
   </form>
@@ -712,8 +740,54 @@ function tilbud() {
 </main>`;
 
   return layout({
-    url: '/tilbud/', tittel: 'Få et uforpliktende tilbud | Berg Utleie',
-    beskrivelse: 'Fortell oss om festen, så sjekker vi tilgjengelighet og svarer med et konkret tilbud innen 6 timer. Uforpliktende.',
+    url: '/reserver/', tittel: 'Reserver utstyret | Berg Utleie',
+    beskrivelse: `Reserver festutstyret med Vipps. Du betaler ${FORSKUDD_PROSENT} % forskudd nå, resten faktureres etter at utstyret er levert tilbake.`,
+    innhold, noindex: true
+  });
+}
+
+/* --- forespørsel: for dem vi ikke leverer til --- */
+function tilbud() {
+  const innhold = `
+<main class="wrap tilbud-side">
+  <div class="tilbud-intro">
+    <h1>Få et tilbud</h1>
+    <p>Skal utstyret ut av området vi kjører til, eller trenger du noe utenom
+       det vanlige? Fortell oss om arrangementet, så finner vi ut av det og
+       sender deg en fast pris.</p>
+  </div>
+
+  <div class="kurv-sammendrag" data-kurv-sammendrag hidden></div>
+
+  <form class="tilbud-skjema" data-skjema data-foresporsel>
+    <p class="skjema-intro">Hvem skal motta tilbudet?</p>
+
+    <div class="felt-rad">
+      <label><span>Fornavn</span><input type="text" name="fornavn" required autocomplete="given-name"></label>
+      <label><span>Etternavn</span><input type="text" name="etternavn" required autocomplete="family-name"></label>
+    </div>
+
+    <label><span>E-post</span><input type="email" name="epost" placeholder="navn@epost.no" required autocomplete="email"></label>
+    <label><span>Mobilnummer <em>valgfritt</em></span><input type="tel" name="mobil" placeholder="900 00 000" autocomplete="tel"></label>
+
+    <label><span>Hvor skal det leveres?</span>
+      <input type="text" name="stedtekst" placeholder="Sted eller adresse"></label>
+
+    <label><span>Fortell oss om arrangementet</span>
+      <textarea name="kommentar" placeholder="Når, hvor, hvor mange gjester – og hva du trenger."></textarea></label>
+
+    <input type="text" name="firma" tabindex="-1" autocomplete="off" class="honningkrukke" aria-hidden="true">
+    <div class="valg">
+      <button type="submit" class="btn btn-lg bred">Send forespørsel</button>
+      <p class="uforpliktende">Uforpliktende – vi svarer innen 6 timer</p>
+    </div>
+    <p class="skjema-status" data-skjema-status role="status"></p>
+  </form>
+</main>`;
+
+  return layout({
+    url: '/tilbud/', tittel: 'Få et tilbud | Berg Utleie',
+    beskrivelse: 'Skal utstyret utenfor området vi leverer til, eller trenger du noe utenom det vanlige? Send en forespørsel, så får du fast pris innen 6 timer.',
     innhold
   });
 }
@@ -904,6 +978,7 @@ await skriv('utstyr', katalog());
 await skriv('selskapspakker', pakkeside());
 await skriv('handlekurv', handlekurv());
 await skriv('tilbud', tilbud());
+await skriv('reserver', reserver());
 await skriv('leievilkar', leievilkar());
 await skriv('personvern', personvern());
 for (const p of PRODUKTER) await skriv(join('utstyr', p.slug), produktside(p));

@@ -28,7 +28,8 @@
    som helst endret summen mellom de to stegene.
    ======================================================================== */
 
-import { klargjor, sendVarsel } from './foresporsel.js';
+import { klargjor, sendVarsel, sendKundebekreftelse } from './foresporsel.js';
+import { sjekkBooking } from './pris.js';
 import { opprettBetaling, hentBetaling, trekk, erSattOpp, verifiserWebhook, VippsFeil } from './vipps.js';
 import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '../data/vilkar.js';
 
@@ -65,14 +66,14 @@ export async function handterStartBetaling(request, env) {
 
   const d = klar.felles;
 
-  // Utenfor fraktsonene finnes det ingen totalpris ennå, og da kan det
-  // heller ikke tas betalt. De skal gå som vanlig forespørsel.
-  if (klar.pris.tilbudspris) {
-    return json(409, {
-      feil: 'Vi må sette prisen for utkjøring manuelt hit. Send forespørsel, så får du et tilbud.',
-      tilbudspris: true
-    });
-  }
+  // En betalt reservasjon må ha dato og klokkeslett vi kan møte opp på.
+  // Nettleseren sjekker det samme, men den kan omgås.
+  const bookbar = sjekkBooking({
+    fra: klar.rå.fra, til: klar.rå.til,
+    hentetid: d.hentetid, returtid: d.returtid,
+    modus: klar.rå.modus, adresse: klar.rå.kommune
+  });
+  if (!bookbar.ok) return json(400, { feil: bookbar.feil });
 
   const ore = Math.round(d.total * FORSKUDD_ANDEL) * 100;
   if (ore < 100) return json(400, { feil: 'Beløpet er for lavt.' });
@@ -209,7 +210,13 @@ async function fullfor(env, referanse, d, betaling) {
 
   const ferdig = { ...d, vippsRef: referanse, status: 'ferdig' };
   await env.TELLER.put(`booking:${referanse}`, JSON.stringify(ferdig), { expirationTtl: FERDIG_TID });
-  await sendVarsel(env, ferdig, { betalt: true }).catch(() => {});
+
+  // Varsel til lageret og bekreftelse til kunden. Begge feiler stille –
+  // pengene er trukket, og bookingen skal ikke gå tapt fordi Resend er nede.
+  await Promise.allSettled([
+    sendVarsel(env, ferdig, { betalt: true }),
+    sendKundebekreftelse(env, ferdig)
+  ]);
   return 'ferdig';
 }
 

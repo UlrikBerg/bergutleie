@@ -17,6 +17,7 @@
 import { lagBilag } from './bilag.js';
 import { regnUt } from './pris.js';
 import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '../data/vilkar.js';
+import { APNINGSTID_TEKST } from '../data/apningstid.js';
 
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
 const MVA_SATS = 0.25;          // prisene på nettsiden er oppgitt inkl. mva
@@ -72,11 +73,7 @@ export async function handterForesporsel(request, env) {
   // Totalen sendes tilbake så konverteringen til Google Ads får serverens
   // tall, ikke nettleserens. Ellers kunne annonsestatistikken vise
   // ordreverdier som aldri fantes.
-  return svar(200, {
-    ok: true,
-    total: klar.felles.total,
-    tilbudspris: klar.felles.tilbudspris
-  });
+  return svar(200, { ok: true, total: klar.felles.total });
 }
 
 /**
@@ -111,6 +108,11 @@ export async function klargjor(data, env) {
   const utenMva = Math.round(total / (1 + MVA_SATS));
   const mva = total - utenMva;
 
+  // Klokkeslett for henting og retur. Valideres mot åpningstidene i
+  // sjekkBooking() før det tas betalt – her bare leses de inn.
+  const hentetid = /^\d{2}:\d{2}$/.test(data.hentetid || '') ? data.hentetid : '';
+  const returtid = /^\d{2}:\d{2}$/.test(data.returtid || '') ? data.returtid : '';
+
   const periode = fra && til ? `${norskDato(fra)} – ${norskDato(til)}` : 'Ikke valgt';
   const levering = tekst(data.levering, 200) || 'Ikke oppgitt';
   // Samme kilde som frakten regnes ut fra. Leses den av teksten i stedet,
@@ -130,9 +132,10 @@ export async function klargjor(data, env) {
 
   const felles = { navn, mobil, epost, periode, dagerLabel, levering, henter,
                    varer, leie, frakt, total, utenMva, mva, kommentar,
-                   gclid, gclidType, tilbudspris: pris.tilbudspris,
-                   hentDato: fra ? norskDato(fra) : 'avtales',
-                   returDato: til ? norskDato(til) : 'avtales',
+                   gclid, gclidType,
+                   hentetid, returtid,
+                   hentDato: (fra ? norskDato(fra) : 'avtales') + (hentetid ? ` kl. ${hentetid}` : ''),
+                   returDato: (til ? norskDato(til) : 'avtales') + (returtid ? ` kl. ${returtid}` : ''),
                    tilbudsnr,
                    kontonr: KONTONR, orgnr: ORGNR, epostFirma: EPOST,
                    utstedt: `${naa.dag}. ${MANEDER[naa.maned]} ${naa.aar}`,
@@ -141,7 +144,9 @@ export async function klargjor(data, env) {
                    rest: total - Math.round(total * FORSKUDD_ANDEL),
                    forskuddProsent: FORSKUDD_PROSENT };
 
-  return { felles, pris };
+  // `rå` er det klienten sendte, etter opprydding. Betalingsflyten trenger
+  // det for å validere booking mot åpningstidene.
+  return { felles, pris, rå: { fra, til, modus: tekst(data.modus, 10), kommune: tekst(data.kommune, 80) } };
 }
 
 /**
@@ -180,6 +185,174 @@ export async function sendVarsel(env, d, { betalt = false } = {}) {
     })
   });
   return res.ok;
+}
+
+/**
+ * Bekreftelse til kunden etter betalt reservasjon.
+ *
+ * Uten denne har kunden ingenting å vise til når fanen er lukket – bare et
+ * trekk i Vipps. Da ringer de og spør om det gikk gjennom, hva de har
+ * bestilt, og når de skal hente. Alt det står her.
+ */
+export async function sendKundebekreftelse(env, d) {
+  if (!env.RESEND_API_KEY) return false;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: AVSENDER,
+      to: [d.epost],
+      reply_to: env.VARSEL_TIL || 'kontakt@bergevent.no',
+      subject: `Bookingen din er bekreftet – Berg Utleie #${d.tilbudsnr}`,
+      html: kundeHtml(d),
+      text: kundeTekst(d),
+      attachments: [{
+        filename: `Booking-${d.tilbudsnr}-Berg-Utleie.pdf`,
+        content: lagBilag(d)
+      }]
+    })
+  });
+  return res.ok;
+}
+
+function kundeHtml(d) {
+  const rad = (etikett, verdi) => `
+    <tr>
+      <td style="padding:7px 16px 7px 0;font-size:14px;color:${C.dempet2};white-space:nowrap;vertical-align:top;">${etikett}</td>
+      <td style="padding:7px 0;font-size:15px;color:${C.ink};font-weight:600;">${verdi}</td>
+    </tr>`;
+
+  return `<!doctype html>
+<html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bookingen din er bekreftet</title></head>
+<body style="margin:0;padding:0;background:${C.bg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.bg};padding:24px 12px;">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid ${C.linje};">
+
+  <tr><td style="background:${C.ink};padding:28px 30px;">
+    <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#7FA09E;">Berg Utleie</p>
+    <h1 style="margin:0;font-size:24px;font-weight:800;color:#ffffff;">Bookingen din er bekreftet</h1>
+    <p style="margin:8px 0 0;font-size:15px;color:#BCD0CE;">Booking #${d.tilbudsnr} · utstyret er reservert til deg</p>
+  </td></tr>
+
+  <tr><td style="padding:26px 30px 4px;">
+    <p style="margin:0 0 18px;font-size:16px;color:${C.ink};line-height:1.6;">
+      Hei ${esc(d.navn.split(' ')[0])}, takk for bestillingen! Vi har mottatt
+      <strong>${nok(d.forskudd)}</strong> i forskudd, og utstyret er satt av til deg.
+    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+      ${rad(d.henter ? 'Hentes' : 'Leveres ut', esc(d.hentDato))}
+      ${rad(d.henter ? 'Leveres tilbake' : 'Hentes igjen', esc(d.returDato))}
+      ${rad(d.henter ? 'Sted' : 'Adresse', d.henter
+          ? 'Sørliveien 78, 1788 Halden<br><span style="font-weight:400;color:' + C.dempet + ';font-size:13.5px;">Rett ved E6</span>'
+          : esc(d.levering))}
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:20px 30px 0;">
+    <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:${C.aksent};">Dette har du bestilt</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      ${d.varer.map(v => `
+      <tr>
+        <td style="padding:8px 8px 8px 0;border-bottom:1px solid ${C.linje};font-size:15px;color:${C.ink};">
+          ${Number(v.antall) || 0} × ${esc(v.navn)}
+        </td>
+        <td style="padding:8px 0;border-bottom:1px solid ${C.linje};font-size:15px;color:${C.ink};text-align:right;white-space:nowrap;">
+          ${nok(v.sum)}
+        </td>
+      </tr>`).join('')}
+      ${d.frakt ? `
+      <tr>
+        <td style="padding:8px 8px 8px 0;border-bottom:1px solid ${C.linje};font-size:15px;color:${C.ink};">Levering og henting</td>
+        <td style="padding:8px 0;border-bottom:1px solid ${C.linje};font-size:15px;color:${C.ink};text-align:right;">${nok(d.frakt)}</td>
+      </tr>` : ''}
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:16px 30px 26px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding:10px 0;font-size:16px;color:${C.ink};font-weight:700;border-top:2px solid ${C.ink};">Totalt</td>
+        <td style="padding:10px 0;font-size:18px;color:${C.ink};text-align:right;font-weight:800;border-top:2px solid ${C.ink};">${nok(d.total)}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:14.5px;color:#1E7A44;font-weight:600;">Betalt nå med Vipps (${d.forskuddProsent} %)</td>
+        <td style="padding:6px 0;font-size:14.5px;color:#1E7A44;text-align:right;font-weight:700;">− ${nok(d.forskudd)}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:14.5px;color:${C.dempet};">Faktureres etter retur</td>
+        <td style="padding:6px 0;font-size:14.5px;color:${C.ink};text-align:right;font-weight:700;">${nok(d.rest)}</td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:0 30px 26px;">
+    <div style="background:${C.bg};border-radius:10px;padding:18px 20px;">
+      <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:${C.ink};">Godt å vite</p>
+      <p style="margin:0 0 6px;font-size:14px;color:${C.dempet};line-height:1.6;">
+        Restbeløpet på ${nok(d.rest)} faktureres først etter at utstyret er levert tilbake – ingenting mer trekkes automatisk.
+      </p>
+      <p style="margin:0 0 6px;font-size:14px;color:${C.dempet};line-height:1.6;">
+        Montering inngår ikke. Trenger du hjelp til opprigg, si fra i god tid.
+      </p>
+      <p style="margin:0;font-size:14px;color:${C.dempet};line-height:1.6;">
+        Må noe endres, eller passer ikke datoen likevel? Svar på denne e-posten, så finner vi en løsning.
+      </p>
+    </div>
+  </td></tr>
+
+  <tr><td style="background:${C.bg};padding:18px 30px;border-top:1px solid ${C.linje};">
+    <p style="margin:0 0 4px;font-size:13px;color:${C.ink};font-weight:600;">Berg Utleie</p>
+    <p style="margin:0;font-size:12.5px;color:${C.dempet2};line-height:1.7;">
+      Sørliveien 78, 1788 Halden · ${APNINGSTID_TEKST}<br>
+      <a href="mailto:${EPOST}" style="color:${C.dempet};">${EPOST}</a> ·
+      <a href="tel:+4741241285" style="color:${C.dempet};">412 41 285</a> ·
+      <a href="https://bergutleie.no" style="color:${C.dempet};">bergutleie.no</a><br>
+      Et varemerke av Berg Event · Org.nr. ${ORGNR}
+    </p>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+function kundeTekst(d) {
+  return [
+    `Hei ${d.navn.split(' ')[0]},`,
+    '',
+    `Takk for bestillingen! Bookingen din er bekreftet, og utstyret er reservert til deg.`,
+    '',
+    `BOOKING #${d.tilbudsnr}`,
+    `  ${d.henter ? 'Hentes:         ' : 'Leveres ut:     '} ${d.hentDato}`,
+    `  ${d.henter ? 'Leveres tilbake:' : 'Hentes igjen:   '} ${d.returDato}`,
+    d.henter
+      ? '  Sted:            Sørliveien 78, 1788 Halden (rett ved E6)'
+      : `  Adresse:         ${d.levering}`,
+    '',
+    'DETTE HAR DU BESTILT',
+    ...d.varer.map(v => `  ${v.antall} × ${v.navn} — ${nok(v.sum)}`),
+    ...(d.frakt ? [`  Levering og henting — ${nok(d.frakt)}`] : []),
+    '',
+    `  Totalt:                ${nok(d.total)}`,
+    `  Betalt nå med Vipps:   ${nok(d.forskudd)} (${d.forskuddProsent} %)`,
+    `  Faktureres etter retur: ${nok(d.rest)}`,
+    '',
+    'GODT Å VITE',
+    `  Restbeløpet faktureres først etter at utstyret er levert tilbake.`,
+    '  Montering inngår ikke.',
+    '  Må noe endres, svar på denne e-posten.',
+    '',
+    'Berg Utleie',
+    `Sørliveien 78, 1788 Halden · ${APNINGSTID_TEKST}`,
+    `${EPOST} · 412 41 285 · bergutleie.no`,
+    `Et varemerke av Berg Event · Org.nr. ${ORGNR}`
+  ].join('\n');
 }
 
 /* ---------------------------------------------------------------- HTML --- */
@@ -443,10 +616,7 @@ function tekst(v, maks) {
   return typeof v === 'string' ? v.trim().slice(0, maks) : '';
 }
 
-/** Ligger adressen utenfor sonene, er frakten ikke null – den er ikke satt
-    ennå. «0 kr» ville lest som gratis utkjøring. */
 function fraktTekst(d) {
-  if (d.tilbudspris) return 'Etter avtale';
   return d.frakt ? nok(d.frakt) : '0 kr';
 }
 
