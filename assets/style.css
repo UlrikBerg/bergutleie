@@ -86,15 +86,54 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .slik-virker li::before {
   content: counter(steg); grid-row: span 2;
   width: 1.6rem; height: 1.6rem; border-radius: 50%;
-  background: var(--ink, #113B3F); color: #fff;
+  background: #fff; color: var(--muted, #5A6E6D);
+  border: 1.5px solid #D5DBD7;
   font-size: .8rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
 }
+/* Steget kunden står i nå. Grønn fordi den signaliserer framdrift – men
+   den er markert som AKTIV, ikke som fullført. Å vise «betalt» før noen
+   har betalt ville vært å lyve om hvor man er i løpet. */
+.slik-virker li.na::before { background: #1E7A44; color: #fff; border-color: #1E7A44; }
+.slik-virker li.na strong { color: var(--ink, #113B3F); }
+.slik-virker li:not(.na) strong { color: var(--muted, #5A6E6D); font-weight: 600; }
 .slik-virker strong { font-size: .98rem; }
 .slik-virker span { grid-column: 2; font-size: .88rem; color: var(--muted, #5A6E6D); }
 
-.tid-note { margin: -.35rem 0 1rem; font-size: .85rem; color: var(--muted, #5A6E6D); }
+/* Dagen står over klokkeslettet, så valget gir mening uten å bla opp. */
+.felt-dag {
+  display: block; margin: -.15rem 0 .35rem;
+  font-size: .85rem; font-weight: 600; color: var(--accent, #E8562E);
+  text-transform: capitalize;
+}
+.tid-note { margin: -.35rem 0 1rem; font-size: .85rem; color: var(--muted, #5A6E6D); line-height: 1.5; }
 .tid-note.feil { color: #B4341C; font-weight: 600; }
+
+/* --- sammendraget i kassen --- */
+.sammendrag-topp {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .9rem;
+}
+.sammendrag-topp a { font-size: .85rem; font-weight: 600; }
+.sammendrag-varer { list-style: none; margin: 0 0 1rem; padding: 0; }
+.sammendrag-varer li {
+  display: grid; grid-template-columns: 2rem 1fr auto; gap: .6rem;
+  align-items: baseline; padding: .45rem 0;
+  border-bottom: 1px solid var(--line, #E5E7E1);
+}
+.sammendrag-varer .v-antall { color: var(--muted, #5A6E6D); font-variant-numeric: tabular-nums; }
+.sammendrag-varer .v-navn { font-weight: 600; }
+.sammendrag-varer .v-sum { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.sammendrag-sum { margin-top: 1rem; padding-top: .9rem; border-top: 2px solid var(--ink, #113B3F); }
+.sammendrag-sum .rad {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: .18rem 0; font-size: .95rem;
+}
+.sammendrag-sum .rad span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sammendrag-sum .total { font-size: 1.15rem; font-weight: 800; margin-bottom: .45rem; }
+.sammendrag-sum .na { color: #1E7A44; font-weight: 700; }
+.sammendrag-sum .rest { color: var(--muted, #5A6E6D); }
 
 .forskudd-linje {
   display: flex; justify-content: space-between; align-items: baseline;

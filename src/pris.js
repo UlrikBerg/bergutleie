@@ -20,7 +20,7 @@
 
 import { PRODUKTER, SONER, enhetspris } from '../data/produkter.js';
 import { soneForKommune } from '../data/kommuner.js';
-import { gyldigTid, erStengt } from '../data/apningstid.js';
+import { gyldigTid } from '../data/apningstid.js';
 
 const MAKS_LINJER = 60;      // flere varelinjer enn dette er ikke en ekte booking
 const MAKS_ANTALL = 99;      // per varelinje
@@ -38,15 +38,10 @@ export function sjekkBooking({ fra, til, hentetid, returtid, modus, adresse }) {
   const d = antallDager(fra, til);
   if (!d.har) return { ok: false, feil: 'Returdatoen må være etter hentedatoen.' };
 
-  if (erStengt(fra)) return { ok: false, feil: 'Lageret er stengt på lørdager. Velg en annen hentedag.' };
-  if (erStengt(til)) return { ok: false, feil: 'Lageret er stengt på lørdager. Velg en annen returdag.' };
-
-  if (!gyldigTid(fra, hentetid)) {
-    return { ok: false, feil: 'Velg et tidspunkt for henting innenfor åpningstiden.' };
-  }
-  if (!gyldigTid(til, returtid)) {
-    return { ok: false, feil: 'Velg et tidspunkt for tilbakelevering innenfor åpningstiden.' };
-  }
+  // Alle tidspunkt mellom 07 og 22 er lov, hver dag. Er lageret ubemannet,
+  // er henting og tilbakelevering selvbetjent – ikke umulig.
+  if (!gyldigTid(fra, hentetid)) return { ok: false, feil: 'Velg et tidspunkt for henting.' };
+  if (!gyldigTid(til, returtid)) return { ok: false, feil: 'Velg et tidspunkt for tilbakelevering.' };
 
   if (modus === 'lev' && !adresse) {
     return { ok: false, feil: 'Velg leveringsadressen fra listen.' };

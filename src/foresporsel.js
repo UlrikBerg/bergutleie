@@ -17,7 +17,7 @@
 import { lagBilag } from './bilag.js';
 import { regnUt } from './pris.js';
 import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '../data/vilkar.js';
-import { APNINGSTID_TEKST } from '../data/apningstid.js';
+import { APNINGSTID_TEKST, erBetjent } from '../data/apningstid.js';
 
 const AVSENDER = 'Berg Utleie <skjema@bergutleie.no>';
 const MVA_SATS = 0.25;          // prisene på nettsiden er oppgitt inkl. mva
@@ -134,8 +134,12 @@ export async function klargjor(data, env) {
                    varer, leie, frakt, total, utenMva, mva, kommentar,
                    gclid, gclidType,
                    hentetid, returtid,
-                   hentDato: (fra ? norskDato(fra) : 'avtales') + (hentetid ? ` kl. ${hentetid}` : ''),
-                   returDato: (til ? norskDato(til) : 'avtales') + (returtid ? ` kl. ${returtid}` : ''),
+                   // «(selvbetjent)» står i bekreftelsen og på bilaget, slik at
+                   // kunden ikke møter en låst dør og lurer på om noe er galt.
+                   hentSelvbetjent: !!(fra && hentetid) && !erBetjent(fra, hentetid),
+                   returSelvbetjent: !!(til && returtid) && !erBetjent(til, returtid),
+                   hentDato: medTid(fra, hentetid),
+                   returDato: medTid(til, returtid),
                    tilbudsnr,
                    kontonr: KONTONR, orgnr: ORGNR, epostFirma: EPOST,
                    utstedt: `${naa.dag}. ${MANEDER[naa.maned]} ${naa.aar}`,
@@ -636,6 +640,13 @@ function norskNaa() {
     timeZone: 'Europe/Oslo', year: 'numeric', month: '2-digit', day: '2-digit'
   }).format(new Date()).split('-');            // «2026-08-17»
   return { aar: +deler[0], maned: +deler[1] - 1, dag: +deler[2] };
+}
+
+/** «4. juli 2026 kl. 20:00 (selvbetjent)» */
+function medTid(iso, tid) {
+  if (!iso) return 'avtales';
+  if (!tid) return norskDato(iso);
+  return `${norskDato(iso)} kl. ${tid}` + (erBetjent(iso, tid) ? '' : ' (selvbetjent)');
 }
 
 /** 2026-07-04 → 4. juli 2026 */

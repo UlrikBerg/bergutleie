@@ -693,7 +693,7 @@ function reserver() {
   </div>
 
   <ol class="slik-virker">
-    <li><strong>Betal ${FORSKUDD_PROSENT} % med Vipps</strong><span>Utstyret reserveres til datoene dine med en gang</span></li>
+    <li class="na"><strong>Betal ${FORSKUDD_PROSENT} % med Vipps</strong><span>Utstyret reserveres til datoene dine med en gang</span></li>
     <li><strong>Du får bekreftelse på e-post</strong><span>Med hentetidspunkt og hele bestillingen</span></li>
     <li><strong>Resten faktureres etter retur</strong><span>Ingenting trekkes automatisk</span></li>
   </ol>
@@ -711,12 +711,18 @@ function reserver() {
     <label><span>E-post</span><input type="email" name="epost" placeholder="navn@epost.no" required autocomplete="email"></label>
     <label><span>Mobilnummer</span><input type="tel" name="mobil" placeholder="900 00 000" required autocomplete="tel"></label>
 
-    <p class="skjema-intro" data-tid-tittel>Når passer det?</p>
+    <p class="skjema-intro">Når ser du for deg henting og tilbakelevering?</p>
     <div class="felt-rad">
-      <label><span data-hent-etikett>Henting</span>
-        <select name="hentetid" data-hentetid required></select></label>
-      <label><span data-retur-etikett>Tilbakelevering</span>
-        <select name="returtid" data-returtid required></select></label>
+      <label>
+        <span data-hent-etikett>Henting</span>
+        <span class="felt-dag" data-hent-dag></span>
+        <select name="hentetid" data-hentetid required></select>
+      </label>
+      <label>
+        <span data-retur-etikett>Tilbakelevering</span>
+        <span class="felt-dag" data-retur-dag></span>
+        <select name="returtid" data-returtid required></select>
+      </label>
     </div>
     <p class="tid-note" data-tid-note></p>
 

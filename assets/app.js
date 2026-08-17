@@ -13,7 +13,7 @@ import { lagAdressesok } from '/assets/adressesok.js';
 import { oppsettSvg } from '/data/oppsett-svg.js';
 import { startMaling, hentGclid, sporForesporsel } from '/assets/maling.js';
 import { FORSKUDD_ANDEL, FORSKUDD_PROSENT } from '/data/vilkar.js';
-import { tiderFor, erStengt, APNINGSTID_TEKST } from '/data/apningstid.js';
+import { tiderFor, dagNavn, APNINGSTID_TEKST } from '/data/apningstid.js';
 
 const NOKKEL = 'bergutleie-kurv';
 const ADRESSE_NOKKEL = 'bergutleie-adresse';
@@ -622,15 +622,32 @@ function settOppTilbud() {
       ? (bestilling.adresse ? 'Leveres til ' + bestilling.adresse : 'Leveres – adresse mangler')
       : 'Hentes i Sørliveien 78, 1788 Halden';
 
+    const forskudd = Math.round(s.total * FORSKUDD_ANDEL);
     sammendrag.innerHTML = `
-      <p class="sammendrag-tittel">Din bestilling</p>
-      <ul>${varer.map(p => `<li>${antall(p.id)} × ${p.navn}</li>`).join('')}</ul>
+      <div class="sammendrag-topp">
+        <p class="sammendrag-tittel">Din bestilling</p>
+        <a href="/handlekurv/">Endre</a>
+      </div>
+
+      <ul class="sammendrag-varer">
+        ${varer.map(p => `<li>
+          <span class="v-antall">${antall(p.id)}</span>
+          <span class="v-navn">${p.navn}</span>
+          <span class="v-sum">${kr(antall(p.id) * enhetspris(p, s.d.n))}</span>
+        </li>`).join('')}
+      </ul>
+
       <dl class="sammendrag-fakta">
         <dt>Leieperiode</dt><dd>${periode}</dd>
         <dt>${bestilling.modus === 'lev' ? 'Levering' : 'Henting'}</dt><dd>${levering}</dd>
+        ${s.levering ? `<dt>Frakt</dt><dd>${kr(s.levering)}</dd>` : ''}
       </dl>
-      <p class="sammendrag-sum">Totalt: <strong>${s.utenforSone ? '—' : kr(s.total)}</strong></p>
-      <p class="sammendrag-note"><a href="/handlekurv/">← Endre i handlekurven</a></p>`;
+
+      <div class="sammendrag-sum">
+        <div class="rad total"><span>Totalt</span><span>${s.utenforSone ? '—' : kr(s.total)}</span></div>
+        ${s.kanBookes ? `<div class="rad na"><span>Du betaler nå (${FORSKUDD_PROSENT} %)</span><span>${kr(forskudd)}</span></div>
+        <div class="rad rest"><span>Faktureres etter retur</span><span>${kr(s.total - forskudd)}</span></div>` : ''}
+      </div>`;
   };
 
   tegnSammendrag();
@@ -652,27 +669,29 @@ function settOppTilbud() {
     skjema.querySelector('[data-hent-etikett]').textContent = lev ? 'Levering' : 'Henting';
     skjema.querySelector('[data-retur-etikett]').textContent = lev ? 'Vi henter igjen' : 'Tilbakelevering';
 
-    const fyll = (el, iso) => {
+    // Datoen står over velgeren, ikke bare i sammendraget lenger oppe.
+    // Kunden skal se hvilken dag klokkeslettet gjelder mens de velger det.
+    skjema.querySelector('[data-hent-dag]').textContent = dagNavn(bestilling.fra);
+    skjema.querySelector('[data-retur-dag]').textContent = dagNavn(bestilling.til);
+
+    const fyll = (el, iso, forvalg) => {
       const tider = tiderFor(iso);
       el.innerHTML = tider.length
-        ? tider.map(t => `<option value="${t}">${t}</option>`).join('')
+        ? tider.map(({ tid, betjent }) =>
+            `<option value="${tid}"${tid === forvalg ? ' selected' : ''}>${tid}${betjent ? '' : ' · selvbetjent'}</option>`).join('')
         : '<option value="">—</option>';
       el.disabled = !tider.length;
     };
-    fyll(hentetid, bestilling.fra);
-    fyll(returtid, bestilling.til);
+    // Forvalg midt i betjent tid der det finnes, ellers formiddag.
+    fyll(hentetid, bestilling.fra, '12:00');
+    fyll(returtid, bestilling.til, '12:00');
 
-    // Lørdag er stengt. Uten dette kunne kunden betalt for en henting
-    // som ikke kan skje.
-    const stengt = [bestilling.fra, bestilling.til].filter(erStengt);
     if (!bestilling.fra || !bestilling.til) {
       note.textContent = 'Velg datoer i handlekurven først.';
       note.className = 'tid-note feil';
-    } else if (stengt.length) {
-      note.textContent = 'Lageret er stengt på lørdager. Velg en annen dag i handlekurven.';
-      note.className = 'tid-note feil';
     } else {
-      note.textContent = APNINGSTID_TEKST;
+      note.textContent = 'Utenfor betjent tid er henting og tilbakelevering selvbetjent. '
+        + APNINGSTID_TEKST + '.';
       note.className = 'tid-note';
     }
   }
