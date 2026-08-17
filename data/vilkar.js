@@ -39,4 +39,4 @@ export const REST_PROSENT = 100 - FORSKUDD_PROSENT;
    NÅR DU SETTER NØKLENE: sett denne til `true` og push i samme slengen.
    Se VIPPS.md.
    ------------------------------------------------------------------------ */
-export const VIPPS_I_DRIFT = false;
+export const VIPPS_I_DRIFT = true;   // satt i drift 17. august 2026
