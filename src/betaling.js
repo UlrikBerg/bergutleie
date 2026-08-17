@@ -230,8 +230,9 @@ function kvittering(d) {
       og utstyret er reservert til deg.</p>
     <dl>
       <dt>Bookingnummer</dt><dd>#${esc(d.tilbudsnr)}</dd>
-      <dt>Periode</dt><dd>${esc(d.periode)}</dd>
-      <dt>${d.henter ? 'Henting' : 'Levering'}</dt><dd>${esc(d.levering)}</dd>
+      <dt>${d.henter ? 'Hentes' : 'Leveres ut'}</dt><dd>${esc(d.hentDato)}</dd>
+      <dt>${d.henter ? 'Leveres tilbake' : 'Hentes igjen'}</dt><dd>${esc(d.returDato)}</dd>
+      <dt>${d.henter ? 'Sted' : 'Adresse'}</dt><dd>${esc(d.henter ? 'Sørliveien 78, 1788 Halden' : d.levering)}</dd>
       <dt>Totalt</dt><dd>${nok(d.total)}</dd>
       <dt>Betalt nå</dt><dd>${nok(d.forskudd)} (${d.forskuddProsent} %)</dd>
       <dt>Faktureres etterpå</dt><dd>${nok(d.rest)}</dd>
